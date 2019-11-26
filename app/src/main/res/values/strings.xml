@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">ECO</string>
+    <string name="next_text">Далее</string>
+    <string name="skip_text">Пропустить</string>
+
+    <string name="on_board_text1">Федеральная картра для всех моек в одном приложении</string>
+    <string name="on_board_text2">Получай кешбэк с каждой мойки</string>
+    <string name="on_board_text3">Отслеживай все операции по карте</string>
+
 </resources>
