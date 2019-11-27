@@ -1,7 +1,7 @@
 package com.voodoolab.eco.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.SkipListener
 import com.voodoolab.eco.ui.onboarding.OnBoardContainerFragment
@@ -25,8 +25,7 @@ class MainActivity : AppCompatActivity(), SkipListener {
 
     override fun skipGuide() {
         supportFragmentManager?.beginTransaction()
-            .setCustomAnimations(R.anim.enter_from_right, R.anim.nav_default_exit_anim)
-            .replace(R.id.fragment_container, AuthFragment(), "auth")
-            .commit()
+            ?.setCustomAnimations(R.anim.enter_from_right, R.anim.nav_default_exit_anim)
+            ?.replace(R.id.fragment_container, AuthFragment(), "auth")?.commit()
     }
 }
