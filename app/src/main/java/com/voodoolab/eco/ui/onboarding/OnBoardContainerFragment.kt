@@ -1,5 +1,7 @@
 package com.voodoolab.eco.ui.onboarding
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,11 +21,13 @@ import com.voodoolab.eco.adapters.OnboardingRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.OnSnapPositionChangeListener
 import com.voodoolab.eco.interfaces.SkipListener
 import com.voodoolab.eco.models.OnboardModel
+import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.utils.SnapOnScrollListener
 
-class OnBoardContainerFragment(var skipListener: SkipListener?) : Fragment(),
+class OnBoardContainerFragment() : Fragment(),
     OnSnapPositionChangeListener {
 
+    var skipListener: SkipListener? = null
     var skipButton: Button? = null
     var nextButton: Button? = null
     var pageIndicator: PageIndicatorView? = null
@@ -63,6 +67,19 @@ class OnBoardContainerFragment(var skipListener: SkipListener?) : Fragment(),
         initViews(view)
         initOnBoard()
         setList()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainActivity) {
+            println("DEBUG: присоединил слушателя")
+            skipListener = context
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        skipListener = null
     }
 
     private fun initViews(view: View) {

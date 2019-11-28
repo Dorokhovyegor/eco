@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/menu_graph"
+    app:startDestination="@id/onBoardContainerFragment">
+    <fragment
+        tools:layout="@layout/onboard_layout"
+        android:id="@+id/onBoardContainerFragment"
+        android:name="com.voodoolab.eco.ui.onboarding.OnBoardContainerFragment"
+        android:label="OnBoardContainerFragment" >
+        <action
+            android:id="@+id/action_onBoardContainerFragment_to_authFragment"
+            app:destination="@id/authFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/auth_layout"
+        android:id="@+id/authFragment"
+        android:name="com.voodoolab.eco.ui.AuthFragment"
+        android:label="AuthFragment" >
+        <action
+            android:id="@+id/action_authFragment_to_containerFragment"
+            app:destination="@id/containerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/containerFragment"
+        android:name="com.voodoolab.eco.ui.ContainerFragment"
+        android:label="ContainerFragment" />
+</navigation>
