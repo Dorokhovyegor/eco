@@ -48,4 +48,6 @@ dependencies {
 
     implementation "ru.tinkoff.decoro:decoro:$decoro_version"
 
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+
 }
