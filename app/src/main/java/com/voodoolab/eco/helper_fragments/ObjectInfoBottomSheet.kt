@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.voodoolab.eco.R
 
-class ObjectInfoBottomSheet : BottomSheetDialogFragment() {
+class ObjectInfoBottomSheet: BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -16,4 +16,5 @@ class ObjectInfoBottomSheet : BottomSheetDialogFragment() {
     ): View? {
         return inflater.inflate(R.layout.object_info_layout, container,false)
     }
+
 }

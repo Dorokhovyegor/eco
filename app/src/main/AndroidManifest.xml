@@ -18,7 +18,14 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCds68yTlQhL1rsAwSVR51vuUwIKL5aMeQ"/>
 
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
+
         <activity android:name=".ui.MainActivity">
+
+        </activity>
+        <activity android:name=".ui.PaymentActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

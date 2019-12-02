@@ -6,4 +6,7 @@
     <color name="activeColor">#27AE60</color>
     <color name="white">#fff</color>
     <color name="black">#000</color>
+    <color name="grey">#E0E0E0</color>
+    <color name="grey_from_Serge">#E0E0E0</color>
+    <color name="transparent">#00FFFFFF</color>
 </resources>

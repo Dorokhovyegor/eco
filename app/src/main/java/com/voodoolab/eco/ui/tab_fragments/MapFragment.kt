@@ -11,6 +11,7 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import com.voodoolab.eco.R
+import com.voodoolab.eco.helper_fragments.ObjectInfoBottomSheet
 import com.voodoolab.eco.ui.MainActivity
 
 class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
@@ -19,13 +20,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private var mapView: MapView? = null
     private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
 
-    private val PERTH = LatLng(-31.952854, 115.857342)
-    private val SYDNEY = LatLng(-33.87365, 151.20689)
-    private val BRISBANE = LatLng(-27.47093, 153.0235)
+    private val ecoVolgograd1 = LatLng(48.6809142, 44.4448137)
+    private val ecoVolgograd2 = LatLng(48.5848916, 44.4207241)
+    private val ecoVolgograd3 = LatLng(48.5153207, 44.5327722)
+    private val ecoVolgograd4 = LatLng(48.7255262, 44.4867742)
+    private val ecoVolgograd5 = LatLng(48.7494673, 44.490054)
+    private val ecoVolgograd6 = LatLng(48.7862051, 44.5887283)
 
-    private var mPerth: Marker? = null
-    private var mSydney: Marker? = null
-    private var mBrisbane: Marker? = null
+    private var stadionnay: Marker? = null
+    private var fruktovay: Marker? = null
+    private var heroes: Marker? = null
+    private var zhukova: Marker? = null
+    private var pobedi: Marker? = null
+    private var lenina: Marker? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,9 +49,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         val viewStub = view.findViewById<ViewStub>(R.id.view_stub)
         mapView = viewStub.inflate() as MapView
         mapView?.getMapAsync(this)
-
         mapView?.onCreate(savedInstanceState)
-
         activity?.let {
             if (it is MainActivity) {
                 it.supportActionBar?.title = "Карта"
@@ -53,21 +58,49 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     override fun onMarkerClick(p0: Marker?): Boolean {
+        childFragmentManager.run {
+            val bottomSheetDialogFragment = ObjectInfoBottomSheet()
+            bottomSheetDialogFragment.show(this, "tag")
+            println("DEBUG: ${p0?.tag}")
+        }
         return false
     }
 
-
-
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
+        map?.setOnMarkerClickListener(this)
+        val bitmap =  BitmapDescriptorFactory.fromResource(R.mipmap.selected_itemhdpi)
 
-        mPerth = map?.addMarker(MarkerOptions()
-            .position(PERTH)
-            .title("Perth")
-            .icon(
-                BitmapDescriptorFactory.fromResource(R.mipmap.selected_itemhdpi)
-            )
-        )
+        stadionnay = map?.addMarker(MarkerOptions()
+            .position(ecoVolgograd1)
+            .title("ул. Стадионная д. 20")
+            .icon(bitmap))
+
+        stadionnay?.tag = "sfa"
+        fruktovay = map?.addMarker(MarkerOptions()
+            .position(ecoVolgograd2)
+            .title("ул. Фруктовая, 9А")
+            .icon(bitmap))
+
+        heroes = map?.addMarker(MarkerOptions()
+            .position(ecoVolgograd3)
+            .title("пр-кт., Героев Сталинграда, 72А")
+            .icon(bitmap))
+
+        zhukova = map?.addMarker(MarkerOptions()
+            .position(ecoVolgograd4)
+            .title("пр-кт., им. Маршала Жукова, д. 55")
+            .icon(bitmap))
+
+        pobedi = map?.addMarker(MarkerOptions()
+            .position(ecoVolgograd5)
+            .title("Бульвар 30 лет Победы, д. 1")
+            .icon(bitmap))
+
+        lenina = map?.addMarker(MarkerOptions()
+            .position(ecoVolgograd6)
+            .title("пр-кт., им. В.И. Ленина, 120Ж")
+            .icon(bitmap))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -77,7 +110,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
             mapViewBundle = Bundle()
             outState.putBundle(MAP_VIEW_BUNDLE_KEY, mapViewBundle)
         }
-
         mapView?.onSaveInstanceState(mapViewBundle)
     }
 

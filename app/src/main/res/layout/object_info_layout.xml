@@ -6,5 +6,11 @@
     android:paddingEnd="16dp"
     android:paddingBottom="22dp"
     android:layout_height="wrap_content">
+
     <include layout="@layout/object_item"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"/>
 </LinearLayout>
