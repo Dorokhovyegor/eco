@@ -33,7 +33,6 @@ class ContainerFragment: Fragment() {
 
         bottomNavigationView?.let {navView ->
             navigationController?.let { navController ->
-                println("DEBUG: я тут")
                 NavigationUI.setupWithNavController(navView, navController)
             }
         }

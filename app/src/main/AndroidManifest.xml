@@ -16,21 +16,22 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCds68yTlQhL1rsAwSVR51vuUwIKL5aMeQ"/>
+            android:value="AIzaSyCds68yTlQhL1rsAwSVR51vuUwIKL5aMeQ" />
 
         <meta-data
             android:name="com.google.android.gms.wallet.api.enabled"
             android:value="true" />
 
-        <activity android:name=".ui.MainActivity">
 
-        </activity>
-        <activity android:name=".ui.PaymentActivity">
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".ui.PaymentActivity">
+
         </activity>
     </application>
 

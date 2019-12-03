@@ -16,10 +16,31 @@
         android:id="@+id/action_profile"
         android:name="com.voodoolab.eco.ui.tab_fragments.ProfileFragment"
         android:label="ProfileFragment" >
+        <action
+            android:id="@+id/action_action_profile_to_paymentMethodFragment"
+            app:destination="@+id/paymentMethodFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:launchSingleTop="false"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         tools:layout="@layout/map_fragment"
         android:id="@+id/action_map"
         android:name="com.voodoolab.eco.ui.tab_fragments.MapFragment"
         android:label="MapFragment" />
+    <fragment
+        android:id="@+id/paymentMethodFragment"
+        android:name="com.voodoolab.eco.ui.PaymentMethodFragment"
+        android:label="PaymentMethodFragment" >
+        <action
+            android:id="@+id/action_paymentMethodFragment_to_webFragment"
+            app:destination="@id/webFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/webFragment"
+        android:name="com.voodoolab.eco.helper_fragments.WebFragment"
+        android:label="WebFragment" />
 </navigation>

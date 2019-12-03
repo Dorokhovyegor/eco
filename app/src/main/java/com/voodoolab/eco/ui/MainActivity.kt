@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity(), SkipListener, AuthenticateListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        navController = Navigation.findNavController(this, R.id.fragment_container)
+        navController = Navigation.findNavController(this, R.id.frame_container)
         supportActionBar?.hide()
     }
 
@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity(), SkipListener, AuthenticateListener {
             .build()
         navController?.navigate(R.id.containerFragment, null, navOptions )
     }
+
+
 
 
 }
