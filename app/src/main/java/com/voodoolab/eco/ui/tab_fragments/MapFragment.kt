@@ -93,42 +93,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         }
     }
 
-    private fun getDeviceLocation() {
-        try {
-            if (locationPermissionGranted) {
-                val locationResult: Task = mFusedLocationProviderClient.getLastLocation()
-                locationResult.addOnCompleteListener(this, object : OnCompleteListener {
-                    override fun onComplete(task: Task<*>) {
-                        if (task.isSuccessful) {
-                            // Set the map's camera position to the current location of the device.
-                            lastKnownLocation = task.result as LatLng
-                            lastKnownLocation?.let { location ->
-                                map?.moveCamera(
-                                    CameraUpdateFactory.newLatLngZoom(
-                                        LatLng(
-                                            location.latitude,
-                                            location.longitude
-                                        ), DEFAULT_ZOOM
-                                    )
-                                )
-                            }
-                        } else {
-                            map?.moveCamera(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    defaultLocation,
-                                    DEFAULT_ZOOM
-                                )
-                            )
-                            map?.uiSettings?.isMyLocationButtonEnabled = false
-                        }
-                    }
-                })
-            }
-        } catch (e: SecurityException) {
-            println("DEBUG: ${e.message}")
-        }
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -136,8 +100,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.map_fragment, container, false)
-
-        fusedLocationProviderClient = Location.
 
         return view
     }
@@ -167,7 +129,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
         updateLocationUI()
-        getDeviceLocation()
         map?.setOnMarkerClickListener(this)
         val bitmap = BitmapDescriptorFactory.fromResource(R.mipmap.selected_itemhdpi)
 
