@@ -5,11 +5,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <VideoView
-        android:id="@+id/video_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
     <EditText
         android:id="@+id/phone_input"
         android:layout_width="match_parent"
@@ -24,6 +19,45 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.33" />
 
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/progress_bar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="7dp"
+        android:layout_gravity="bottom"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_showProgressBackground="false"
+        app:mpb_useIntrinsicPadding="false" />
+
+    <EditText
+        android:visibility="visible"
+        android:id="@+id/code_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:hint="Введите код"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/phone_input"/>
+
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/timer_textview"
+        android:layout_marginBottom="32dp"
+        android:textAlignment="center"
+        android:textColor="#2F80ED"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Отправить SMS повторно 0:25"
+        app:layout_constraintBottom_toTopOf="@+id/auth_button" />
+
     <Button
         android:id="@+id/auth_button"
         android:layout_width="match_parent"
@@ -31,14 +65,12 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:background="@drawable/active_button_drawable"
-        android:text="Войти"
+        android:text="Получить код"
         android:textAllCaps="false"
         android:textColor="#fff"
-        app:layout_constraintVertical_bias="0.4"
+        android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phone_input" />
-
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

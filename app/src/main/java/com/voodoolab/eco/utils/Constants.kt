@@ -88,4 +88,7 @@ object Constants {
         "protocolVersion" to "ECv1",
         "publicKey" to DIRECT_TOKENIZATION_PUBLIC_KEY
     )
+
+    val TOKEN = "token"
+    val TYPE_TOKEN = "token_type"
 }
