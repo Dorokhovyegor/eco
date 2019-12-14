@@ -1,5 +1,6 @@
 package com.voodoolab.eco.ui
 
+import android.content.Context
 import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,8 +9,14 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.voodoolab.eco.R
+import com.voodoolab.eco.interfaces.SkipSplashScreenListener
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SplashScreen : Fragment() {
+
+    var splashScreenListener: SkipSplashScreenListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -20,10 +27,27 @@ class SplashScreen : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-      /*  val layout = view.findViewById<ConstraintLayout>(R.id.layout)
+        val layout = view.findViewById<ConstraintLayout>(R.id.layout)
         val animationDrawable = layout.background as AnimationDrawable
         animationDrawable.setEnterFadeDuration(2000)
         animationDrawable.setExitFadeDuration(4000)
-        animationDrawable.start()*/
+        animationDrawable.start()
+
+        GlobalScope.launch {
+            delay(800)
+            splashScreenListener?.splashScreenComplete()
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainActivity) {
+            splashScreenListener = context
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        splashScreenListener = null
     }
 }

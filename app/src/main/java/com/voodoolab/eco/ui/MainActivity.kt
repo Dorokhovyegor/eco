@@ -1,9 +1,6 @@
 package com.voodoolab.eco.ui
 
-import android.graphics.Rect
 import android.os.Bundle
-import android.view.View
-import android.view.ViewTreeObserver
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -11,13 +8,11 @@ import androidx.navigation.Navigation
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.AuthenticateListener
-import com.voodoolab.eco.interfaces.SkipListener
-import com.voodoolab.eco.ui.onboarding.OnBoardContainerFragment
+import com.voodoolab.eco.interfaces.BalanceUpClickListener
+import com.voodoolab.eco.interfaces.SkipSplashScreenListener
 import com.voodoolab.eco.utils.Constants
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
-class MainActivity : AppCompatActivity(), SkipListener, AuthenticateListener{
+class MainActivity : AppCompatActivity(), SkipSplashScreenListener, AuthenticateListener, BalanceUpClickListener{
 
     lateinit var navController: NavController
 
@@ -26,37 +21,18 @@ class MainActivity : AppCompatActivity(), SkipListener, AuthenticateListener{
         setContentView(R.layout.activity_main)
         navController = Navigation.findNavController(this, R.id.frame_container)
         supportActionBar?.hide()
-
-
         if (!Hawk.isBuilt())
             Hawk.init(this).build()
-
-        val token = Hawk.get<String>(Constants.TOKEN, null)
-        println("DEBUG: ${token}")
-
-        if (token != null) {
-            val navOptions: NavOptions? = NavOptions.Builder()
-                .setEnterAnim(R.anim.enter_from_right)
-                .setExitAnim(R.anim.nav_default_exit_anim)
-                .setPopUpTo(R.id.splash_destination, true)
-                .build()
-          //  navController.navigate(R.id.action_profile, null, navOptions)
-        } else {
-            val navOptions: NavOptions? = NavOptions.Builder()
-                .setEnterAnim(R.anim.enter_from_right)
-                .setExitAnim(R.anim.nav_default_exit_anim)
-                .setPopUpTo(R.id.auth_destination, true)
-                .build()
-         //   navController.navigate(R.id.auth_destination, null, navOptions)
-        }
     }
 
-    override fun skipGuide() {
-        val navOptions: NavOptions? = NavOptions.Builder()
-            .setEnterAnim(R.anim.enter_from_right)
-            .setExitAnim(R.anim.nav_default_exit_anim)
-            .build()
-        navController.navigate(R.id.auth_destination, null, navOptions)
+    override fun splashScreenComplete() {
+        val token = Hawk.get<String>(Constants.TOKEN, null)
+        if (token != null) {
+            navController.navigate(R.id.action_splash_destination_to_containerFragment)
+        } else {
+            navController.navigate(R.id.action_splash_destination_to_auth_destination)
+        }
+
     }
 
     override fun completeAuthenticated() {
@@ -65,7 +41,11 @@ class MainActivity : AppCompatActivity(), SkipListener, AuthenticateListener{
             .setEnterAnim(R.anim.enter_from_right)
             .setExitAnim(R.anim.nav_default_exit_anim)
             .build()
-        navController.navigate(R.id.action_profile, null, navOptions)
+        navController.navigate(R.id.from_auth_To_container, null, navOptions)
+    }
+
+    override fun onBalanceUpClick() {
+        navController.navigate(R.id.action_containerFragment_to_payment_destination)
     }
 
     override fun onSupportNavigateUp(): Boolean = navController.navigateUp()

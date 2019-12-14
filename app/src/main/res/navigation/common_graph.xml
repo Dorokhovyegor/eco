@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/common_graph"
+    app:startDestination="@id/splash_destination">
+
+    <fragment
+        android:id="@+id/payment_destination"
+        android:name="com.voodoolab.eco.ui.PaymentMethodFragment"
+        android:label="PaymentMethodFragment">
+        <action
+            android:id="@+id/action_paymentMethodFragment_to_webFragment"
+            app:destination="@id/webFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/webFragment"
+        android:name="com.voodoolab.eco.helper_fragments.WebFragment"
+        android:label="WebFragment" />
+    <fragment
+        android:id="@+id/splash_destination"
+        android:name="com.voodoolab.eco.ui.SplashScreen"
+        android:label="SplashScreen">
+        <action
+            android:id="@+id/action_splash_destination_to_auth_destination"
+            app:destination="@+id/auth_destination" />
+        <action
+            android:id="@+id/action_splash_destination_to_containerFragment"
+            app:destination="@id/containerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/auth_destination"
+        android:name="com.voodoolab.eco.ui.AuthFragment"
+        android:label="AuthFragment">
+        <action
+            android:id="@+id/from_auth_To_container"
+            app:destination="@+id/containerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/containerFragment"
+        android:name="com.voodoolab.eco.ui.ContainerFragment"
+        android:label="ContainerFragment" >
+        <action
+            app:popUpTo="@id/containerFragment"
+            app:popUpToInclusive="false"
+            android:id="@+id/action_containerFragment_to_payment_destination"
+            app:destination="@id/payment_destination" />
+    </fragment>
+</navigation>

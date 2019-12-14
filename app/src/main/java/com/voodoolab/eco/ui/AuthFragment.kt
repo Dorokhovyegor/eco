@@ -61,7 +61,7 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
         if (number?.length == 11) {
             codeViewModel.setStateEvent(CodeStateEvent.RequestCodeEvent(number))
         } else {
-            inputNumberEditText?.error = "Неверный формат номера"
+            inputPhoneLayout?.error = "Неверный формат номера"
         }
     }
 
@@ -73,7 +73,9 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
 
     private var hasPasswordClickListener = View.OnClickListener {                                     // если код изначально есть и хотим его ввести
         authButton?.setOnClickListener(loginClickListener)
+        inputCodeLayout?.visibility = View.VISIBLE
         inputCodeEditText?.visibility = View.VISIBLE
+        authButton?.text = "Войти"
         if (it is TextView) {
             it.text = "Получить новый пароль"
         }
@@ -84,7 +86,7 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
         if (number?.length == 11) {
             codeViewModel.setStateEvent(CodeStateEvent.RequestCodeEvent(number))
         } else {
-            inputNumberEditText?.error = "Неверный формат номера"
+            inputPhoneLayout?.error = "Неверный формат номера"
         }
     }
 
@@ -94,6 +96,8 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+
         KeyboardVisibilityEvent.setEventListener(activity, this)
         codeViewModel = ViewModelProvider(this).get(CodeViewModel::class.java)
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
@@ -152,7 +156,6 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
     private fun initListeners() {
         hasPasswordTextView?.setOnClickListener(hasPasswordClickListener)
         authButton?.setOnClickListener(getCodeClickListener)
-
         inputNumberEditText?.addTextChangedListener(object: TextWatcher{
             override fun afterTextChanged(s: Editable?) {
                 val number = getNumberFromDecorateNumber(s.toString())

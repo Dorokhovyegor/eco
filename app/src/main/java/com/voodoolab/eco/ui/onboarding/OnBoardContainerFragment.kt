@@ -1,6 +1,5 @@
 package com.voodoolab.eco.ui.onboarding
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,13 +12,12 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SnapHelper
 import com.rd.PageIndicatorView
 import com.rd.animation.type.AnimationType
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.OnboardingRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.OnSnapPositionChangeListener
-import com.voodoolab.eco.interfaces.SkipListener
+import com.voodoolab.eco.interfaces.SkipSplashScreenListener
 import com.voodoolab.eco.models.OnboardModel
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.utils.SnapOnScrollListener
@@ -27,7 +25,7 @@ import com.voodoolab.eco.utils.SnapOnScrollListener
 class OnBoardContainerFragment() : Fragment(),
     OnSnapPositionChangeListener {
 
-    var skipListener: SkipListener? = null
+    var skipSplashScreenListener: SkipSplashScreenListener? = null
     var skipButton: Button? = null
     var nextButton: Button? = null
     var pageIndicator: PageIndicatorView? = null
@@ -46,13 +44,13 @@ class OnBoardContainerFragment() : Fragment(),
                 onBoardingRecyclerView?.smoothScrollToPosition(position +1)
 
             if (position == 2) {
-                skipListener?.skipGuide()
+                skipSplashScreenListener?.splashScreenComplete()
             }
         }
     }
 
     var skipButtonListener = View.OnClickListener {
-        skipListener?.skipGuide()
+        skipSplashScreenListener?.splashScreenComplete()
     }
 
     override fun onCreateView(
@@ -73,13 +71,13 @@ class OnBoardContainerFragment() : Fragment(),
         super.onAttach(context)
         if (context is MainActivity) {
             println("DEBUG: присоединил слушателя")
-            skipListener = context
+         //   skipSplashScreenListener = context
         }
     }
 
     override fun onDetach() {
         super.onDetach()
-        skipListener = null
+        skipSplashScreenListener = null
     }
 
     private fun initViews(view: View) {
@@ -104,11 +102,6 @@ class OnBoardContainerFragment() : Fragment(),
         val snapOnScrollListener =
             SnapOnScrollListener(snapHelper, SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL, this)
         onBoardingRecyclerView?.addOnScrollListener(snapOnScrollListener)
-
-        // init listeners
-        // todo skip button -> убираем этот фрагмент и заменяем его на авторизацию
-        // todo next button -> переходим на слеующий item, если item последний, тогда переходим на вторизацию
-        // todo подключить pager indicator
     }
 
     private fun setList() {

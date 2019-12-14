@@ -1,5 +1,6 @@
 package com.voodoolab.eco.ui.tab_fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Html
 import android.view.LayoutInflater
@@ -8,19 +9,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
 import com.voodoolab.eco.R
+import com.voodoolab.eco.interfaces.BalanceUpClickListener
 import com.voodoolab.eco.ui.MainActivity
 import com.xw.repo.BubbleSeekBar
 import kotlinx.android.synthetic.main.container_fragment.*
 
 class ProfileFragment : Fragment() {
 
+    private var onBalanceUpClickListener: BalanceUpClickListener? = null
+
     private var helloTextView: TextView? = null
     private var balanceTextView: TextView? = null
     private var topUpBalance: Button? = null
     private var bubbleSeekBar: BubbleSeekBar? = null
-
     private var listTextView: List<TextView>? = null
 
     override fun onCreateView(
@@ -59,11 +61,7 @@ class ProfileFragment : Fragment() {
 
     private fun initListeners() {
         topUpBalance?.setOnClickListener {
-            activity?.let {
-                val navigationController = Navigation.findNavController(it, R.id.container_fragment)
-                it.bottom_nav_view.visibility = View.GONE
-                navigationController.navigate(R.id.payment_destination)
-            }
+            onBalanceUpClickListener?.onBalanceUpClick()
         }
     }
 
@@ -90,5 +88,17 @@ class ProfileFragment : Fragment() {
             }
         }
         bubbleSeekBar?.setProgress(progress)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainActivity) {
+            onBalanceUpClickListener = context
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        onBalanceUpClickListener = null
     }
 }

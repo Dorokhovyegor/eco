@@ -31,7 +31,7 @@ class PaymentMethodFragment : Fragment() {
                     it.supportActionBar?.title = "Оплата"
                 }
                 if (!price?.text.isNullOrBlank()) {
-                    it.findNavController(R.id.container_fragment).navigate(R.id.webFragment)
+                    it.findNavController(R.id.frame_container).navigate(R.id.webFragment)
                 } else {
                     price?.error = "Заполните поле"
                 }

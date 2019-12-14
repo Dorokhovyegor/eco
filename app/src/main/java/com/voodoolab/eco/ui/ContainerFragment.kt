@@ -5,17 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.voodoolab.eco.R
 
-class ContainerFragment: Fragment() {
-    var bottomNavigationView: BottomNavigationView? = null
-    var navigationController: NavController? = null
+
+class ContainerFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,18 +22,14 @@ class ContainerFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        bottomNavigationView = view.findViewById(R.id.bottom_nav_view)
-        activity?.let {
-            navigationController = Navigation.findNavController(it, R.id.container_fragment)
-        }
-
-        bottomNavigationView?.let {navView ->
-            navigationController?.let { navController ->
-                NavigationUI.setupWithNavController(navView, navController)
-            }
-        }
+        val bottomNavigationView = view.findViewById<BottomNavigationView>(R.id.bottom_nav_view)
+        println("DEBUG: ${bottomNavigationView.tag}")
+        val navHostFragment =
+            childFragmentManager.findFragmentById(R.id.frame_for_bottom_nav_view) as NavHostFragment
+        NavigationUI.setupWithNavController(bottomNavigationView, navHostFragment.navController)
 
     }
+
 }
 
 
