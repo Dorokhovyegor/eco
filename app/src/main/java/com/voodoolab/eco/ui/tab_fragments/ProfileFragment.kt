@@ -62,7 +62,7 @@ class ProfileFragment : Fragment() {
             activity?.let {
                 val navigationController = Navigation.findNavController(it, R.id.container_fragment)
                 it.bottom_nav_view.visibility = View.GONE
-                navigationController.navigate(R.id.paymentMethodFragment)
+                navigationController.navigate(R.id.payment_destination)
             }
         }
     }

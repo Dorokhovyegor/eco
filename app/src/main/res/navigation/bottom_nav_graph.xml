@@ -3,36 +3,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_nav_graph"
-    app:startDestination="@id/action_profile">
+    app:startDestination="@id/auth_destination">
 
     <fragment
         tools:layout="@layout/discounts_fragment"
-        android:id="@+id/action_discounts"
+        android:id="@+id/discount_destination"
         android:name="com.voodoolab.eco.ui.tab_fragments.DiscountsFragment"
         android:label="DiscountsFragment" >
     </fragment>
     <fragment
         tools:layout="@layout/profile_fragment"
-        android:id="@+id/action_profile"
+        android:id="@+id/profile_destination"
         android:name="com.voodoolab.eco.ui.tab_fragments.ProfileFragment"
         android:label="ProfileFragment" >
         <action
             android:id="@+id/action_action_profile_to_paymentMethodFragment"
-            app:destination="@+id/paymentMethodFragment"
+            app:destination="@+id/payment_destination"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
-            app:launchSingleTop="false"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
             app:popUpToInclusive="false" />
     </fragment>
     <fragment
         tools:layout="@layout/map_fragment"
-        android:id="@+id/action_map"
+        android:id="@+id/map_destination"
         android:name="com.voodoolab.eco.ui.tab_fragments.MapFragment"
         android:label="MapFragment" />
     <fragment
-        android:id="@+id/paymentMethodFragment"
+        android:id="@+id/payment_destination"
         android:name="com.voodoolab.eco.ui.PaymentMethodFragment"
         android:label="PaymentMethodFragment" >
         <action
@@ -43,4 +42,16 @@
         android:id="@+id/webFragment"
         android:name="com.voodoolab.eco.helper_fragments.WebFragment"
         android:label="WebFragment" />
+    <fragment
+        android:id="@+id/splash_destination"
+        android:name="com.voodoolab.eco.ui.SplashScreen"
+        android:label="SplashScreen" >
+        <action
+            android:id="@+id/action_splash_destination_to_profile_destination"
+            app:destination="@id/profile_destination" />
+    </fragment>
+    <fragment
+        android:id="@+id/auth_destination"
+        android:name="com.voodoolab.eco.ui.AuthFragment"
+        android:label="AuthFragment" />
 </navigation>

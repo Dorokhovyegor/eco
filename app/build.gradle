@@ -6,6 +6,8 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
+apply plugin: "androidx.navigation.safeargs.kotlin"
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -36,6 +38,7 @@ dependencies {
     def lifecycle_version = "2.2.0-alpha03"
     def horizontal_progress_bar ="1.6.1"
     def hawk_version = "2.0.1"
+    def keyboard_listener = "2.3.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -72,4 +75,11 @@ dependencies {
     implementation "me.zhanghai.android.materialprogressbar:library:$horizontal_progress_bar"
 
     implementation "com.orhanobut:hawk:$hawk_version"
+
+    implementation 'com.eightbitlab:supportrenderscriptblur:1.0.2'
+    implementation 'com.eightbitlab:blurview:1.6.3'
+
+    implementation 'com.google.android.material:material:1.0.0'
+
+    implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:$keyboard_listener"
 }
