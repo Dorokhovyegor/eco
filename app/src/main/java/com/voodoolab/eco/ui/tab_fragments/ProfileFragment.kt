@@ -2,7 +2,6 @@ package com.voodoolab.eco.ui.tab_fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +9,12 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.BalanceUpClickListener
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.xw.repo.BubbleSeekBar
@@ -29,11 +30,13 @@ class ProfileFragment : Fragment(), DataStateListener {
     private var onBalanceUpClickListener: BalanceUpClickListener? = null
 
     private var helloTextView: TextView? = null
+    private var nameTextView: TextView? = null
     private var balanceTextView: TextView? = null
     private var topUpBalance: Button? = null
     private var progressBar: MaterialProgressBar? = null
     private var bubbleSeekBar: BubbleSeekBar? = null
-    private var listTextView: List<TextView>? = null
+    private var listPercentsTextView: List<TextView>? = null
+    private var listMoneyTextView: List<TextView>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,17 +49,16 @@ class ProfileFragment : Fragment(), DataStateListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         balanceTextView = view.findViewById(R.id.money_text_view)
         bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
-        helloTextView = view.findViewById(R.id.title)
+        helloTextView = view.findViewById(R.id.hello_text_view)
+        nameTextView = view.findViewById(R.id.name_text_view)
         topUpBalance = view.findViewById(R.id.topUpBalance)
-        listTextView = initTextViewsDiscounts(view)
+        listPercentsTextView = initTextViewsDiscounts(view)
+        listMoneyTextView = initTextViewsMoney(view)
 
-        val hello =
-            "<font style='line-height: 100px' color=#27AE60>Привет, </font><br/><font color=#828282>Егор</font>"
-        helloTextView?.text = Html.fromHtml(hello, 0)
-        setCurrentProgress(12f, 2)
-
+        subscribeObservers()
         initListeners()
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -83,13 +85,49 @@ class ProfileFragment : Fragment(), DataStateListener {
         return textViews
     }
 
-    private fun subscribeObservers() {
+    private fun initTextViewsMoney(view: View?): List<TextView>? {
+        val textViews = ArrayList<TextView>()
+        view?.let { container ->
+            textViews.add(container.findViewById(R.id.level_1) as TextView)
+            textViews.add(container.findViewById(R.id.level_2) as TextView)
+            textViews.add(container.findViewById(R.id.level_3) as TextView)
+            textViews.add(container.findViewById(R.id.level_4) as TextView)
+            textViews.add(container.findViewById(R.id.level_5) as TextView)
+        }
+        return textViews
+    }
 
+    private fun subscribeObservers() {
+        userViewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
+            dataStateHandler.onDataStateChange(dataState)
+            dataState.data?.let { userViewState ->
+                userViewState.getContentIfNotHandled()?.let {
+                    it.userResponse?.let {
+                        userViewModel.setUserResponse(it)
+                    }
+                }
+            }
+        })
+
+        userViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
+            viewState.userResponse?.let {
+                if (it.status == "ok") {
+                    // todo update name
+                    updateContent(it)
+                    calculateCurrentProgress(it)
+                }
+            }
+        })
     }
 
     private fun handleDataStateChange(dataState: DataState<*>?) {
         dataState?.let {
-
+            showProgressBar(it.loading)
+            it.message?.let { event ->
+                event.getContentIfNotHandled()?.let {
+                    showToast(it)
+                }
+            }
         }
     }
 
@@ -107,8 +145,61 @@ class ProfileFragment : Fragment(), DataStateListener {
         }
     }
 
-    private fun setCurrentProgress(progress: Float, currentPosition: Int) {
-        listTextView?.withIndex()?.forEach { wrappedTextView ->
+    private fun updateContent(userInfoResponse: UserInfoResponse) {
+        nameTextView?.text = userInfoResponse.data?.name
+        balanceTextView?.text = "${userInfoResponse.data?.balance}\u20BD"
+        listPercentsTextView?.get(0)?.text =
+            userInfoResponse.month_cash_back?.levelCashBack1?.percent.toString()
+        listPercentsTextView?.get(1)?.text =
+            userInfoResponse.month_cash_back?.levelCashBack2?.percent.toString()
+        listPercentsTextView?.get(2)?.text =
+            userInfoResponse.month_cash_back?.levelCashBack3?.percent.toString()
+        listPercentsTextView?.get(3)?.text =
+            userInfoResponse.month_cash_back?.levelCashBack4?.percent.toString()
+        listPercentsTextView?.get(4)?.text =
+            userInfoResponse.month_cash_back?.levelCashBack5?.percent.toString()
+
+        listMoneyTextView?.get(0)?.text =
+            "${userInfoResponse.month_cash_back?.levelCashBack1?.value.toString()}\u20BD"
+        listMoneyTextView?.get(1)?.text =
+            "${userInfoResponse.month_cash_back?.levelCashBack2?.value.toString()}\u20BD"
+        listMoneyTextView?.get(2)?.text =
+            "${userInfoResponse.month_cash_back?.levelCashBack3?.value.toString()}\u20BD"
+        listMoneyTextView?.get(3)?.text =
+            "${userInfoResponse.month_cash_back?.levelCashBack4?.value.toString()}\u20BD"
+        listMoneyTextView?.get(4)?.text =
+            "${userInfoResponse.month_cash_back?.levelCashBack5?.value.toString()}\u20BD"
+    }
+
+    private fun calculateCurrentProgress(userInfoResponse: UserInfoResponse) {
+        var currentPosition = -1
+        var progress = 0.0f
+        var remainingValue = 0.0f
+
+        val monthBalance = userInfoResponse.data?.month_balance!! // потрачено в этом месяце
+        val arrayOfPoints = intArrayOf(
+            userInfoResponse.month_cash_back?.levelCashBack1?.value!!,
+            userInfoResponse.month_cash_back.levelCashBack2?.value!!,
+            userInfoResponse.month_cash_back.levelCashBack3?.value!!,
+            userInfoResponse.month_cash_back.levelCashBack4?.value!!,
+            userInfoResponse.month_cash_back.levelCashBack5?.value!!
+        )
+
+        for (index in arrayOfPoints) {
+            if (index + 1 <= arrayOfPoints.size - 1) {
+                if (monthBalance >= arrayOfPoints[index] && monthBalance < arrayOfPoints[index + 1]) {
+                    currentPosition = index
+                    remainingValue = arrayOfPoints[index + 1].toFloat() - monthBalance.toFloat()
+                }
+            }
+        }
+
+        // todo
+        // берем текущее значение месечного баланса
+        // берем разницу между следующим лвл и предыдущим
+        // берем проценто заполненности
+
+        listPercentsTextView?.withIndex()?.forEach { wrappedTextView ->
             wrappedTextView.value.textSize = 16.0f
             wrappedTextView.value.setTextColor(resources.getColor(R.color.grey_from_Serge, null))
 
