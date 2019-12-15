@@ -23,11 +23,9 @@ class ContainerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val bottomNavigationView = view.findViewById<BottomNavigationView>(R.id.bottom_nav_view)
-        println("DEBUG: ${bottomNavigationView.tag}")
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.frame_for_bottom_nav_view) as NavHostFragment
         NavigationUI.setupWithNavController(bottomNavigationView, navHostFragment.navController)
-
     }
 
 }

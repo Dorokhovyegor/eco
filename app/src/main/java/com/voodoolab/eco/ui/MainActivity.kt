@@ -1,7 +1,13 @@
 package com.voodoolab.eco.ui
 
+import android.content.DialogInterface
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageButton
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
@@ -15,14 +21,37 @@ import com.voodoolab.eco.utils.Constants
 class MainActivity : AppCompatActivity(), SkipSplashScreenListener, AuthenticateListener, BalanceUpClickListener{
 
     lateinit var navController: NavController
+    lateinit var exitButton: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        initViews()
+        initAndSetListeners()
         navController = Navigation.findNavController(this, R.id.frame_container)
-        supportActionBar?.hide()
         if (!Hawk.isBuilt())
             Hawk.init(this).build()
+    }
+
+    private fun initViews() {
+        exitButton = findViewById(R.id.exit_button)
+    }
+
+    private fun initAndSetListeners() {
+        exitButton.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Выход")
+                .setMessage("Вы действительно хотите выйти из приложения?")
+                .setPositiveButton("Да"
+                ) { p0, p1 ->
+
+                }
+                .setNegativeButton("Нет"
+                ) { p0, p1 ->
+
+                }
+                .show()
+        }
     }
 
     override fun splashScreenComplete() {
@@ -32,7 +61,6 @@ class MainActivity : AppCompatActivity(), SkipSplashScreenListener, Authenticate
         } else {
             navController.navigate(R.id.action_splash_destination_to_auth_destination)
         }
-
     }
 
     override fun completeAuthenticated() {

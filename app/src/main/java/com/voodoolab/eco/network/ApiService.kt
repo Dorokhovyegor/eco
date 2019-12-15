@@ -3,6 +3,7 @@ package com.voodoolab.eco.network
 import androidx.lifecycle.LiveData
 import com.voodoolab.eco.responses.AuthCodeResponse
 import com.voodoolab.eco.responses.LoginResponse
+import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.utils.GenericApiResponse
 import retrofit2.http.*
 
@@ -19,4 +20,10 @@ interface ApiService {
         @Part("phone") phone: String,
         @Part("code") code: String
     ): LiveData<GenericApiResponse<LoginResponse>>
+
+    @GET("api/user")
+    fun getUserInfo(
+        @Header("Authorization") token: String,
+        @Header("Accept") accept: String
+    ): LiveData<GenericApiResponse<UserInfoResponse>>
 }

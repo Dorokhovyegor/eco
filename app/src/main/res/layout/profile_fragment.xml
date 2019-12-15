@@ -20,15 +20,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="24dp"
-            android:src="@drawable/hand_icon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <androidx.cardview.widget.CardView
             android:id="@+id/card_container"
             android:layout_width="match_parent"
@@ -101,6 +92,19 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/presents_title"
+            android:layout_width="match_parent"
+            android:layout_height="21dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:text="Бонусы за месяц"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/card_container"/>
+
 
         <TextView
             android:id="@+id/cash_back_1"
@@ -185,7 +189,7 @@
             app:bsb_track_size="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/card_container" />
+            app:layout_constraintTop_toBottomOf="@+id/presents_title" />
 
         <TextView
             android:id="@+id/level_1"
