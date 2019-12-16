@@ -6,20 +6,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
+import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.BalanceUpClickListener
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.states.user_state.UserStateEvent
 import com.voodoolab.eco.ui.MainActivity
+import com.voodoolab.eco.ui.view_models.TransactionsViewModel
 import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.voodoolab.eco.utils.Constants
 import com.xw.repo.BubbleSeekBar
@@ -29,6 +34,7 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 class ProfileFragment : Fragment(), DataStateListener {
 
     lateinit var userViewModel: UserInfoViewModel
+    lateinit var transactionViewModel: TransactionsViewModel
 
     var dataStateHandler: DataStateListener = this
 
@@ -39,9 +45,13 @@ class ProfileFragment : Fragment(), DataStateListener {
     private var balanceTextView: TextView? = null
     private var topUpBalance: Button? = null
     private var progressBar: MaterialProgressBar? = null
+    private var transactionsRecyclerView: RecyclerView? = null
+    private var transactionsProgressBar: ProgressBar? = null
     private var bubbleSeekBar: BubbleSeekBar? = null
     private var listPercentsTextView: List<TextView>? = null
     private var listMoneyTextView: List<TextView>? = null
+
+    private var adapter: TransactionsRecyclerViewAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,13 +59,16 @@ class ProfileFragment : Fragment(), DataStateListener {
         savedInstanceState: Bundle?
     ): View? {
         userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
+        transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
         return inflater.inflate(R.layout.profile_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        transactionsRecyclerView = view.findViewById(R.id.transactionsRecyclerView)
         progressBar = view.findViewById(R.id.progress_bar)
         balanceTextView = view.findViewById(R.id.money_text_view)
         bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
+        transactionsProgressBar = view.findViewById(R.id.transactions_progressBar)
         helloTextView = view.findViewById(R.id.hello_text_view)
         nameTextView = view.findViewById(R.id.name_text_view)
         topUpBalance = view.findViewById(R.id.topUpBalance)
@@ -63,13 +76,23 @@ class ProfileFragment : Fragment(), DataStateListener {
         listMoneyTextView = initTextViewsMoney(view)
         val token = Hawk.get<String>(Constants.TOKEN)
         userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
+        val token2 = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
+        transactionViewModel.initialize(token2)
+
         subscribeObservers()
         initListeners()
+        initRecyclerView()
     }
-
 
     override fun onResume() {
         super.onResume()
+
+    }
+
+    private fun initRecyclerView() {
+        adapter = TransactionsRecyclerViewAdapter()
+        transactionsRecyclerView?.layoutManager = LinearLayoutManager(context)
+        transactionsRecyclerView?.adapter = adapter
     }
 
     private fun initTextViewsDiscounts(view: View?): List<TextView>? {
@@ -115,6 +138,11 @@ class ProfileFragment : Fragment(), DataStateListener {
                     calculateCurrentProgress(it)
                 }
             }
+        })
+
+        transactionViewModel.transactionsPagedList?.observe(viewLifecycleOwner, Observer {
+            transactionsProgressBar?.visibility = View.GONE
+             adapter?.submitList(it)
         })
     }
 

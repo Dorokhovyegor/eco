@@ -32,7 +32,8 @@ interface ApiService {
     @GET("api/user/operations")
     fun getOperations(
         @Header("Authorization") token: String,
-        @Query("page") page: Int,
-        @Query("qty") qty: Int
+        @Header("Accept") accept: String,
+        @Query("page") page: String,
+        @Query("qty") qty: String
     ): Call<TransactionResponse>
 }

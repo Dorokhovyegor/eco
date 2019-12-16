@@ -16,13 +16,22 @@ class TransactionDataSource(val token: String): PageKeyedDataSource<Int, Transac
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, TransactionData>
     ) {
-        RetrofitBuilder.apiService.getOperations(token, FIRST_PAGE,QUANTITY).enqueue( object: retrofit2.Callback<TransactionResponse> {
-            override fun onFailure(call: Call<TransactionResponse>, t: Throwable) { }
+
+        println("DEBUG ТУТ Я ПОПАЛ В МЕТОД")
+
+
+        RetrofitBuilder.apiService.getOperations(token, "application/json", FIRST_PAGE.toString(), QUANTITY.toString()).enqueue( object: retrofit2.Callback<TransactionResponse> {
+            override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {
+                t.printStackTrace()
+                println("DEBUG ТУТ 1111111111111111111")
+            }
             override fun onResponse(
                 call: Call<TransactionResponse>,
                 response: Response<TransactionResponse>
             ) {
+                println("DEBUG ТУТ")
                 response.body()?.let { transactionsResponse ->
+
                     callback.onResult(transactionsResponse.data, null, FIRST_PAGE + 1)
                 }
             }
@@ -30,7 +39,7 @@ class TransactionDataSource(val token: String): PageKeyedDataSource<Int, Transac
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionData>) {
-        val call = RetrofitBuilder.apiService.getOperations(token, params.key, QUANTITY)
+        val call = RetrofitBuilder.apiService.getOperations(token, "application/json", params.key.toString(), QUANTITY.toString())
 
         call.enqueue(object: retrofit2.Callback<TransactionResponse> {
             override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {}

@@ -7,6 +7,12 @@
     <string name="on_board_text2">Получай кешбэк с каждой мойки</string>
     <string name="on_board_text3">Отслеживай все операции по карте</string>
 
+    <string name="transaction_value">%1$d ₽</string>
+    <string name="replenish_offline">Пополнение %1$s</string>
+    <string name="month_bonus">Пополнение %1$d</string>
+    <string name="cashback">Кэшбэк</string>
+    <string name="replenish_online">Пополнение через %1$s</string>
+    <string name="waste">Списание %1$s</string>
 
     <string name="store_name" translatable="false">Auto T-Shirt Shop</string>
     <string name="googlepay_status_unavailable" translatable="false">Unfortunately, Google Pay is not available on this phone.</string>
