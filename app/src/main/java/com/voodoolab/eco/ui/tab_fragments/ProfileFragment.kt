@@ -8,15 +8,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.BalanceUpClickListener
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.UserInfoResponse
+import com.voodoolab.eco.states.user_state.UserStateEvent
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.view_models.UserInfoViewModel
+import com.voodoolab.eco.utils.Constants
 import com.xw.repo.BubbleSeekBar
 import kotlinx.android.synthetic.main.container_fragment.*
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
@@ -43,10 +48,12 @@ class ProfileFragment : Fragment(), DataStateListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
         return inflater.inflate(R.layout.profile_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        progressBar = view.findViewById(R.id.progress_bar)
         balanceTextView = view.findViewById(R.id.money_text_view)
         bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
         helloTextView = view.findViewById(R.id.hello_text_view)
@@ -54,7 +61,8 @@ class ProfileFragment : Fragment(), DataStateListener {
         topUpBalance = view.findViewById(R.id.topUpBalance)
         listPercentsTextView = initTextViewsDiscounts(view)
         listMoneyTextView = initTextViewsMoney(view)
-
+        val token = Hawk.get<String>(Constants.TOKEN)
+        userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
         subscribeObservers()
         initListeners()
     }
@@ -62,15 +70,6 @@ class ProfileFragment : Fragment(), DataStateListener {
 
     override fun onResume() {
         super.onResume()
-        activity?.let {
-            it.bottom_nav_view?.visibility = View.VISIBLE
-        }
-    }
-
-    private fun initListeners() {
-        topUpBalance?.setOnClickListener {
-            onBalanceUpClickListener?.onBalanceUpClick()
-        }
     }
 
     private fun initTextViewsDiscounts(view: View?): List<TextView>? {
@@ -112,7 +111,6 @@ class ProfileFragment : Fragment(), DataStateListener {
         userViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.userResponse?.let {
                 if (it.status == "ok") {
-                    // todo update name
                     updateContent(it)
                     calculateCurrentProgress(it)
                 }
@@ -209,6 +207,29 @@ class ProfileFragment : Fragment(), DataStateListener {
             }
         }
         bubbleSeekBar?.setProgress(progress)
+    }
+
+    private fun initListeners() {
+        topUpBalance?.setOnClickListener {
+            onBalanceUpClickListener?.onBalanceUpClick()
+        }
+
+        /*exitButton.setOnClickListener {
+            AlertDialog.Builder(context)
+                .setTitle("Выход")
+                .setMessage("Вы действительно хотите выйти из приложения?")
+                .setPositiveButton(
+                    "Да"
+                ) { p0, p1 ->
+
+                }
+                .setNegativeButton(
+                    "Нет"
+                ) { p0, p1 ->
+
+                }
+                .show()
+        }*/
     }
 
     override fun onAttach(context: Context) {

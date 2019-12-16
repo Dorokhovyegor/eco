@@ -100,21 +100,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.map_fragment, container, false)
-
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val viewStub = view.findViewById<ViewStub>(R.id.view_stub)
-        mapView = viewStub.inflate() as MapView
+        mapView = view.findViewById(R.id.map_view)
         mapView?.getMapAsync(this)
         mapView?.onCreate(savedInstanceState)
-        activity?.let {
-            if (it is MainActivity) {
-                it.supportActionBar?.title = "Карта"
-            }
-        }
     }
 
     override fun onMarkerClick(p0: Marker?): Boolean {

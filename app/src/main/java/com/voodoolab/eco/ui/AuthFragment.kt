@@ -1,6 +1,5 @@
 package com.voodoolab.eco.ui
 
-import android.R.attr.data
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,14 +11,11 @@ import com.voodoolab.eco.interfaces.AuthenticateListener
 import ru.tinkoff.decoro.MaskImpl
 import ru.tinkoff.decoro.slots.PredefinedSlots
 import ru.tinkoff.decoro.watchers.MaskFormatWatcher
-import android.R.attr.start
-import android.graphics.BlurMaskFilter
 import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
@@ -29,13 +25,12 @@ import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.states.auth_state.AuthStateEvent
 import com.voodoolab.eco.states.code_state.CodeStateEvent
+import com.voodoolab.eco.ui.view_models.CodeViewModel
+import com.voodoolab.eco.ui.view_models.LoginViewModel
 import com.voodoolab.eco.utils.Constants
-import eightbitlab.com.blurview.BlurView
-import eightbitlab.com.blurview.RenderScriptBlur
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
-import org.w3c.dom.Text
 
 class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListener {
 

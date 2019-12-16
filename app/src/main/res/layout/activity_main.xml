@@ -6,35 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:visibility="visible"
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="Профиль"
-        app:titleTextColor="@color/white">
-
-        <ImageButton
-            android:id="@+id/exit_button"
-            android:layout_gravity="end"
-            android:background="@null"
-            android:padding="16dp"
-            android:src="@drawable/exit_to_app"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
-
-    </androidx.appcompat.widget.Toolbar>
-
     <fragment
         android:id="@+id/frame_container"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintTop_toBottomOf="parent"
         app:navGraph="@navigation/common_graph" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,11 +21,11 @@ import com.voodoolab.eco.utils.Constants
 class MainActivity : AppCompatActivity(), SkipSplashScreenListener, AuthenticateListener, BalanceUpClickListener{
 
     lateinit var navController: NavController
-    lateinit var exitButton: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        supportActionBar?.hide()
         initViews()
         initAndSetListeners()
         navController = Navigation.findNavController(this, R.id.frame_container)
@@ -34,24 +34,11 @@ class MainActivity : AppCompatActivity(), SkipSplashScreenListener, Authenticate
     }
 
     private fun initViews() {
-        exitButton = findViewById(R.id.exit_button)
+
     }
 
     private fun initAndSetListeners() {
-        exitButton.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("Выход")
-                .setMessage("Вы действительно хотите выйти из приложения?")
-                .setPositiveButton("Да"
-                ) { p0, p1 ->
 
-                }
-                .setNegativeButton("Нет"
-                ) { p0, p1 ->
-
-                }
-                .show()
-        }
     }
 
     override fun splashScreenComplete() {

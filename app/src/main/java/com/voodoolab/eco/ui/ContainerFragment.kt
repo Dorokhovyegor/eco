@@ -9,6 +9,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.voodoolab.eco.R
+import kotlinx.android.synthetic.main.container_fragment.*
 
 
 class ContainerFragment : Fragment() {
@@ -28,6 +29,9 @@ class ContainerFragment : Fragment() {
         NavigationUI.setupWithNavController(bottomNavigationView, navHostFragment.navController)
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
 }
 
 

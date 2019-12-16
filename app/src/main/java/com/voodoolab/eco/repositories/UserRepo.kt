@@ -21,7 +21,7 @@ object UserRepo {
             }
 
             override fun createCall(): LiveData<GenericApiResponse<UserInfoResponse>> {
-                return RetrofitBuilder.apiService.getUserInfo(token, "application/json")
+                return RetrofitBuilder.apiService.getUserInfo("Bearer " + token, "application/json")
             }
         }.asLiveData()
     }
