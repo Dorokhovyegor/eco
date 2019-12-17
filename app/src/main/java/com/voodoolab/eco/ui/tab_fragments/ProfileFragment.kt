@@ -60,18 +60,13 @@ class ProfileFragment : Fragment(), DataStateListener {
     ): View? {
         userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
         transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
+
         return inflater.inflate(R.layout.profile_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        transactionsRecyclerView = view.findViewById(R.id.transactionsRecyclerView)
-        progressBar = view.findViewById(R.id.progress_bar)
-        balanceTextView = view.findViewById(R.id.money_text_view)
-        bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
-        transactionsProgressBar = view.findViewById(R.id.transactions_progressBar)
-        helloTextView = view.findViewById(R.id.hello_text_view)
-        nameTextView = view.findViewById(R.id.name_text_view)
-        topUpBalance = view.findViewById(R.id.topUpBalance)
+        findViewsFromLayout(view)
+
         listPercentsTextView = initTextViewsDiscounts(view)
         listMoneyTextView = initTextViewsMoney(view)
         val token = Hawk.get<String>(Constants.TOKEN)
@@ -87,6 +82,17 @@ class ProfileFragment : Fragment(), DataStateListener {
     override fun onResume() {
         super.onResume()
 
+    }
+
+    private fun findViewsFromLayout(view: View) {
+        transactionsRecyclerView = view.findViewById(R.id.transactionsRecyclerView)
+        progressBar = view.findViewById(R.id.progress_bar)
+        balanceTextView = view.findViewById(R.id.money_text_view)
+        bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
+        transactionsProgressBar = view.findViewById(R.id.transactions_progressBar)
+        helloTextView = view.findViewById(R.id.hello_text_view)
+        nameTextView = view.findViewById(R.id.name_text_view)
+        topUpBalance = view.findViewById(R.id.topUpBalance)
     }
 
     private fun initRecyclerView() {

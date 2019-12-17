@@ -17,4 +17,7 @@ class ObjectInfoBottomSheet: BottomSheetDialogFragment() {
         return inflater.inflate(R.layout.object_info_layout, container,false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    }
 }

@@ -1,346 +1,358 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.Toolbar
+        app:subtitleTextColor="@color/grey_from_Serge"
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:elevation="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Профиль"
+        app:titleMarginStart="24dp"
+        app:titleTextColor="@color/white">
 
-        <androidx.appcompat.widget.Toolbar
-            app:subtitleTextColor="@color/grey_from_Serge"
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
+        <ImageButton
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            app:layout_constraintTop_toTopOf="parent"
-            app:title="Профиль"
-            app:titleMarginStart="24dp"
-            app:titleTextColor="@color/white">
+            android:layout_gravity="end"
+            android:background="@null"
+            android:padding="16dp"
+            android:src="@drawable/exit_to_app" />
 
-            <ImageButton
+    </androidx.appcompat.widget.Toolbar>
+
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/progress_bar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_gravity="bottom"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_showProgressBackground="false"
+        app:mpb_useIntrinsicPadding="false" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/hello_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:background="@null"
-                android:padding="16dp"
-                android:src="@drawable/exit_to_app" />
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/hello_profile_screen"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-        </androidx.appcompat.widget.Toolbar>
+            <TextView
+                android:id="@+id/name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="4dp"
+                android:text=""
+                android:textSize="22sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/hello_text_view" />
 
-        <me.zhanghai.android.materialprogressbar.MaterialProgressBar
-            android:id="@+id/progress_bar"
-            style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_gravity="bottom"
-            android:indeterminate="true"
-            android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:mpb_progressStyle="horizontal"
-            app:mpb_showProgressBackground="false"
-            app:mpb_useIntrinsicPadding="false" />
-
-        <TextView
-            android:id="@+id/hello_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:text="@string/hello_profile_screen"
-            android:textColor="@color/black"
-            android:textSize="22sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar" />
-
-        <TextView
-            android:id="@+id/name_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="4dp"
-            android:text=""
-            android:textSize="22sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/hello_text_view" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_container"
-            android:layout_width="match_parent"
-            android:layout_height="190dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="26dp"
-            android:layout_marginEnd="16dp"
-            android:minWidth="400dp"
-            app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="24dp"
-            app:layout_constraintTop_toBottomOf="@+id/name_text_view">
-
-            <ImageView
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/card_background" />
+                android:layout_height="190dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginEnd="16dp"
+                android:minWidth="400dp"
+                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardCornerRadius="24dp"
+                app:layout_constraintTop_toBottomOf="@+id/name_text_view">
 
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/card_title"
+                <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="Карта лояльности"
-                    android:textColor="#fff"
-                    android:textSize="15sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.1" />
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/card_background" />
 
-                <TextView
-                    android:id="@+id/money_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/card_title"
-                    android:textColor="#fff"
-                    android:textSize="28sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.8" />
 
-                <Button
-                    android:id="@+id/topUpBalance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end|center_vertical"
-                    android:background="@drawable/white_background"
-                    android:drawableStart="@drawable/wallet_icon"
-                    android:drawablePadding="12dp"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:text="Пополнить"
-                    android:textAllCaps="false"
-                    android:textSize="15sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.9"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.8" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:id="@+id/card_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Карта лояльности"
+                        android:textColor="#fff"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.1" />
 
-        <TextView
-            android:id="@+id/presents_title"
-            android:layout_width="match_parent"
-            android:layout_height="21dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
-            android:text="Бонусы за месяц"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@+id/card_container" />
+                    <TextView
+                        android:id="@+id/money_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/card_title"
+                        android:textColor="#fff"
+                        android:textSize="28sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.8" />
 
-        <TextView
-            android:id="@+id/cash_back_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/grey_from_Serge"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+                    <Button
+                        android:id="@+id/topUpBalance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:background="@drawable/white_background"
+                        android:drawableStart="@drawable/wallet_icon"
+                        android:drawablePadding="12dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="Пополнить"
+                        android:textAllCaps="false"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.9"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.8" />
 
-        <TextView
-            android:id="@+id/cash_back_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="32sp"
-            app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="0.25"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
 
-        <TextView
-            android:id="@+id/cash_back_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/grey_from_Serge"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="0.50"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+            <TextView
+                android:id="@+id/presents_title"
+                android:layout_width="match_parent"
+                android:layout_height="21dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="32dp"
+                android:text="Бонусы за месяц"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@+id/card_container" />
 
-        <TextView
-            android:id="@+id/cash_back_4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/grey_from_Serge"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="0.75"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+            <TextView
+                android:id="@+id/cash_back_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
 
-        <TextView
-            android:id="@+id/cash_back_5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/grey_from_Serge"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+            <TextView
+                android:id="@+id/cash_back_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="32sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.25"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
 
-        <com.xw.repo.BubbleSeekBar
-            android:id="@+id/bubbleSeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="56dp"
-            android:layout_marginEnd="16dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            app:bsb_max="100.0"
-            app:bsb_min="0.0"
-            app:bsb_second_track_color="@color/colorPrimary"
-            app:bsb_second_track_size="1dp"
-            app:bsb_section_count="4"
-            app:bsb_show_section_mark="true"
-            app:bsb_show_thumb_text="false"
-            app:bsb_thumb_color="@color/transparent"
-            app:bsb_thumb_radius="7dp"
-            app:bsb_thumb_radius_on_dragging="1dp"
-            app:bsb_track_color="@color/grey"
-            app:bsb_track_size="1dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/presents_title" />
+            <TextView
+                android:id="@+id/cash_back_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.50"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
 
-        <TextView
-            android:id="@+id/level_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/grey_from_Serge"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
-            app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+            <TextView
+                android:id="@+id/cash_back_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.75"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
 
-        <TextView
-            android:id="@+id/level_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/grey_from_Serge"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="0.25"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
-            app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+            <TextView
+                android:id="@+id/cash_back_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
 
-        <TextView
-            android:id="@+id/level_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/grey_from_Serge"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="0.50"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
-            app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+            <com.xw.repo.BubbleSeekBar
+                android:clickable="false"
+                android:focusable="false"
+                android:id="@+id/bubbleSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:saveEnabled="false"
+                android:layout_marginTop="56dp"
+                android:layout_marginEnd="16dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                app:bsb_max="100.0"
+                app:bsb_min="0.0"
+                app:bsb_second_track_color="@color/colorPrimary"
+                app:bsb_second_track_size="1dp"
+                app:bsb_section_count="4"
+                app:bsb_show_section_mark="true"
+                app:bsb_show_thumb_text="false"
+                app:bsb_thumb_color="@color/transparent"
+                app:bsb_thumb_radius="7dp"
+                app:bsb_thumb_radius_on_dragging="1dp"
+                app:bsb_track_color="@color/grey"
+                app:bsb_track_size="1dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/presents_title" />
 
-        <TextView
-            android:id="@+id/level_4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/grey_from_Serge"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="0.75"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
-            app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+            <TextView
+                android:id="@+id/level_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
 
-        <TextView
-            android:id="@+id/level_5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/grey_from_Serge"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
-            app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
-            app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+            <TextView
+                android:id="@+id/level_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.25"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
 
-        <TextView
-            android:id="@+id/message_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text=""
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/level_2" />
+            <TextView
+                android:id="@+id/level_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.50"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
 
-        <View
-            android:id="@+id/view"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="24dp"
-            android:background="#F1F1F1"
-            app:layout_constraintTop_toBottomOf="@+id/message_text_view"
-            tools:layout_editor_absoluteX="0dp" />
+            <TextView
+                android:id="@+id/level_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.75"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
 
-        <TextView
-            android:id="@+id/transactions_title"
-            android:layout_width="match_parent"
-            android:layout_height="21dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
-            android:text="Операции по карте"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@+id/view"
-            tools:layout_editor_absoluteX="16dp" />
+            <TextView
+                android:id="@+id/level_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
 
-        <ProgressBar
-            android:id="@+id/transactions_progressBar"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/transactions_title" />
+            <TextView
+                android:id="@+id/message_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text=""
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/level_2" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/transactionsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            app:layout_constraintTop_toBottomOf="@+id/transactions_title" />
+            <View
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:background="#F1F1F1"
+                app:layout_constraintTop_toBottomOf="@+id/message_text_view"
+                tools:layout_editor_absoluteX="0dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/transactions_title"
+                android:layout_width="match_parent"
+                android:layout_height="21dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="32dp"
+                android:text="Операции по карте"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@+id/view"
+                tools:layout_editor_absoluteX="16dp" />
 
-</androidx.core.widget.NestedScrollView>
+            <ProgressBar
+                android:id="@+id/transactions_progressBar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/transactions_title" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/transactionsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:layout_constraintTop_toBottomOf="@+id/transactions_title" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>
+

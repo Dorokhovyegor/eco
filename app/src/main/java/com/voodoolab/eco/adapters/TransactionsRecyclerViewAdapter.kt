@@ -16,6 +16,12 @@ class TransactionsRecyclerViewAdapter() :
         TRANSACTION_COMPARATOR
     ) {
 
+    val REPLENISH_OFFLINE = "replenish_offline"
+    val MONTH_BONUS = "month_bonus"
+    val CASHBACK = "cashback"
+    val REPLENISH_ONLINE = "replenish_online"
+    val WASTE = "waste"
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.transaction_layout_item, parent, false)
@@ -36,31 +42,40 @@ class TransactionsRecyclerViewAdapter() :
         private val dateTextView = itemView.dateTextView
 
         fun bind(transactionData: TransactionData) {
-            transactionValue?.text = itemView.resources.getString(R.string.transaction_value, transactionData.value?.div(100))
+            transactionValue?.text = itemView.resources.getString(
+                R.string.transaction_value,
+                transactionData.value?.div(100)
+            )
             dateTextView?.text = transactionData.createdAt
 
             when (transactionData.type) {
-                "replenish_offline" -> {
+                REPLENISH_OFFLINE -> {
                     Glide.with(itemView).load(R.drawable.balance_up).into(image)
-                  transactionName?.text = itemView.resources.getString(R.string.replenish_offline, transactionData.wash?.address)
+                    transactionName?.text = itemView.resources.getString(
+                        R.string.replenish_offline,
+                        transactionData.wash?.address
+                    )
 
                 }
-                "month_bonus" -> {
+                MONTH_BONUS -> {
                     Glide.with(itemView).load(R.drawable.cashback).into(image)
-                    transactionName?.text =  itemView.resources.getString(R.string.month_bonus)
+                    transactionName?.text = itemView.resources.getString(R.string.month_bonus)
                 }
-                "cashback" -> {
+                CASHBACK -> {
                     Glide.with(itemView).load(R.drawable.cashback).into(image)
                     transactionName?.text = itemView.resources.getString(R.string.cashback)
                 }
-                "replenish_online" -> {
+                REPLENISH_ONLINE -> {
                     Glide.with(itemView).load(R.drawable.balance_up).into(image)
-                    transactionName?.text = itemView.resources.getString(R.string.replenish_online, transactionData.terminal?.name)
-
+                    transactionName?.text = itemView.resources.getString(
+                        R.string.replenish_online,
+                        transactionData.terminal?.name
+                    )
                 }
-                "waste" -> {
+                WASTE -> {
                     Glide.with(itemView).load(R.drawable.balance_out).into(image)
-                    transactionName?.text = itemView.resources.getString(R.string.waste, transactionData.wash?.address)
+                    transactionName?.text =
+                        itemView.resources.getString(R.string.waste, transactionData.wash?.address)
                 }
             }
         }

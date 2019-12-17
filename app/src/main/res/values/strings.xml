@@ -9,7 +9,7 @@
 
     <string name="transaction_value">%1$d ₽</string>
     <string name="replenish_offline">Пополнение %1$s</string>
-    <string name="month_bonus">Пополнение %1$d</string>
+    <string name="month_bonus">Месячный бонус</string>
     <string name="cashback">Кэшбэк</string>
     <string name="replenish_online">Пополнение через %1$s</string>
     <string name="waste">Списание %1$s</string>
