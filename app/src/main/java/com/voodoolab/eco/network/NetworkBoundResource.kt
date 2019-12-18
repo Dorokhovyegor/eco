@@ -35,9 +35,6 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType> {
             is ApiOtherError -> {
                 onReturnError(response.errorMessage)
             }
-            is ApiAuthError -> {
-                onReturnError(response.errorMessage)
-            }
             is ApiEmptyResponse -> {
                 onReturnError("code 204 Returned nothing")
             }

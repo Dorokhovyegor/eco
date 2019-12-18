@@ -26,17 +26,28 @@
         map:mapType="normal"
         map:uiRotateGestures="false" />
 
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/progress_bar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_gravity="bottom"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_showProgressBackground="false"
+        app:mpb_useIntrinsicPadding="false" />
+
     <Button
-        android:id="@+id/button"
+        android:id="@+id/choose_city"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:background="@drawable/white_button"
-        android:drawableEnd="@drawable/drop_down"
-        android:drawablePadding="12dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:text="Воронеж"
+        android:paddingStart="26dp"
+        android:paddingEnd="26dp"
+        android:text=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />

@@ -17,7 +17,7 @@ sealed class GenericApiResponse<T> {
                 if (body == null || response.code() == 204) {
                     return ApiEmptyResponse()
                 } else if (response.code() == 401) {
-                    return ApiAuthError("401 unauthorized. Token may be invalid")
+                    return ApiOtherError("401 unauthorized. Token may be invalid")
                 } else {
                     return ApiSuccessResponse(body)
                 }
@@ -40,5 +40,3 @@ class ApiEmptyResponse<T>: GenericApiResponse<T>()
 data class ApiSuccessResponse<T>(val body: T): GenericApiResponse<T>()
 
 data class ApiOtherError<T>(val errorMessage: String): GenericApiResponse<T>()
-
-data class ApiAuthError<T>(val errorMessage: String): GenericApiResponse<T>()

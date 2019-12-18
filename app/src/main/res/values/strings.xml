@@ -13,6 +13,9 @@
     <string name="cashback">Кэшбэк</string>
     <string name="replenish_online">Пополнение через %1$s</string>
     <string name="waste">Списание %1$s</string>
+    <string name="choose_city">Выберите город</string>
+
+    <string name="value_of_cashback">Кешбэк %1$d%%</string>
 
     <string name="store_name" translatable="false">Auto T-Shirt Shop</string>
     <string name="googlepay_status_unavailable" translatable="false">Unfortunately, Google Pay is not available on this phone.</string>

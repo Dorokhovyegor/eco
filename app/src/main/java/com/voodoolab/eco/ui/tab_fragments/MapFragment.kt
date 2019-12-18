@@ -1,15 +1,26 @@
 package com.voodoolab.eco.ui.tab_fragments
 
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.provider.SyncStateContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
+import android.widget.Button
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.core.text.isDigitsOnly
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -20,46 +31,177 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
+import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
+import com.voodoolab.eco.helper_fragments.ChooseCityFragment
 import com.voodoolab.eco.helper_fragments.ObjectInfoBottomSheet
+import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
+import com.voodoolab.eco.interfaces.DataStateListener
+import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.responses.ObjectResponse
+import com.voodoolab.eco.states.object_state.ListObjectStateEvent
+import com.voodoolab.eco.states.object_state.ObjectStateEvent
 import com.voodoolab.eco.ui.MainActivity
+import com.voodoolab.eco.utils.Constants
+import com.voodoolab.eco.utils.convertFromStringToLatLng
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar
+import java.nio.BufferUnderflowException
 
 
-class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-    // todo https://github.com/googlemaps/android-samples/blob/master/ApiDemos/java/app/src/main/java/com/example/mapdemo/MyLocationDemoActivity.java
-    // todo https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderApi
-    // todo https://developers.google.com/maps/documentation/android-sdk/location
+class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+    DataStateListener, DialogInterface.OnClickListener {
+
+    lateinit var objectViewModel: ObjectInfoViewModel
+    var stateHandler: DataStateListener = this
 
     private var map: GoogleMap? = null
     private var mapView: MapView? = null
+    private var progressBar: MaterialProgressBar? = null
+    private var chooseCityButton: Button? = null
     private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
 
     private var locationPermissionGranted = false
     val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 145
     var lastKnownLocation: LatLng? = null
-    val defaultLocation = LatLng(0.0, 0.0)
-    val DEFAULT_ZOOM = 15f
 
-    var geoDataClient = null
-    var placeDetectionClient = null
-    var fusedLocationProviderClient = null
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        objectViewModel = ViewModelProvider(this).get(ObjectInfoViewModel::class.java)
+        val view = inflater.inflate(R.layout.map_fragment, container, false)
+        return view
+    }
 
-    private val ecoVolgograd1 = LatLng(48.6809142, 44.4448137)
-    private val ecoVolgograd2 = LatLng(48.5848916, 44.4207241)
-    private val ecoVolgograd3 = LatLng(48.5153207, 44.5327722)
-    private val ecoVolgograd4 = LatLng(48.7255262, 44.4867742)
-    private val ecoVolgograd5 = LatLng(48.7494673, 44.490054)
-    private val ecoVolgograd6 = LatLng(48.7862051, 44.5887283)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        chooseCityButton = view.findViewById(R.id.choose_city)
+        progressBar = view.findViewById(R.id.progress_bar)
+        mapView = view.findViewById(R.id.map_view)
+        mapView?.getMapAsync(this)
+        mapView?.onCreate(savedInstanceState)
+        val token = Hawk.get<String>(Constants.TOKEN)
+        objectViewModel.setStateEventForListObject(ListObjectStateEvent.RequestAllObjectEvent("Bearer $token"))
+        subscribeObservers()
 
-    private var stadionnay: Marker? = null
-    private var fruktovay: Marker? = null
-    private var heroes: Marker? = null
-    private var zhukova: Marker? = null
-    private var pobedi: Marker? = null
-    private var lenina: Marker? = null
+        chooseCityButton?.setOnClickListener {
+            AlertDialog.Builder(context!!)
+                .setTitle(getString(R.string.choose_city))
+                .setSingleChoiceItems(arrayOf(
+                    "Тамбов",
+                    "Липецк",
+                    "Волгоград"
+                ), 0, object: DialogInterface.OnClickListener{
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+
+                    }
+                })
+                .setPositiveButton("ОК", this)
+                .setNegativeButton("Отмена", this)
+                .create()
+                .show()
+        }
+    }
+
+    override fun onClick(dialog: DialogInterface?, which: Int) {
+
+    }
+
+    private fun subscribeObservers() {
+        objectViewModel.dataStateListObject.observe(viewLifecycleOwner, Observer { dataState ->
+            stateHandler.onDataStateChange(dataState)
+            dataState.data?.let { listData ->
+                listData.getContentIfNotHandled()?.let { content ->
+                    content.listObjectResponse?.let { response ->
+                        objectViewModel.setListResponse(response)
+                    }
+                }
+            }
+        })
+
+        objectViewModel.viewStateListObject.observe(viewLifecycleOwner, Observer { viewState ->
+            viewState.listObjectResponse?.let { list ->
+                list.list?.let { markers ->
+                    if (markers.isNotEmpty()) {
+                        markers.forEach { markerResponse ->
+                            val bitmap = BitmapDescriptorFactory.fromResource(R.mipmap.icon_marker)
+                            markerResponse.coordinates?.let {coordinatesString ->
+                                val markerOptions = MarkerOptions()
+                                    .position(coordinatesString.convertFromStringToLatLng())
+                                    .icon(bitmap)
+                                    .title(markerResponse.address)
+                                    .draggable(false)
+                                val marker = map?.addMarker(markerOptions)
+                                marker?.tag = markerResponse.id
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        objectViewModel.dataStateObject.observe(viewLifecycleOwner, Observer { dataState ->
+            stateHandler.onDataStateChange(dataState)
+            dataState.data?.let { data ->
+                data.getContentIfNotHandled()?.let { content ->
+                    content.objectResponse?.let { objectResponse ->
+                        objectViewModel.setObjectResponse(objectResponse)
+                    }
+                }
+            }
+        })
+
+        objectViewModel.viewStateObject.observe(viewLifecycleOwner, Observer { viewState ->
+            viewState.objectResponse?.let { washObject ->
+                // запустить bottom sheet wash
+                openBottomSheet(washObject)
+            }
+        })
+    }
+
+    private fun showProgressBar(visible: Boolean) {
+        if (visible) {
+            progressBar?.visibility = View.VISIBLE
+        } else {
+            progressBar?.visibility = View.GONE
+        }
+    }
+
+    private fun showToast(message: String?) {
+        message?.let {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showObject(idObject: String) {
+        if (idObject.isDigitsOnly()) {
+            val token = Hawk.get<String>(Constants.TOKEN)
+            objectViewModel.setStateEventForObject(
+                ObjectStateEvent.RequestObjectEvent(
+                    "Bearer $token",
+                    idObject.toInt()
+                )
+            )
+        }
+    }
+
+    private fun openBottomSheet(objectResponse: ObjectResponse) {
+        childFragmentManager.run {
+            val bundle = bundleOf(
+                "id" to objectResponse.id,
+                "city" to objectResponse.city,
+                "address" to objectResponse.address,
+                "seats" to objectResponse.seats,
+                "cashback" to objectResponse.cashback
+            )
+
+            val bottomSheetDialogFragment = ObjectInfoBottomSheet(bundle)
+            bottomSheetDialogFragment.show(this, "objectInfoFragment")
+        }
+    }
 
     private fun getLocationPermission() {
-
         context?.let {
             if (ContextCompat.checkSelfPermission(
                     it.applicationContext,
@@ -71,7 +213,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
                 activity?.let { mainActivity ->
                     if (mainActivity is MainActivity) {
-                        ActivityCompat.requestPermissions(mainActivity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
+                        ActivityCompat.requestPermissions(
+                            mainActivity,
+                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
+                        )
                     }
                 }
             }
@@ -79,7 +225,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     private fun updateLocationUI() {
-        map?.let {googleMap ->
+        map?.let { googleMap ->
             if (locationPermissionGranted) {
                 map?.isMyLocationEnabled = true
                 map?.uiSettings?.isMyLocationButtonEnabled = true
@@ -89,33 +235,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 lastKnownLocation = null
                 getLocationPermission()
             }
-
         }
-    }
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.map_fragment, container, false)
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        mapView = view.findViewById(R.id.map_view)
-        mapView?.getMapAsync(this)
-        mapView?.onCreate(savedInstanceState)
     }
 
     override fun onMarkerClick(p0: Marker?): Boolean {
-        childFragmentManager.run {
-            val bottomSheetDialogFragment = ObjectInfoBottomSheet()
-            bottomSheetDialogFragment.show(this, "tag")
-            println("DEBUG: ${p0?.tag}")
-        }
+        showObject(p0?.tag.toString())
         return false
     }
 
@@ -123,50 +247,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         map = p0
         updateLocationUI()
         map?.setOnMarkerClickListener(this)
-        val bitmap = BitmapDescriptorFactory.fromResource(R.mipmap.selected_itemhdpi)
 
-        stadionnay = map?.addMarker(
-            MarkerOptions()
-                .position(ecoVolgograd1)
-                .title("ул. Стадионная д. 20")
-                .icon(bitmap)
-        )
-
-        stadionnay?.tag = "sfa"
-        fruktovay = map?.addMarker(
-            MarkerOptions()
-                .position(ecoVolgograd2)
-                .title("ул. Фруктовая, 9А")
-                .icon(bitmap)
-        )
-
-        heroes = map?.addMarker(
-            MarkerOptions()
-                .position(ecoVolgograd3)
-                .title("пр-кт., Героев Сталинграда, 72А")
-                .icon(bitmap)
-        )
-
-        zhukova = map?.addMarker(
-            MarkerOptions()
-                .position(ecoVolgograd4)
-                .title("пр-кт., им. Маршала Жукова, д. 55")
-                .icon(bitmap)
-        )
-
-        pobedi = map?.addMarker(
-            MarkerOptions()
-                .position(ecoVolgograd5)
-                .title("Бульвар 30 лет Победы, д. 1")
-                .icon(bitmap)
-        )
-
-        lenina = map?.addMarker(
-            MarkerOptions()
-                .position(ecoVolgograd6)
-                .title("пр-кт., им. В.И. Ленина, 120Ж")
-                .icon(bitmap)
-        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -222,6 +303,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 }
             }
         }
-        // todo update ui
+        updateLocationUI()
+    }
+
+    override fun onDataStateChange(dataState: DataState<*>?) {
+        dataState?.let {
+            showProgressBar(it.loading)
+            it.message?.let { event ->
+                event.getContentIfNotHandled()?.let {
+                    showToast(it)
+                }
+            }
+        }
     }
 }
