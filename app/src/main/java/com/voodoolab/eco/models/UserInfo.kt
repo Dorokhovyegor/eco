@@ -7,5 +7,5 @@ data class UserInfo(
     @SerializedName("name") val name: String?,
     @SerializedName("phone") val phone: String?,
     @SerializedName("balance") val balance: Int?,
-    @SerializedName("month_balance") val month_balance: Int?
+    @SerializedName("month_spent") val month_balance: Int?
 )

@@ -1,17 +1,17 @@
 package com.voodoolab.eco.ui.tab_fragments
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.provider.SyncStateContract
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewStub
+import android.view.*
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -57,7 +57,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private var map: GoogleMap? = null
     private var mapView: MapView? = null
     private var progressBar: MaterialProgressBar? = null
-    private var chooseCityButton: Button? = null
+    private var optionsButton: ImageButton? = null
     private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
 
     private var locationPermissionGranted = false
@@ -76,7 +76,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        chooseCityButton = view.findViewById(R.id.choose_city)
+        optionsButton = view.findViewById(R.id.options_button)
         progressBar = view.findViewById(R.id.progress_bar)
         mapView = view.findViewById(R.id.map_view)
         mapView?.getMapAsync(this)
@@ -84,8 +84,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         val token = Hawk.get<String>(Constants.TOKEN)
         objectViewModel.setStateEventForListObject(ListObjectStateEvent.RequestAllObjectEvent("Bearer $token"))
         subscribeObservers()
-
-        chooseCityButton?.setOnClickListener {
+        setToolbarContent(view)
+        optionsButton?.setOnClickListener {
             AlertDialog.Builder(context!!)
                 .setTitle(getString(R.string.choose_city))
                 .setSingleChoiceItems(arrayOf(
@@ -105,6 +105,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     override fun onClick(dialog: DialogInterface?, which: Int) {
+
+    }
+
+
+    private fun setToolbarContent(view: View) {
+        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+        activity?.let {
+            val pref = it.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
+            val city = pref.getString(Constants.CITY_ECO, null)
+            city?.let {
+                toolbar.subtitle = it
+            }
+        }
 
     }
 
@@ -225,7 +238,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     private fun updateLocationUI() {
-        map?.let { googleMap ->
+        map?.let { _ ->
             if (locationPermissionGranted) {
                 map?.isMyLocationEnabled = true
                 map?.uiSettings?.isMyLocationButtonEnabled = true

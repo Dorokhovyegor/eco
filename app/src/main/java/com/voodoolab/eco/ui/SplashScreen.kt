@@ -18,6 +18,8 @@ class SplashScreen : Fragment() {
 
     var splashScreenListener: SkipSplashScreenListener? = null
 
+    // todo (Получить список городов)
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

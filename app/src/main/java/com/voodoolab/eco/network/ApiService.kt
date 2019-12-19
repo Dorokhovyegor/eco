@@ -1,6 +1,7 @@
 package com.voodoolab.eco.network
 
 import androidx.lifecycle.LiveData
+import com.voodoolab.eco.models.CityModel
 import com.voodoolab.eco.responses.*
 import com.voodoolab.eco.utils.GenericApiResponse
 import retrofit2.Call
@@ -46,4 +47,10 @@ interface ApiService {
         @Header("Accept") accept: String,
         @Path("id") washId: Int
     ) : LiveData<GenericApiResponse<ObjectResponse>>
+
+    @GET("api/cities")
+    fun getAllCities(
+        @Header("Accept") accept: String
+    ) : LiveData<GenericApiResponse<List<CityModel>>>
+
 }

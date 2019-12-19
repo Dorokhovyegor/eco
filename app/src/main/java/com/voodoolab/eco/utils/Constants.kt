@@ -91,4 +91,7 @@ object Constants {
 
     val TOKEN = "token"
     val TYPE_TOKEN = "token_type"
+
+    val SETTINGS = "eco_settings"
+    val CITY_ECO = "city"
 }
