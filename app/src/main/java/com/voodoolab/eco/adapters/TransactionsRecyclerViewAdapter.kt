@@ -35,6 +35,8 @@ class TransactionsRecyclerViewAdapter() :
         }
     }
 
+
+
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val image = itemView.iconImageView
         private val transactionName = itemView.replanish_name

@@ -17,8 +17,10 @@ import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.BalanceUpClickListener
+import com.voodoolab.eco.interfaces.ChangeCityEventListener
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.states.user_state.UserStateEvent
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.view_models.TransactionsViewModel
@@ -36,6 +38,7 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
     var dataStateHandler: DataStateListener = this
 
     private var onBalanceUpClickListener: BalanceUpClickListener? = null
+    private var chooseCityListener: ChangeCityEventListener? = null
 
     private var helloTextView: TextView? = null
     private var nameTextView: TextView? = null
@@ -87,7 +90,6 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
                 toolbar.subtitle = it
             }
         }
-
     }
 
     private fun findViewsFromLayout(view: View) {
@@ -107,8 +109,6 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
             val inflater = popup.menuInflater
             inflater.inflate(R.menu.setting_menu, popup.menu)
             popup.show()
-
-
         }
     }
 
@@ -157,6 +157,7 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         userViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.userResponse?.let {
                 if (it.status == "ok") {
+
                 }
             }
         })
@@ -164,7 +165,44 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         transactionViewModel.transactionsPagedList?.observe(viewLifecycleOwner, Observer {
             transactionsProgressBar?.visibility = View.GONE
             adapter?.submitList(it)
+
+            if (adapter?.itemCount == 0) {
+                // todo show empty list holder
+            }
+
         })
+    }
+
+    private fun updateContent(userInfoResponse: UserInfoResponse?) {
+        // todo set content
+        balanceTextView?.text = userInfoResponse?.data?.balance.toString()
+        nameTextView?.text = userInfoResponse?.data?.name
+
+        listMoneyTextView?.withIndex()?.forEach {
+            it.value.text = getString(R.string.transaction_value, userInfoResponse?.month_cash_back?.get(it.index)?.value)
+        }
+
+        listPercentsTextView?.withIndex()?.forEach {
+            it.value.text = getString(R.string.percent_value,userInfoResponse?.month_cash_back?.get(it.index)?.percent)
+        }
+
+
+        var firstRange: IntRange? = null
+        var secondRange: IntRange? = null
+        var thirdRange: IntRange? = null
+        var forthRange: IntRange? = null
+        var fiftRange: IntRange? = null
+        userInfoResponse?.month_cash_back?.withIndex()?.forEach {
+
+        }
+
+
+        when (userInfoResponse?.data?.month_balance) {
+            in firstRange -> {}
+            in 200..399 -> {}
+            in 400..
+        }
+
     }
 
     private fun handleDataStateChange(dataState: DataState<*>?) {
@@ -196,35 +234,20 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         topUpBalance?.setOnClickListener {
             onBalanceUpClickListener?.onBalanceUpClick()
         }
-
-        /*exitButton.setOnClickListener {
-            AlertDialog.Builder(context)
-                .setTitle("Выход")
-                .setMessage("Вы действительно хотите выйти из приложения?")
-                .setPositiveButton(
-                    "Да"
-                ) { p0, p1 ->
-
-                }
-                .setNegativeButton(
-                    "Нет"
-                ) { p0, p1 ->
-
-                }
-                .show()
-        }*/
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is MainActivity) {
             onBalanceUpClickListener = context
+            chooseCityListener = context
         }
     }
 
     override fun onDetach() {
         super.onDetach()
         onBalanceUpClickListener = null
+        chooseCityListener = null
     }
 
     override fun onDataStateChange(dataState: DataState<*>?) {
@@ -234,10 +257,12 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.action_choose_city -> {
-
+                chooseCityListener?.showDialog()
+            }
+            R.id.action_exit -> {
+                // todo exit
             }
         }
-
         return true
     }
 }

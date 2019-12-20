@@ -85,23 +85,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         objectViewModel.setStateEventForListObject(ListObjectStateEvent.RequestAllObjectEvent("Bearer $token"))
         subscribeObservers()
         setToolbarContent(view)
-        optionsButton?.setOnClickListener {
-            AlertDialog.Builder(context!!)
-                .setTitle(getString(R.string.choose_city))
-                .setSingleChoiceItems(arrayOf(
-                    "Тамбов",
-                    "Липецк",
-                    "Волгоград"
-                ), 0, object: DialogInterface.OnClickListener{
-                    override fun onClick(dialog: DialogInterface?, which: Int) {
-
-                    }
-                })
-                .setPositiveButton("ОК", this)
-                .setNegativeButton("Отмена", this)
-                .create()
-                .show()
-        }
     }
 
     override fun onClick(dialog: DialogInterface?, which: Int) {
@@ -214,43 +197,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         }
     }
 
-    private fun getLocationPermission() {
-        context?.let {
-            if (ContextCompat.checkSelfPermission(
-                    it.applicationContext,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                locationPermissionGranted = true
-            } else {
-
-                activity?.let { mainActivity ->
-                    if (mainActivity is MainActivity) {
-                        ActivityCompat.requestPermissions(
-                            mainActivity,
-                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private fun updateLocationUI() {
-        map?.let { _ ->
-            if (locationPermissionGranted) {
-                map?.isMyLocationEnabled = true
-                map?.uiSettings?.isMyLocationButtonEnabled = true
-            } else {
-                map?.isMyLocationEnabled = false
-                map?.uiSettings?.isMyLocationButtonEnabled = false
-                lastKnownLocation = null
-                getLocationPermission()
-            }
-        }
-    }
-
     override fun onMarkerClick(p0: Marker?): Boolean {
         showObject(p0?.tag.toString())
         return false
@@ -258,7 +204,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
-        updateLocationUI()
         map?.setOnMarkerClickListener(this)
 
     }
@@ -301,22 +246,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     override fun onLowMemory() {
         super.onLowMemory()
         mapView?.onLowMemory()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        locationPermissionGranted = false
-        when (requestCode) {
-            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
-                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    locationPermissionGranted = true
-                }
-            }
-        }
-        updateLocationUI()
     }
 
     override fun onDataStateChange(dataState: DataState<*>?) {
