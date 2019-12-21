@@ -1,7 +1,7 @@
 package com.voodoolab.eco.states.cities_state
 
-import com.voodoolab.eco.models.CityModel
+import com.voodoolab.eco.responses.CitiesResponse
 
 data class CitiesViewState(
-    var citiesResponse: List<CityModel>? = null
+    var citiesResponse: CitiesResponse? = null
 )

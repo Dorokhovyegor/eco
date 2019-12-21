@@ -39,7 +39,7 @@ class CitiesViewModels : ViewModel() {
         }
     }
 
-    fun setCitiesResponse(citiesResponse: List<CityModel>) {
+    fun setCitiesResponse(citiesResponse: CitiesResponse) {
         val update = getCurrentViewStateOrNew()
         update.citiesResponse = citiesResponse
         _citiesViewState.value = update

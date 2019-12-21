@@ -95,4 +95,6 @@ object Constants {
     val SETTINGS = "eco_settings"
     val CITY_ECO = "city"
     val CITY_COORDINATES = "coordinates"
+
+    val CONTAINER_FRAGMENT = "ContainerFragment"
 }

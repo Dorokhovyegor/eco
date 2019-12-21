@@ -40,7 +40,7 @@ class CitiesRecyclerViewAdapter(var list: List<String>, var listener: ChooseCity
         }
 
         override fun onClick(v: View?) {
-            listener.onCcityClick(city?.text.toString())
+            listener.onCityClick(city?.text.toString())
         }
     }
 }

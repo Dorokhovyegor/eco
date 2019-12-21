@@ -60,10 +60,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private var optionsButton: ImageButton? = null
     private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
 
-    private var locationPermissionGranted = false
-    val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 145
-    var lastKnownLocation: LatLng? = null
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -124,7 +120,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                             val bitmap = BitmapDescriptorFactory.fromResource(R.mipmap.icon_marker)
                             markerResponse.coordinates?.let {coordinatesString ->
                                 val markerOptions = MarkerOptions()
-                                    .position(coordinatesString.convertFromStringToLatLng())
+                                    .position(LatLng(coordinatesString[0], coordinatesString[1]))
                                     .icon(bitmap)
                                     .title(markerResponse.address)
                                     .draggable(false)

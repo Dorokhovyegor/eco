@@ -11,10 +11,8 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.models.TransactionData
 import kotlinx.android.synthetic.main.transaction_layout_item.view.*
 
-class TransactionsRecyclerViewAdapter() :
-    PagedListAdapter<TransactionData, TransactionsRecyclerViewAdapter.ViewHolder>(
-        TRANSACTION_COMPARATOR
-    ) {
+class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, TransactionsRecyclerViewAdapter.ViewHolder>(
+        TRANSACTION_COMPARATOR) {
 
     val REPLENISH_OFFLINE = "replenish_offline"
     val MONTH_BONUS = "month_bonus"

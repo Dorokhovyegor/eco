@@ -6,7 +6,7 @@ data class ObjectResponse(
     @SerializedName("id") val id: Int,
     @SerializedName("city") val city: String?,
     @SerializedName("address") val address: String?,
-    @SerializedName("coordinates") val coordinates: String?,
+    @SerializedName("coordinates") val coordinates: ArrayList<Double>?,
     @SerializedName("cashback") val cashback: Int?,
     @SerializedName("seats") val seats: Int?
 )

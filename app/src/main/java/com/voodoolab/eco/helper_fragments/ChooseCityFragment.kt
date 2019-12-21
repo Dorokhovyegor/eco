@@ -37,7 +37,7 @@ class ChooseCityFragment(var list: List<String>, var currentCity: String): Dialo
 
     }
 
-    override fun onCcityClick(city: String) {
+    override fun onCityClick(city: String) {
         println("DEBUG: $city")
     }
 }

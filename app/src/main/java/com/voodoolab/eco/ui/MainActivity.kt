@@ -3,19 +3,17 @@ package com.voodoolab.eco.ui
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.View
-import android.widget.ImageButton
 import android.widget.Toast
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.ListAdapter
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.*
@@ -23,10 +21,11 @@ import com.voodoolab.eco.models.CityModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.CitiesResponse
 import com.voodoolab.eco.states.cities_state.CitiesStateEvent
+import com.voodoolab.eco.states.firebase_token_state.UpdateTokenFireBaseStateEvent
 import com.voodoolab.eco.ui.view_models.CitiesViewModels
+import com.voodoolab.eco.ui.view_models.FirebaseTokenViewModel
 import com.voodoolab.eco.utils.Constants
-import java.util.*
-import kotlin.collections.ArrayList
+import com.voodoolab.eco.utils.Constants.CONTAINER_FRAGMENT
 
 class MainActivity : AppCompatActivity(),
     DataStateListener,
@@ -34,11 +33,12 @@ class MainActivity : AppCompatActivity(),
     AuthenticateListener,
     BalanceUpClickListener,
     ChangeCityEventListener,
-    DialogInterface.OnClickListener {
+    DialogInterface.OnClickListener,
+    NavController.OnDestinationChangedListener {
 
     lateinit var navController: NavController
+    lateinit var updateTokenViewModel: FirebaseTokenViewModel
     lateinit var citiesViewModel: CitiesViewModels
-
     private var stateListener = this as DataStateListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,10 +48,37 @@ class MainActivity : AppCompatActivity(),
         initViews()
         initAndSetListeners()
         navController = Navigation.findNavController(this, R.id.frame_container)
+        navController.addOnDestinationChangedListener(this)
+
+        updateTokenViewModel = ViewModelProvider(this).get(FirebaseTokenViewModel::class.java)
         citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
 
         if (!Hawk.isBuilt())
             Hawk.init(this).build()
+    }
+
+    private fun initToken() {
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    return@OnCompleteListener
+                }
+                // Get new Instance ID token
+                val token = task.result?.token
+
+                if (Hawk.contains(Constants.TOKEN) && token != null) {
+
+                    val applicaionToken = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
+                    println("DEBUG firebase token $token")
+
+                    updateTokenViewModel.setStateEvent(
+                        UpdateTokenFireBaseStateEvent.UpdateTokenEvent(
+                            appToken = applicaionToken,
+                            firebaseToken = token
+                        )
+                    )
+                }
+            })
     }
 
     private fun initViews() {
@@ -79,6 +106,25 @@ class MainActivity : AppCompatActivity(),
                 showChooseCityDialogs(cities)
             }
         })
+
+        updateTokenViewModel.dataState.observe(this, Observer {
+            stateListener.onDataStateChange(it)
+            it.data?.let {tokenViewState->
+                tokenViewState.getContentIfNotHandled()?.let {
+                    it.updateTokenResponse?.let {
+                        updateTokenViewModel.setTokenResponse(it)
+                    }
+                }
+            }
+        })
+
+        updateTokenViewModel.viewState.observe(this, Observer {
+            it.updateTokenResponse?.let {
+                if (it.status == "ok") {
+                    Toast.makeText(this, "Токен передан", Toast.LENGTH_LONG).show()
+                }
+            }
+        })
     }
 
     private fun findCurrentPositionOrZero(list: ArrayList<String>): Int {
@@ -95,12 +141,11 @@ class MainActivity : AppCompatActivity(),
         return 0
     }
 
-    fun showChooseCityDialogs(citiesResponse: List<CityModel>) {
+    fun showChooseCityDialogs(citiesResponse: CitiesResponse) {
         val citiesArrayList = ArrayList<String>()
         val citiesCoordinates = ArrayList<String>()
 
-        // ковертирую, чтобы удобно было брать
-        citiesResponse.forEach {
+        citiesResponse.listCities?.forEach {
             citiesArrayList.add(it.city)
             citiesCoordinates.add(it.coordinates.toString())
         }
@@ -137,12 +182,6 @@ class MainActivity : AppCompatActivity(),
         val token = Hawk.get<String>(Constants.TOKEN, null)
         if (token != null) {
             navController.navigate(R.id.action_splash_destination_to_containerFragment)
-
-            runOnUiThread {
-                citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
-                subscribeObservers()
-            }
-
         } else {
             navController.navigate(R.id.action_splash_destination_to_auth_destination)
         }
@@ -155,11 +194,6 @@ class MainActivity : AppCompatActivity(),
             .setExitAnim(R.anim.nav_default_exit_anim)
             .build()
         navController.navigate(R.id.from_auth_To_container, null, navOptions)
-
-        runOnUiThread {
-            citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
-            subscribeObservers()
-        }
     }
 
     override fun onBalanceUpClick() {
@@ -169,13 +203,34 @@ class MainActivity : AppCompatActivity(),
     override fun onSupportNavigateUp(): Boolean = navController.navigateUp()
 
     override fun onDataStateChange(dataState: DataState<*>?) {
-        //todo ничего не показываем, ждем сообщения о выборе города
         dataState?.let {
-
+            it.message?.let {
+                    it.getContentIfNotHandled()?.let {
+                        Toast.makeText(this, "Произошла ошибка", Toast.LENGTH_LONG).show()
+                    }
+                }
         }
     }
 
     override fun showDialog() {
+        println("DEBUG show dialog")
         citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
+    }
+
+    override fun onDestinationChanged(
+        controller: NavController,
+        destination: NavDestination,
+        arguments: Bundle?
+    ) {
+        when (destination.label) {
+            CONTAINER_FRAGMENT -> {
+                runOnUiThread {
+
+                    citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
+                    subscribeObservers()
+                    initToken()
+                }
+            }
+        }
     }
 }

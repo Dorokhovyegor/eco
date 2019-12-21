@@ -14,8 +14,8 @@ import com.voodoolab.eco.utils.GenericApiResponse
 object CitiesRepo{
 
     fun requestListCities(): LiveData<DataState<CitiesViewState>> {
-        return object : NetworkBoundResource<List<CityModel>, CitiesViewState>() {
-            override fun handleApiSuccessResponse(response: ApiSuccessResponse<List<CityModel>>) {
+        return object : NetworkBoundResource<CitiesResponse, CitiesViewState>() {
+            override fun handleApiSuccessResponse(response: ApiSuccessResponse<CitiesResponse>) {
                 result.value = DataState.data(
                     data = CitiesViewState(
                         citiesResponse = response.body
@@ -23,7 +23,7 @@ object CitiesRepo{
                 )
             }
 
-            override fun createCall(): LiveData<GenericApiResponse<List<CityModel>>> {
+            override fun createCall(): LiveData<GenericApiResponse<CitiesResponse>> {
                 return RetrofitBuilder.apiService.getAllCities( "application/json")
             }
         }.asLiveData()

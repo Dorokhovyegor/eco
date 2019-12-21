@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -30,7 +31,7 @@ import com.xw.repo.BubbleSeekBar
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
 
-class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClickListener{
+class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClickListener {
 
     lateinit var userViewModel: UserInfoViewModel
     lateinit var transactionViewModel: TransactionsViewModel
@@ -157,7 +158,8 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         userViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.userResponse?.let {
                 if (it.status == "ok") {
-
+                    updateContent(it)
+                    println("DEBUG: ${it.data?.month_balance}")
                 }
             }
         })
@@ -169,40 +171,112 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
             if (adapter?.itemCount == 0) {
                 // todo show empty list holder
             }
-
         })
     }
 
     private fun updateContent(userInfoResponse: UserInfoResponse?) {
-        // todo set content
+        // ебал в рот бэкэнд из-за которого приходится так
+
         balanceTextView?.text = userInfoResponse?.data?.balance.toString()
         nameTextView?.text = userInfoResponse?.data?.name
 
         listMoneyTextView?.withIndex()?.forEach {
-            it.value.text = getString(R.string.transaction_value, userInfoResponse?.month_cash_back?.get(it.index)?.value)
+            it.value.text = getString(
+                R.string.transaction_value,
+                userInfoResponse?.month_cash_back?.get(it.index)?.value
+            )
         }
 
         listPercentsTextView?.withIndex()?.forEach {
-            it.value.text = getString(R.string.percent_value,userInfoResponse?.month_cash_back?.get(it.index)?.percent)
+            it.value.text = getString(
+                R.string.percent_value,
+                userInfoResponse?.month_cash_back?.get(it.index)?.percent
+            )
         }
 
+        val rangeList: ArrayList<IntRange> = ArrayList()
 
-        var firstRange: IntRange? = null
-        var secondRange: IntRange? = null
-        var thirdRange: IntRange? = null
-        var forthRange: IntRange? = null
-        var fiftRange: IntRange? = null
-        userInfoResponse?.month_cash_back?.withIndex()?.forEach {
-
+        userInfoResponse?.month_cash_back?.let { cashBacks ->
+            if (cashBacks.size == 5) {
+                cashBacks.withIndex().forEach { wrappedItem ->
+                    if (wrappedItem.index == 0) {
+                        wrappedItem.value.value?.let { endOfRange ->
+                            rangeList.add(
+                                IntRange(0, endOfRange - 1)
+                            )
+                        }
+                    } else if (wrappedItem.index == 4) {
+                        wrappedItem.value.value?.let { endOfRange ->
+                            cashBacks[wrappedItem.index - 1].value?.let { startRangeOf ->
+                                rangeList.add(
+                                    IntRange(startRangeOf, endOfRange)
+                                )
+                            }
+                        }
+                    } else {
+                        wrappedItem.value.value?.let { endOfRange ->
+                            cashBacks[wrappedItem.index - 1].value?.let { startRangeOf ->
+                                rangeList.add(
+                                    IntRange(startRangeOf, endOfRange - 1)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
 
+        var currentSection = -1
 
-        when (userInfoResponse?.data?.month_balance) {
-            in firstRange -> {}
-            in 200..399 -> {}
-            in 400..
+        userInfoResponse?.data?.month_balance?.let { month_spend ->
+            currentSection = when (month_spend) {
+                in rangeList[0] -> {
+                    -1
+                }
+                in rangeList[1] -> {
+                    0  // находимся в первой секции
+                }
+                in rangeList[2] -> {
+                    1 // находимся во второй секции
+                }
+                in rangeList[3] -> {
+                    2
+                }
+                in rangeList[4] -> {
+                    3
+                }
+                else -> {
+                    // уведичиваем последний текст
+                    4
+                }
+            }
         }
 
+        if (currentSection != -1) {
+            doPercentTextViewBigger(currentSection)
+        }
+
+        when (currentSection) {
+            -1 -> bubbleSeekBar?.setProgress(0f) // мы не вышли даже на вервую секцию
+            4 -> bubbleSeekBar?.setProgress(100f) // выше последней секции
+            else -> {
+                val p = userInfoResponse?.data?.month_balance
+                val range = rangeList[currentSection + 1].step
+                val percent = p?.div(range)?.plus(20.times(currentSection)) // in percent
+                percent?.let {
+                    bubbleSeekBar?.setProgress(it.toFloat())
+                }
+            }
+        }
+    }
+
+    private fun doPercentTextViewBigger(position: Int) {
+        listPercentsTextView?.forEach { textView ->
+            textView.setTextColor(resources.getColor(R.color.grey_from_Serge, null))
+            textView.textSize = 16f
+        }
+        listPercentsTextView?.get(position)?.textSize = 32f
+        listPercentsTextView?.get(position)?.setTextColor(resources.getColor(R.color.black, null))
     }
 
     private fun handleDataStateChange(dataState: DataState<*>?) {
