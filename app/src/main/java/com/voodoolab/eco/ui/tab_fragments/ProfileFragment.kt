@@ -159,7 +159,6 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
             viewState.userResponse?.let {
                 if (it.status == "ok") {
                     updateContent(it)
-                    println("DEBUG: ${it.data?.month_balance}")
                 }
             }
         })
