@@ -16,23 +16,20 @@ class TransactionDataSource(val token: String): PageKeyedDataSource<Int, Transac
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, TransactionData>
     ) {
-
-        println("DEBUG ТУТ Я ПОПАЛ В МЕТОД")
-
-
         RetrofitBuilder.apiService.getOperations(token, "application/json", FIRST_PAGE.toString(), QUANTITY.toString()).enqueue( object: retrofit2.Callback<TransactionResponse> {
             override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {
                 t.printStackTrace()
-                println("DEBUG ТУТ 1111111111111111111")
             }
             override fun onResponse(
                 call: Call<TransactionResponse>,
                 response: Response<TransactionResponse>
             ) {
-                println("DEBUG ТУТ")
-                response.body()?.let { transactionsResponse ->
 
-                    callback.onResult(transactionsResponse.data, null, FIRST_PAGE + 1)
+                response.body()?.let { transactionsResponse ->
+                    transactionsResponse.data?.let {
+                        callback.onResult(it, null, FIRST_PAGE + 1)
+
+                    }
                 }
             }
         })
@@ -49,8 +46,9 @@ class TransactionDataSource(val token: String): PageKeyedDataSource<Int, Transac
             ) {
                 val key = params.key + 1
                 response.body()?.let { apartmentResponse ->
-                    callback.onResult(apartmentResponse.data, key)
-
+                    apartmentResponse.data?.let {
+                        callback.onResult(it, key)
+                    }
                 }
             }
         })

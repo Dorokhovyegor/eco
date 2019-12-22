@@ -11,7 +11,7 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.utils.Constants
 
-class DiscountsFragment: Fragment(R.layout.discounts_fragment) {
+class DiscountsFragment: Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,6 +34,5 @@ class DiscountsFragment: Fragment(R.layout.discounts_fragment) {
                 toolbar.subtitle = it
             }
         }
-
     }
 }

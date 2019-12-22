@@ -60,5 +60,12 @@ interface ApiService {
         @Part("token") tokenFireBase: String
     ): LiveData<GenericApiResponse<UpdateTokenResponse>>
 
+    @GET("api/stock")
+    fun getSpecialOffersById(
+        @Header("Authorization") tokenApp: String,
+        @Query("city") city: String?,
+        @Query("page") page: String,
+        @Query("qty") qty: String
+    ): Call<SpecialOffersResponse>
 
 }

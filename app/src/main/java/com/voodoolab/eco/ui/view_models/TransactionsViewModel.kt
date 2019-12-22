@@ -14,7 +14,6 @@ class TransactionsViewModel : ViewModel() {
     private var liveDataSource: LiveData<TransactionDataSource>? = null
 
     fun initialize(token: String?) {
-        println("ТУТ VIEW MODEL ${token}")
         token?.let { key->
             val itemDataSourceFactory = TransactionDataSourceFactory(key)
             liveDataSource = itemDataSourceFactory.transactionsLiveDataSource
@@ -23,8 +22,6 @@ class TransactionsViewModel : ViewModel() {
                 .setEnablePlaceholders(false)
                 .setPageSize(5)
                 .build()
-
-            println("ТУТ VIEW MODEL ${key}")
             transactionsPagedList = LivePagedListBuilder(itemDataSourceFactory, config)
                 .build()
         }

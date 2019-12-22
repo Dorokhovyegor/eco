@@ -225,7 +225,6 @@ class MainActivity : AppCompatActivity(),
         when (destination.label) {
             CONTAINER_FRAGMENT -> {
                 runOnUiThread {
-
                     citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
                     subscribeObservers()
                     initToken()
