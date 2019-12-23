@@ -17,7 +17,6 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.*
-import com.voodoolab.eco.models.CityModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.CitiesResponse
 import com.voodoolab.eco.states.cities_state.CitiesStateEvent
@@ -45,6 +44,8 @@ class MainActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
+        actionBar?.hide()
+
         initViews()
         initAndSetListeners()
         navController = Navigation.findNavController(this, R.id.frame_container)
@@ -120,9 +121,7 @@ class MainActivity : AppCompatActivity(),
 
         updateTokenViewModel.viewState.observe(this, Observer {
             it.updateTokenResponse?.let {
-                if (it.status == "ok") {
-                    Toast.makeText(this, "Токен передан", Toast.LENGTH_LONG).show()
-                }
+
             }
         })
     }
@@ -213,7 +212,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun showDialog() {
-        println("DEBUG show dialog")
         citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
     }
 

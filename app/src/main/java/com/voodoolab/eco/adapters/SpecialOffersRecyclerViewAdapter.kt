@@ -38,6 +38,8 @@ class SpecialOffersRecyclerViewAdapter: PagedListAdapter<SpecialOfferModel, Recy
         fun bind(specialOfferModel: SpecialOfferModel) {
             Glide.with(itemView)
                 .load(specialOfferModel.imageUrl)
+                .placeholder(R.drawable.empty_discount)
+                .error(R.drawable.empty_discount)
                 .centerCrop()
                 .into(image)
 

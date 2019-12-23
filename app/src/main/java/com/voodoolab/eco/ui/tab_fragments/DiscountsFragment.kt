@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -14,15 +16,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.SpecialOffersRecyclerViewAdapter
+import com.voodoolab.eco.interfaces.EmptyListInterface
 import com.voodoolab.eco.ui.view_models.SpecialOffersViewModel
 import com.voodoolab.eco.utils.Constants
 
-class DiscountsFragment : Fragment() {
+class DiscountsFragment : Fragment(), EmptyListInterface {
 
     private lateinit var specialOfferViewModel: SpecialOffersViewModel
 
     private var specialOffersRecyclerView: RecyclerView? = null
     private var recyclerViewAdapter: SpecialOffersRecyclerViewAdapter? = null
+
+    private var emptyListImageView: ImageView? = null
+    private var emptyTextView: TextView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,13 +48,16 @@ class DiscountsFragment : Fragment() {
 
         val token = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
 
-        specialOfferViewModel.init(token, city)
+        specialOfferViewModel.init(token, city, this)
 
         setToolbarContent(view)
         subscribeObserver()
     }
 
     private fun initViews(view: View) {
+        emptyListImageView= view.findViewById(R.id.emptyListImageView)
+        emptyTextView = view.findViewById(R.id.emptyListTextView)
+
         specialOffersRecyclerView = view.findViewById(R.id.discountRecyclerView)
         specialOffersRecyclerView?.layoutManager = LinearLayoutManager(context)
         recyclerViewAdapter = SpecialOffersRecyclerViewAdapter()
@@ -70,5 +79,9 @@ class DiscountsFragment : Fragment() {
         specialOfferViewModel.offersPagedList?.observe(viewLifecycleOwner, Observer {
             recyclerViewAdapter?.submitList(it)
         })
+    }
+
+    override fun setEmptyState() {
+
     }
 }

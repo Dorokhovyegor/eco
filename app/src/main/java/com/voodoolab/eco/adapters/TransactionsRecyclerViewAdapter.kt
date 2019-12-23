@@ -3,6 +3,7 @@ package com.voodoolab.eco.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -32,8 +33,6 @@ class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, Transa
             holder.bind(it)
         }
     }
-
-
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val image = itemView.iconImageView

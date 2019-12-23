@@ -17,7 +17,7 @@ class SpecialOffersDataSource(val token: String, val city: String?) :
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, SpecialOfferModel>
     ) {
-        RetrofitBuilder.apiService.getSpecialOffersById(token, city, FIRST_PAGE.toString(), QUANTITY.toString()).enqueue(
+        RetrofitBuilder.apiService.getSpecialOffers(token, city, FIRST_PAGE.toString(), QUANTITY.toString()).enqueue(
             object : retrofit2.Callback<SpecialOffersResponse> {
                 override fun onFailure(call: Call<SpecialOffersResponse>, t: Throwable) {
                     t.printStackTrace()
@@ -41,7 +41,7 @@ class SpecialOffersDataSource(val token: String, val city: String?) :
         params: LoadParams<Int>,
         callback: LoadCallback<Int, SpecialOfferModel>
     ) {
-        RetrofitBuilder.apiService.getSpecialOffersById(token, city, params.key.toString(), QUANTITY.toString())
+        RetrofitBuilder.apiService.getSpecialOffers(token, city, params.key.toString(), QUANTITY.toString())
             .enqueue( object: retrofit2.Callback<SpecialOffersResponse> {
                 override fun onFailure(call: Call<SpecialOffersResponse>, t: Throwable) {
                     t.printStackTrace()

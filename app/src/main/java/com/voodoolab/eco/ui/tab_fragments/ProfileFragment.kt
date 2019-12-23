@@ -20,6 +20,7 @@ import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.BalanceUpClickListener
 import com.voodoolab.eco.interfaces.ChangeCityEventListener
 import com.voodoolab.eco.interfaces.DataStateListener
+import com.voodoolab.eco.interfaces.EmptyListInterface
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.states.user_state.UserStateEvent
@@ -29,9 +30,10 @@ import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.voodoolab.eco.utils.Constants
 import com.xw.repo.BubbleSeekBar
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
+import org.w3c.dom.Text
 
 
-class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClickListener {
+class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClickListener, EmptyListInterface {
 
     lateinit var userViewModel: UserInfoViewModel
     lateinit var transactionViewModel: TransactionsViewModel
@@ -53,6 +55,10 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
     private var listMoneyTextView: List<TextView>? = null
     private var optionButton: ImageButton? = null
 
+    private var titleTransactions: TextView? = null
+    private var emptyImageView: ImageView? = null
+    private var emptyTextView: TextView? = null
+
     private var adapter: TransactionsRecyclerViewAdapter? = null
 
     override fun onCreateView(
@@ -68,13 +74,12 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         findViewsFromLayout(view)
-
         listPercentsTextView = initTextViewsDiscounts(view)
         listMoneyTextView = initTextViewsMoney(view)
         val token = Hawk.get<String>(Constants.TOKEN)
         userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
         val token2 = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
-        transactionViewModel.initialize(token2)
+        transactionViewModel.initialize(token2, this)
 
         setToolbarContent(view)
         subscribeObservers()
@@ -103,6 +108,10 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         nameTextView = view.findViewById(R.id.name_text_view)
         topUpBalance = view.findViewById(R.id.topUpBalance)
         optionButton = view.findViewById(R.id.options_button)
+
+        titleTransactions = view.findViewById(R.id.transactions_title)
+        emptyImageView = view.findViewById(R.id.emptyListImageView)
+        emptyTextView = view.findViewById(R.id.emptyListTextView)
 
         optionButton?.setOnClickListener {
             val popup = PopupMenu(context, it)
@@ -166,23 +175,22 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         transactionViewModel.transactionsPagedList?.observe(viewLifecycleOwner, Observer {
             transactionsProgressBar?.visibility = View.GONE
             adapter?.submitList(it)
-
-            if (adapter?.itemCount == 0) {
-                // todo show empty list holder
-            }
         })
     }
 
     private fun updateContent(userInfoResponse: UserInfoResponse?) {
-        // ебал в рот бэкэнд из-за которого приходится так
+        // ебал в рот бэкэнд из-за которого приходится так делать
+        balanceTextView?.text = getString(
+            R.string.transaction_value,
+            userInfoResponse?.data?.balance?.div(100)
+        )
 
-        balanceTextView?.text = userInfoResponse?.data?.balance.toString()
         nameTextView?.text = userInfoResponse?.data?.name
 
         listMoneyTextView?.withIndex()?.forEach {
             it.value.text = getString(
                 R.string.transaction_value,
-                userInfoResponse?.month_cash_back?.get(it.index)?.value
+                userInfoResponse?.month_cash_back?.get(it.index)?.value?.div(100)
             )
         }
 
@@ -201,14 +209,14 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
                     if (wrappedItem.index == 0) {
                         wrappedItem.value.value?.let { endOfRange ->
                             rangeList.add(
-                                IntRange(0, endOfRange - 1)
+                                IntRange(0, endOfRange.div(100) - 1)
                             )
                         }
                     } else if (wrappedItem.index == 4) {
                         wrappedItem.value.value?.let { endOfRange ->
                             cashBacks[wrappedItem.index - 1].value?.let { startRangeOf ->
                                 rangeList.add(
-                                    IntRange(startRangeOf, endOfRange)
+                                    IntRange(startRangeOf.div(100), endOfRange.div(100))
                                 )
                             }
                         }
@@ -216,7 +224,7 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
                         wrappedItem.value.value?.let { endOfRange ->
                             cashBacks[wrappedItem.index - 1].value?.let { startRangeOf ->
                                 rangeList.add(
-                                    IntRange(startRangeOf, endOfRange - 1)
+                                    IntRange(startRangeOf.div(100), endOfRange.div(100) - 1)
                                 )
                             }
                         }
@@ -228,15 +236,15 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         var currentSection = -1
 
         userInfoResponse?.data?.month_balance?.let { month_spend ->
-            currentSection = when (month_spend) {
+            currentSection = when (month_spend.div(100)) {
                 in rangeList[0] -> {
                     -1
                 }
                 in rangeList[1] -> {
-                    0  // находимся в первой секции
+                    0
                 }
                 in rangeList[2] -> {
-                    1 // находимся во второй секции
+                    1
                 }
                 in rangeList[3] -> {
                     2
@@ -245,7 +253,6 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
                     3
                 }
                 else -> {
-                    // уведичиваем последний текст
                     4
                 }
             }
@@ -259,11 +266,31 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
             -1 -> bubbleSeekBar?.setProgress(0f) // мы не вышли даже на вервую секцию
             4 -> bubbleSeekBar?.setProgress(100f) // выше последней секции
             else -> {
-                val p = userInfoResponse?.data?.month_balance
-                val range = rangeList[currentSection + 1].step
-                val percent = p?.div(range)?.plus(20.times(currentSection)) // in percent
-                percent?.let {
-                    bubbleSeekBar?.setProgress(it.toFloat())
+                val p = userInfoResponse?.data?.month_balance?.div(100)
+                val firstRange = rangeList[currentSection + 1].first
+                val endRange = rangeList[currentSection + 1].last
+
+                //текущее положение в рэндж листе
+                val currentPositionRangeList = currentSection + 1
+
+                // текущий рэндж, до которого мы дошли
+                val range = endRange - firstRange
+
+                var sum = 0
+                for (index in 0 until currentPositionRangeList) {
+                    sum += rangeList[index].last - rangeList[index].first + 1
+                }
+
+                val c = p?.minus(sum)
+                val percentInCurrentRange =
+                    c?.toFloat()
+                        ?.div(range)?.times(25)
+                        ?.plus(
+                            currentPositionRangeList.minus(1)
+                                .times(25)
+                        )
+                percentInCurrentRange?.let {
+                    bubbleSeekBar?.setProgress(it)
                 }
             }
         }
@@ -337,5 +364,13 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
             }
         }
         return true
+    }
+
+    override fun setEmptyState() {
+        transactionsRecyclerView?.visibility = View.GONE
+        titleTransactions?.visibility = View.GONE
+
+        emptyImageView?.visibility = View.VISIBLE
+        emptyTextView?.visibility = View.VISIBLE
     }
 }

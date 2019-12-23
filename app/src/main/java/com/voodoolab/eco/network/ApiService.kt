@@ -46,7 +46,7 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Header("Accept") accept: String,
         @Path("id") washId: Int
-    ) : LiveData<GenericApiResponse<ObjectResponse>>
+    ): LiveData<GenericApiResponse<ObjectResponse>>
 
     @GET("api/cities")
     fun getAllCities(
@@ -61,11 +61,17 @@ interface ApiService {
     ): LiveData<GenericApiResponse<UpdateTokenResponse>>
 
     @GET("api/stock")
-    fun getSpecialOffersById(
+    fun getSpecialOffers(
         @Header("Authorization") tokenApp: String,
         @Query("city") city: String?,
         @Query("page") page: String,
         @Query("qty") qty: String
     ): Call<SpecialOffersResponse>
+
+    @GET("api/stock/{id}")
+    fun getSpeciaOfferById(
+        @Header("Authorization") tokenApp: String,
+        @Path("id") discountId: Int
+    ): LiveData<GenericApiResponse<DiscountResponse>>
 
 }
