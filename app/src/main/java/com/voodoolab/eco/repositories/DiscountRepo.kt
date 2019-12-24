@@ -22,7 +22,7 @@ object DiscountRepo {
             }
 
             override fun createCall(): LiveData<GenericApiResponse<DiscountResponse>> {
-                return RetrofitBuilder.apiService.getSpeciaOfferById(token, discountID)
+                return RetrofitBuilder.apiService.getSpecialOfferById(token, discountID)
             }
         }.asLiveData()
     }

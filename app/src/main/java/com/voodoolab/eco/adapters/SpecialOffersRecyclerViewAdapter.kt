@@ -12,7 +12,7 @@ import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.models.TransactionData
 import kotlinx.android.synthetic.main.special_offer_item.view.*
 
-class SpecialOffersRecyclerViewAdapter: PagedListAdapter<SpecialOfferModel, RecyclerView.ViewHolder>(
+class SpecialOffersRecyclerViewAdapter(val block: (model: SpecialOfferModel) -> Unit): PagedListAdapter<SpecialOfferModel, RecyclerView.ViewHolder>(
     SPECIAL_OFFER_COMPARATOR
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -23,9 +23,12 @@ class SpecialOffersRecyclerViewAdapter: PagedListAdapter<SpecialOfferModel, Recy
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
-        item?.let {
+        item?.let {model ->
             if (holder is SpecialOfferViewHolder) {
-                holder.bind(it)
+                holder.bind(model)
+                holder.itemView.setOnClickListener {
+                    block(model)
+                }
             }
         }
     }

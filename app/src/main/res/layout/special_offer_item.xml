@@ -20,7 +20,7 @@
         app:cardCornerRadius="16dp">
 
         <ImageView
-            android:background="#F2F2F2"
+            android:background="#fff"
             android:scaleType="center"
             android:src="@drawable/empty_discount"
             android:id="@+id/offerImageView"

@@ -44,5 +44,26 @@
             app:popUpToInclusive="false"
             android:id="@+id/action_containerFragment_to_payment_destination"
             app:destination="@id/payment_destination" />
+        <action
+            android:id="@+id/action_containerFragment_to_viewDiscountFragment"
+            app:destination="@id/viewDiscountFragment"
+            app:popUpTo="@+id/containerFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewDiscountFragment"
+        android:name="com.voodoolab.eco.ui.ViewDiscountFragment"
+        android:label="ViewDiscountFragment" >
+        <action
+            android:id="@+id/action_viewDiscountFragment_to_washOnMapFragment"
+            app:destination="@id/washOnMapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/washOnMapFragment"
+        android:name="com.voodoolab.eco.ui.WashOnMapFragment"
+        android:label="WashOnMapFragment" >
+        <action
+            android:id="@+id/action_washOnMapFragment_to_viewDiscountFragment"
+            app:destination="@id/viewDiscountFragment" />
     </fragment>
 </navigation>

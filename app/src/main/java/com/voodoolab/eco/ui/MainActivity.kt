@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -33,7 +34,8 @@ class MainActivity : AppCompatActivity(),
     BalanceUpClickListener,
     ChangeCityEventListener,
     DialogInterface.OnClickListener,
-    NavController.OnDestinationChangedListener {
+    NavController.OnDestinationChangedListener,
+    DiscountClickListener {
 
     lateinit var navController: NavController
     lateinit var updateTokenViewModel: FirebaseTokenViewModel
@@ -110,7 +112,7 @@ class MainActivity : AppCompatActivity(),
 
         updateTokenViewModel.dataState.observe(this, Observer {
             stateListener.onDataStateChange(it)
-            it.data?.let {tokenViewState->
+            it.data?.let { tokenViewState ->
                 tokenViewState.getContentIfNotHandled()?.let {
                     it.updateTokenResponse?.let {
                         updateTokenViewModel.setTokenResponse(it)
@@ -157,7 +159,7 @@ class MainActivity : AppCompatActivity(),
                 .setSingleChoiceItems(
                     citiesArrayList.toList().toTypedArray(),
                     findCurrentPositionOrZero(citiesArrayList)
-                ) { dialog, which ->
+                ) { _, which ->
                     if (which >= 0) {
                         pref
                             .edit()
@@ -199,15 +201,23 @@ class MainActivity : AppCompatActivity(),
         navController.navigate(R.id.action_containerFragment_to_payment_destination)
     }
 
+    override fun onDiscountClick(discountID: Int) {
+        val bundle = bundleOf(
+            "discount_id" to discountID
+        )
+
+        navController.navigate(R.id.action_containerFragment_to_viewDiscountFragment, bundle)
+    }
+
     override fun onSupportNavigateUp(): Boolean = navController.navigateUp()
 
     override fun onDataStateChange(dataState: DataState<*>?) {
         dataState?.let {
             it.message?.let {
-                    it.getContentIfNotHandled()?.let {
-                        Toast.makeText(this, "Произошла ошибка", Toast.LENGTH_LONG).show()
-                    }
+                it.getContentIfNotHandled()?.let {
+                    Toast.makeText(this, "Произошла ошибка", Toast.LENGTH_LONG).show()
                 }
+            }
         }
     }
 

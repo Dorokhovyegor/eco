@@ -9,18 +9,25 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
+import com.voodoolab.eco.adapters.WashAdapterRecyclerView
 import com.voodoolab.eco.interfaces.DataStateListener
+import com.voodoolab.eco.models.WashModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.states.discount_state.DiscountStateEvent
 import com.voodoolab.eco.ui.view_models.DiscountViewModel
 import com.voodoolab.eco.utils.Constants
+import com.voodoolab.eco.utils.show
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
-class ViewDiscountFragment(discountId: Int) : Fragment(), DataStateListener {
+class ViewDiscountFragment : Fragment(), DataStateListener {
 
     var dataStateHandler: DataStateListener = this
 
@@ -29,29 +36,36 @@ class ViewDiscountFragment(discountId: Int) : Fragment(), DataStateListener {
     private var titleTextView: TextView? = null
     private var bodyTextView: TextView? = null
     private var imageStock: ImageView? = null
+    private var progressBar: MaterialProgressBar? = null
     private var washRecyclerView: RecyclerView? = null
+
+    private var adapterRecyclerView: WashAdapterRecyclerView? = null
+    private var discountId: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        discountId = arguments?.get("discount_id") as Int
         discountViewModel = ViewModelProvider(this).get(DiscountViewModel::class.java)
         return inflater.inflate(R.layout.discount_layout, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         titleTextView = view.findViewById(R.id.titleTextView)
-        bodyTextView = view.findViewById(R.id.discountImageView)
+        bodyTextView = view.findViewById(R.id.bodyTextView)
         imageStock = view.findViewById(R.id.discountImageView)
-        washRecyclerView?.run {
-            this.layoutManager = LinearLayoutManager(context)
+        progressBar = view.findViewById(R.id.progress_bar)
+        washRecyclerView = view.findViewById(R.id.washRecyclerView
+        )
+        discountId?.let {
+            triggerEvent(it)
         }
-        triggerEvent(id)
         subscribeObservers()
     }
 
-    fun subscribeObservers() {
+    private fun subscribeObservers() {
         discountViewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
             dataStateHandler.onDataStateChange(dataState)
             dataState.data?.let { viewState ->
@@ -64,21 +78,26 @@ class ViewDiscountFragment(discountId: Int) : Fragment(), DataStateListener {
         })
 
         discountViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
-            viewState.discountResponse?.let {response ->
-                if (response.status == "ok") {
-                    titleTextView?.text = response.title
-                    bodyTextView?.text = response.text
-                    imageStock?.let {
-                        if (context != null) {
-                            Glide.with(context!!)
-                                .load(response.logo)
-                                .placeholder(R.drawable.empty_discount)
-                                .error(R.drawable.empty_discount)
-                                .into(it)
-                        }
+            viewState.discountResponse?.let { response ->
+                println("DEBUG: response ${response}")
+                titleTextView?.text = response.title
+                bodyTextView?.text = response.text
+                imageStock?.let {
+                    if (context != null) {
+                        Glide.with(context!!)
+                            .asGif()
+                            .load(response.logo)
+                            .placeholder(R.drawable.empty_discount)
+                            .error(R.drawable.empty_discount)
+                            .into(it)
 
-                        // todo create adapter and set it
                     }
+                    adapterRecyclerView =
+                        WashAdapterRecyclerView(response.washes) { model: WashModel ->
+                            washClicked(model)
+                        }
+                    washRecyclerView?.adapter = adapterRecyclerView
+                    washRecyclerView?.layoutManager = LinearLayoutManager(context)
                 }
             }
         })
@@ -89,7 +108,17 @@ class ViewDiscountFragment(discountId: Int) : Fragment(), DataStateListener {
         discountViewModel.setStateEvent(DiscountStateEvent.RequestDiscountById(token, id))
     }
 
-    override fun onDataStateChange(dataState: DataState<*>?) {
+    private fun washClicked(washModel: WashModel) {
+        view?.let {
 
+            Navigation.findNavController(it).navigate(R.id.action_viewDiscountFragment_to_washOnMapFragment)
+        }
+    }
+
+    override fun onDataStateChange(dataState: DataState<*>?) {
+        dataState?.let {
+            progressBar?.show(dataState.loading)
+        }
     }
 }
+

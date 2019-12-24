@@ -16,7 +16,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.SpecialOffersRecyclerViewAdapter
+import com.voodoolab.eco.interfaces.DiscountClickListener
 import com.voodoolab.eco.interfaces.EmptyListInterface
+import com.voodoolab.eco.models.SpecialOfferModel
+import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.view_models.SpecialOffersViewModel
 import com.voodoolab.eco.utils.Constants
 
@@ -29,6 +32,8 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
 
     private var emptyListImageView: ImageView? = null
     private var emptyTextView: TextView? = null
+
+    private var listener: DiscountClickListener?  = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,8 +65,13 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
 
         specialOffersRecyclerView = view.findViewById(R.id.discountRecyclerView)
         specialOffersRecyclerView?.layoutManager = LinearLayoutManager(context)
-        recyclerViewAdapter = SpecialOffersRecyclerViewAdapter()
+        recyclerViewAdapter = SpecialOffersRecyclerViewAdapter {specialOfferModel: SpecialOfferModel -> discountClick(specialOfferModel)}
         specialOffersRecyclerView?.adapter = recyclerViewAdapter
+    }
+
+    private fun discountClick(data: SpecialOfferModel) {
+        println("DEBUG discount data $data")
+        listener?.onDiscountClick(data.id)
     }
 
     private fun setToolbarContent(view: View) {
@@ -83,5 +93,17 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
 
     override fun setEmptyState() {
 
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainActivity) {
+            listener = context
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
     }
 }

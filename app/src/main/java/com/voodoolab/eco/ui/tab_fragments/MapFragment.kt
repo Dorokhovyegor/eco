@@ -44,6 +44,7 @@ import com.voodoolab.eco.states.object_state.ObjectStateEvent
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.convertFromStringToLatLng
+import com.voodoolab.eco.utils.show
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import java.nio.BufferUnderflowException
 
@@ -152,14 +153,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         })
     }
 
-    private fun showProgressBar(visible: Boolean) {
-        if (visible) {
-            progressBar?.visibility = View.VISIBLE
-        } else {
-            progressBar?.visibility = View.GONE
-        }
-    }
-
     private fun showToast(message: String?) {
         message?.let {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -201,7 +194,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
         map?.setOnMarkerClickListener(this)
-
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -246,7 +238,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
     override fun onDataStateChange(dataState: DataState<*>?) {
         dataState?.let {
-            showProgressBar(it.loading)
+            progressBar?.show(it.loading)
             it.message?.let { event ->
                 event.getContentIfNotHandled()?.let {
                     showToast(it)

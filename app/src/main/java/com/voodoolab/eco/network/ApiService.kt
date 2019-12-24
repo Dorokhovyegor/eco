@@ -69,7 +69,7 @@ interface ApiService {
     ): Call<SpecialOffersResponse>
 
     @GET("api/stock/{id}")
-    fun getSpeciaOfferById(
+    fun getSpecialOfferById(
         @Header("Authorization") tokenApp: String,
         @Path("id") discountId: Int
     ): LiveData<GenericApiResponse<DiscountResponse>>

@@ -98,6 +98,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.2.1'
 
     implementation 'com.google.firebase:firebase-messaging:20.1.0'
+
+    implementation 'com.github.jetradarmobile:android-snowfall:1.2.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
