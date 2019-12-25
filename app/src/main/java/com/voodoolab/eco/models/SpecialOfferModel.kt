@@ -1,7 +1,10 @@
 package com.voodoolab.eco.models
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class SpecialOfferModel(
     @SerializedName("id") val id: Int,
     @SerializedName("status") val status: String?,
@@ -11,4 +14,4 @@ data class SpecialOfferModel(
     @SerializedName("title") val title: String?,
     @SerializedName("text") val body: String?,
     @SerializedName("logo") val imageUrl: String?
-)
+): Parcelable

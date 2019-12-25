@@ -1,6 +1,7 @@
 package com.voodoolab.eco.ui.tab_fragments
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -21,10 +23,14 @@ import com.voodoolab.eco.interfaces.BalanceUpClickListener
 import com.voodoolab.eco.interfaces.ChangeCityEventListener
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.interfaces.EmptyListInterface
+import com.voodoolab.eco.models.ClearUserModel
 import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.responses.CitiesResponse
 import com.voodoolab.eco.responses.UserInfoResponse
+import com.voodoolab.eco.states.cities_state.CitiesStateEvent
 import com.voodoolab.eco.states.user_state.UserStateEvent
 import com.voodoolab.eco.ui.MainActivity
+import com.voodoolab.eco.ui.view_models.CitiesViewModels
 import com.voodoolab.eco.ui.view_models.TransactionsViewModel
 import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.voodoolab.eco.utils.Constants
@@ -33,15 +39,19 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import org.w3c.dom.Text
 
 
-class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClickListener, EmptyListInterface {
+class ProfileFragment : Fragment(),
+    DataStateListener,
+    PopupMenu.OnMenuItemClickListener,
+    EmptyListInterface,
+    DialogInterface.OnClickListener {
 
     lateinit var userViewModel: UserInfoViewModel
     lateinit var transactionViewModel: TransactionsViewModel
+    lateinit var citiesViewModel: CitiesViewModels
 
     var dataStateHandler: DataStateListener = this
 
     private var onBalanceUpClickListener: BalanceUpClickListener? = null
-    private var chooseCityListener: ChangeCityEventListener? = null
 
     private var helloTextView: TextView? = null
     private var nameTextView: TextView? = null
@@ -54,6 +64,7 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
     private var listPercentsTextView: List<TextView>? = null
     private var listMoneyTextView: List<TextView>? = null
     private var optionButton: ImageButton? = null
+    private var toolbar: Toolbar? = null
 
     private var titleTransactions: TextView? = null
     private var emptyImageView: ImageView? = null
@@ -68,6 +79,7 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
     ): View? {
         userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
         transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
+        citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
 
         return inflater.inflate(R.layout.profile_fragment, container, false)
     }
@@ -76,24 +88,24 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         findViewsFromLayout(view)
         listPercentsTextView = initTextViewsDiscounts(view)
         listMoneyTextView = initTextViewsMoney(view)
+        toolbar = view.findViewById(R.id.toolbar)
+
         val token = Hawk.get<String>(Constants.TOKEN)
         userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
         val token2 = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
         transactionViewModel.initialize(token2, this)
-
-        setToolbarContent(view)
+        setToolbarContent()
         subscribeObservers()
         initListeners()
         initRecyclerView()
     }
 
-    private fun setToolbarContent(view: View) {
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+    private fun setToolbarContent() {
         activity?.let {
             val pref = it.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
             val city = pref.getString(Constants.CITY_ECO, null)
             city?.let {
-                toolbar.subtitle = it
+                toolbar?.subtitle = it
             }
         }
     }
@@ -153,6 +165,25 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
     }
 
     private fun subscribeObservers() {
+        citiesViewModel.dataState.observe(this, Observer {
+            dataStateHandler.onDataStateChange(it)
+            it.data?.let { citiesViewState ->
+                citiesViewState.getContentIfNotHandled()?.let {
+                    citiesViewModel.updateCityResonse(it.citiesResponse, it.updateCityResponse)
+                }
+            }
+        })
+
+        citiesViewModel.viewState.observe(this, Observer {
+            it.citiesResponse?.let { cities ->
+                showChooseCityDialogs(cities)
+            }
+
+            it.updateCityResponse?.let {
+                showToast("Изменения сохранены")
+            }
+        })
+
         userViewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
             dataStateHandler.onDataStateChange(dataState)
             dataState.data?.let { userViewState ->
@@ -165,8 +196,8 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         })
 
         userViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
-            viewState.userResponse?.let {
-                if (it.status == "ok") {
+            if (viewState.userResponse?.status == "ok") {
+                viewState.clearResponse?.let {
                     updateContent(it)
                 }
             }
@@ -178,122 +209,39 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         })
     }
 
-    private fun updateContent(userInfoResponse: UserInfoResponse?) {
-        // ебал в рот бэкэнд из-за которого приходится так делать
+    private fun updateContent(data: ClearUserModel?) {
+        bubbleSeekBar?.isEnabled = false // не дать изменять это
+
         balanceTextView?.text = getString(
             R.string.transaction_value,
-            userInfoResponse?.data?.balance?.div(100)
+            data?.balance
         )
 
-        nameTextView?.text = userInfoResponse?.data?.name
+        nameTextView?.text = data?.name
 
         listMoneyTextView?.withIndex()?.forEach {
             it.value.text = getString(
                 R.string.transaction_value,
-                userInfoResponse?.month_cash_back?.get(it.index)?.value?.div(100)
+                data?.valuesMoney?.get(it.index)
             )
         }
 
         listPercentsTextView?.withIndex()?.forEach {
             it.value.text = getString(
                 R.string.percent_value,
-                userInfoResponse?.month_cash_back?.get(it.index)?.percent
+                data?.valuesPercent?.get(it.index)
             )
         }
 
-        val rangeList: ArrayList<IntRange> = ArrayList()
-
-        userInfoResponse?.month_cash_back?.let { cashBacks ->
-            if (cashBacks.size == 5) {
-                cashBacks.withIndex().forEach { wrappedItem ->
-                    if (wrappedItem.index == 0) {
-                        wrappedItem.value.value?.let { endOfRange ->
-                            rangeList.add(
-                                IntRange(0, endOfRange.div(100) - 1)
-                            )
-                        }
-                    } else if (wrappedItem.index == 4) {
-                        wrappedItem.value.value?.let { endOfRange ->
-                            cashBacks[wrappedItem.index - 1].value?.let { startRangeOf ->
-                                rangeList.add(
-                                    IntRange(startRangeOf.div(100), endOfRange.div(100))
-                                )
-                            }
-                        }
-                    } else {
-                        wrappedItem.value.value?.let { endOfRange ->
-                            cashBacks[wrappedItem.index - 1].value?.let { startRangeOf ->
-                                rangeList.add(
-                                    IntRange(startRangeOf.div(100), endOfRange.div(100) - 1)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+        data?.indicatorPosition?.let {
+            if (it != -1)
+                doPercentTextViewBigger(it)
         }
 
-        var currentSection = -1
-
-        userInfoResponse?.data?.month_balance?.let { month_spend ->
-            currentSection = when (month_spend.div(100)) {
-                in rangeList[0] -> {
-                    -1
-                }
-                in rangeList[1] -> {
-                    0
-                }
-                in rangeList[2] -> {
-                    1
-                }
-                in rangeList[3] -> {
-                    2
-                }
-                in rangeList[4] -> {
-                    3
-                }
-                else -> {
-                    4
-                }
-            }
+        data?.currentProgressInPercent?.let {
+            bubbleSeekBar?.setProgress(it)
         }
 
-        if (currentSection != -1) {
-            doPercentTextViewBigger(currentSection)
-        }
-
-        when (currentSection) {
-            -1 -> bubbleSeekBar?.setProgress(0f) // мы не вышли даже на вервую секцию
-            4 -> bubbleSeekBar?.setProgress(100f) // выше последней секции
-            else -> {
-                val p = userInfoResponse?.data?.month_balance?.div(100)
-                val firstRange = rangeList[currentSection + 1].first
-                val endRange = rangeList[currentSection + 1].last
-
-                //текущее положение в рэндж листе
-                val currentPositionRangeList = currentSection + 1
-
-                // текущий рэндж, до которого мы дошли
-                val range = endRange - firstRange
-
-                var sum = 0
-                for (index in 0 until currentPositionRangeList) {
-                    sum += rangeList[index].last - rangeList[index].first + 1
-                }
-
-                val c = p?.minus(sum)
-                val percentInCurrentRange =
-                    c?.toFloat()
-                        ?.div(range)?.times(25)
-                        ?.plus(
-                            currentPositionRangeList.minus(1)
-                                .times(25)
-                        )
-                percentInCurrentRange?.let {
-                    bubbleSeekBar?.setProgress(it)
-                }
-            }
-        }
     }
 
     private fun doPercentTextViewBigger(position: Int) {
@@ -314,6 +262,60 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
                 }
             }
         }
+    }
+
+    private fun findCurrentPositionOrZero(list: ArrayList<String>): Int {
+        val pref = activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
+        val currentCity = pref?.getString(Constants.CITY_ECO, "-1")
+        if (currentCity == "-1") {
+            return 0
+        }
+        list.withIndex().forEach {
+            if (currentCity == it.value) {
+                return it.index
+            }
+        }
+        return 0
+    }
+
+    private fun showChooseCityDialogs(citiesResponse: CitiesResponse) {
+        val citiesArrayList = ArrayList<String>()
+        val citiesCoordinates = ArrayList<String>()
+
+        citiesResponse.listCities?.forEach {
+            citiesArrayList.add(it.city)
+            citiesCoordinates.add(it.coordinates.toString())
+        }
+
+        val pref = context?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
+
+        var positionCity: Int? = null
+        AlertDialog.Builder(context!!)
+            .setTitle(getString(R.string.choose_city))
+            .setSingleChoiceItems(
+                citiesArrayList.toList().toTypedArray(),
+                findCurrentPositionOrZero(citiesArrayList)
+            ) { _, which ->
+                if (which >= 0) {
+                    positionCity = which
+                }
+            }
+            .setPositiveButton("Ok") { _, which ->
+                if (which == DialogInterface.BUTTON_POSITIVE) {
+                    positionCity?.let {
+                        citiesViewModel.setStateEvent(
+                            CitiesStateEvent.UpdateCity(
+                                "Bearer ${Hawk.get<String>(
+                                    Constants.TOKEN
+                                )}", citiesArrayList[it]
+                            )
+                        )
+                    }
+                }
+            }
+            .setCancelable(false)
+            .create()
+            .show()
     }
 
     private fun showProgressBar(visible: Boolean) {
@@ -340,14 +342,12 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
         super.onAttach(context)
         if (context is MainActivity) {
             onBalanceUpClickListener = context
-            chooseCityListener = context
         }
     }
 
     override fun onDetach() {
         super.onDetach()
         onBalanceUpClickListener = null
-        chooseCityListener = null
     }
 
     override fun onDataStateChange(dataState: DataState<*>?) {
@@ -357,7 +357,7 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.action_choose_city -> {
-                chooseCityListener?.showDialog()
+                citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
             }
             R.id.action_exit -> {
                 // todo exit
@@ -369,8 +369,11 @@ class ProfileFragment : Fragment(), DataStateListener, PopupMenu.OnMenuItemClick
     override fun setEmptyState() {
         transactionsRecyclerView?.visibility = View.GONE
         titleTransactions?.visibility = View.GONE
-
         emptyImageView?.visibility = View.VISIBLE
         emptyTextView?.visibility = View.VISIBLE
+    }
+
+    override fun onClick(dialog: DialogInterface?, which: Int) {
+
     }
 }

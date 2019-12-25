@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -37,6 +38,7 @@ import com.voodoolab.eco.helper_fragments.ChooseCityFragment
 import com.voodoolab.eco.helper_fragments.ObjectInfoBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
 import com.voodoolab.eco.interfaces.DataStateListener
+import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.states.object_state.ListObjectStateEvent
@@ -60,6 +62,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private var progressBar: MaterialProgressBar? = null
     private var optionsButton: ImageButton? = null
     private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
+
+    private var coord: ArrayList<Double>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,6 +98,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         activity?.let {
             val pref = it.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
             val city = pref.getString(Constants.CITY_ECO, null)
+            var coordinates = pref.getString(Constants.CITY_COORDINATES, null)
+
+            if (coordinates != null) {
+                coord = ArrayList()
+                coordinates =  coordinates.replace("[","")
+                coordinates = coordinates.replace("]","")
+                coord?.add( coordinates.split(",")[0].toDouble())
+                coord?.add( coordinates.split(",")[1].toDouble())
+            }
+
             city?.let {
                 toolbar.subtitle = it
             }
@@ -118,7 +132,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 list.list?.let { markers ->
                     if (markers.isNotEmpty()) {
                         markers.forEach { markerResponse ->
-                            val bitmap = BitmapDescriptorFactory.fromResource(R.mipmap.icon_marker)
+                            val bitmap = BitmapDescriptorFactory.fromResource(R.mipmap.marker_map_unselected)
                             markerResponse.coordinates?.let {coordinatesString ->
                                 val markerOptions = MarkerOptions()
                                     .position(LatLng(coordinatesString[0], coordinatesString[1]))
@@ -147,7 +161,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
         objectViewModel.viewStateObject.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.objectResponse?.let { washObject ->
-                // запустить bottom sheet wash
                 openBottomSheet(washObject)
             }
         })
@@ -178,11 +191,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 "city" to objectResponse.city,
                 "address" to objectResponse.address,
                 "seats" to objectResponse.seats,
-                "cashback" to objectResponse.cashback
+                "cashback" to objectResponse.cashback,
+                "special_offers" to objectResponse.stocks
             )
 
-            val bottomSheetDialogFragment = ObjectInfoBottomSheet(bundle)
+            val bottomSheetDialogFragment = ObjectInfoBottomSheet(bundle) { data: SpecialOfferModel -> navigateToSpecialOffer(data)}
             bottomSheetDialogFragment.show(this, "objectInfoFragment")
+        }
+    }
+
+    private fun navigateToSpecialOffer(model: SpecialOfferModel) {
+        view?.let {
+            Navigation.findNavController(it).navigate(R.id.action_washOnMapFragment_to_viewDiscountFragment, bundleOf(
+                "offer_model" to model
+            ))
         }
     }
 
@@ -194,6 +216,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
         map?.setOnMarkerClickListener(this)
+        coord?.let {
+            if (it.size == 2) {
+                map?.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(LatLng(it[0], it[1]), 11f)
+                )
+
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

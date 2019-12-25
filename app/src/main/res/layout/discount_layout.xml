@@ -16,16 +16,8 @@
         app:subtitleTextColor="@color/grey_from_Serge"
         app:titleTextColor="@color/white">
 
-        <ImageButton
-            android:id="@+id/options_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:src="@drawable/arrow_back"
-            android:padding="12dp" />
-
         <TextView
-            android:text="Акции"
+            android:text="Акция"
             android:layout_marginStart="20dp"
             android:textColor="@color/white"
             android:layout_marginEnd="16dp"

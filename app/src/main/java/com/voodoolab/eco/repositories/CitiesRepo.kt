@@ -7,6 +7,7 @@ import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.network.NetworkBoundResource
 import com.voodoolab.eco.network.RetrofitBuilder
 import com.voodoolab.eco.responses.CitiesResponse
+import com.voodoolab.eco.responses.UpdateCityResponse
 import com.voodoolab.eco.states.cities_state.CitiesViewState
 import com.voodoolab.eco.utils.ApiSuccessResponse
 import com.voodoolab.eco.utils.GenericApiResponse
@@ -25,6 +26,22 @@ object CitiesRepo{
 
             override fun createCall(): LiveData<GenericApiResponse<CitiesResponse>> {
                 return RetrofitBuilder.apiService.getAllCities( "application/json")
+            }
+        }.asLiveData()
+    }
+
+    fun setCity(token: String, city: String): LiveData<DataState<CitiesViewState>> {
+        return object : NetworkBoundResource<UpdateCityResponse, CitiesViewState>() {
+            override fun handleApiSuccessResponse(response: ApiSuccessResponse<UpdateCityResponse>) {
+                result.value = DataState.data(
+                    data = CitiesViewState(
+                        updateCityResponse = response.body
+                    )
+                )
+            }
+
+            override fun createCall(): LiveData<GenericApiResponse<UpdateCityResponse>> {
+                return RetrofitBuilder.apiService.setCity(token, city)
             }
         }.asLiveData()
     }

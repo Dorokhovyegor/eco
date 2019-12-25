@@ -70,7 +70,6 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
     }
 
     private fun discountClick(data: SpecialOfferModel) {
-        println("DEBUG discount data $data")
         listener?.onDiscountClick(data.id)
     }
 

@@ -54,6 +54,13 @@ interface ApiService {
     ): LiveData<GenericApiResponse<CitiesResponse>>
 
     @Multipart
+    @POST("api/user/set-city")
+    fun setCity(
+        @Header("Authorization") tokenApp: String,
+        @Part("city") city: String?
+    ): LiveData<GenericApiResponse<UpdateCityResponse>>
+
+    @Multipart
     @POST("api/user/set-firebase-token")
     fun sendTokenToServer(
         @Header("Authorization") tokenApp: String,

@@ -9,25 +9,28 @@ import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.Marker
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.*
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_fragments.ObjectInfoBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
 import com.voodoolab.eco.interfaces.DataStateListener
+import com.voodoolab.eco.models.SpecialOfferModel
+import com.voodoolab.eco.models.WashModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.states.object_state.ObjectStateEvent
 import com.voodoolab.eco.utils.Constants
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
-class WashOnMapFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+class WashOnMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
     DataStateListener {
 
     lateinit var objectViewModel: ObjectInfoViewModel
+
     var stateHandler: DataStateListener = this
 
     private var map: GoogleMap? = null
@@ -41,20 +44,55 @@ class WashOnMapFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClick
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.map_fragment_grouped_with_same_special_offer, container, false)
+        objectViewModel = ViewModelProvider(this).get(ObjectInfoViewModel::class.java)
+        return inflater.inflate(
+            R.layout.map_fragment_grouped_with_same_special_offer,
+            container,
+            false
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        backButton = view.findViewById(R.id.back_button)
         progressBar = view.findViewById(R.id.progress_bar)
         mapView = view.findViewById(R.id.map_view)
         mapView?.getMapAsync(this)
-        addMarkersFromDiscount()
+        mapView?.onCreate(savedInstanceState)
         subscriberObservers()
     }
 
     private fun addMarkersFromDiscount() {
+        val list = arguments?.getParcelableArrayList<WashModel>("wash_list")
+        val currentWash = arguments?.get("current_wash") as WashModel?
+        val bitmap = BitmapDescriptorFactory.fromResource(R.mipmap.marker_map_unselected)
+        list?.forEach { washModel ->
+            washModel.coordinates?.let {
+                val markerOptions = MarkerOptions()
+                    .position(LatLng(it[0], it[1]))
+                    .icon(bitmap)
+                    .title(washModel.address)
+                    .draggable(false)
+                val marker = map?.addMarker(markerOptions)
+                marker?.tag = washModel.id
+            }
+        }
 
+        currentWash?.let { wash ->
+            wash.coordinates?.let {
+                if (it.size == 2) {
+                    map?.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(LatLng(it[0], it[1]), 16f)
+                    )
+
+                    wash.id?.let {
+                        objectViewModel.setStateEventForObject(
+                            ObjectStateEvent.RequestObjectEvent(
+                                "Bearer ${Hawk.get<String>(Constants.TOKEN)}", it
+                            )
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun subscriberObservers() {
@@ -71,19 +109,22 @@ class WashOnMapFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClick
 
         objectViewModel.viewStateObject.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.objectResponse?.let { washObject ->
-                // запустить bottom sheet wash
                 openBottomSheet(washObject)
             }
         })
     }
 
+
     override fun onMarkerClick(p0: Marker?): Boolean {
+        val bitmapSelect = BitmapDescriptorFactory.fromResource(R.mipmap.marker_map_selected)
+        p0?.setIcon(bitmapSelect)
         showObject(p0?.tag.toString())
         return false
     }
 
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
+        addMarkersFromDiscount()
         map?.setOnMarkerClickListener(this)
 
     }
@@ -100,6 +141,14 @@ class WashOnMapFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClick
         }
     }
 
+    private fun navigateToSpecialOffer(model: SpecialOfferModel) {
+        view?.let {
+            Navigation.findNavController(it).navigate(R.id.action_washOnMapFragment_to_viewDiscountFragment, bundleOf(
+                "offer_model" to model
+            ))
+        }
+    }
+
     private fun openBottomSheet(objectResponse: ObjectResponse) {
         childFragmentManager.run {
             val bundle = bundleOf(
@@ -107,11 +156,14 @@ class WashOnMapFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClick
                 "city" to objectResponse.city,
                 "address" to objectResponse.address,
                 "seats" to objectResponse.seats,
-                "cashback" to objectResponse.cashback
+                "cashback" to objectResponse.cashback,
+                "special_offers" to objectResponse.stocks
             )
-            // todo add discount
-            val bottomSheetDialogFragment = ObjectInfoBottomSheet(bundle)
-            bottomSheetDialogFragment.show(this, "objectInfoFragment")
+            val bottomSheetDialogFragment = ObjectInfoBottomSheet(bundle) { data: SpecialOfferModel -> navigateToSpecialOffer(data)}
+            val fragment = childFragmentManager.findFragmentByTag("objectInfoFragment")
+            if (fragment == null) {
+                bottomSheetDialogFragment.show(this, "objectInfoFragment")
+            }
         }
     }
 

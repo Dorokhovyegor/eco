@@ -4,6 +4,8 @@ sealed class CitiesStateEvent {
 
     class RequestCityList: CitiesStateEvent()
 
+    class UpdateCity(val token: String, val city: String): CitiesStateEvent()
+
     class None: CitiesStateEvent()
 
 }

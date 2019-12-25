@@ -47,6 +47,10 @@
         <action
             android:id="@+id/action_containerFragment_to_viewDiscountFragment"
             app:destination="@id/viewDiscountFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/exit_to_right"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
             app:popUpTo="@+id/containerFragment"
             app:popUpToInclusive="false" />
     </fragment>
@@ -64,6 +68,7 @@
         android:label="WashOnMapFragment" >
         <action
             android:id="@+id/action_washOnMapFragment_to_viewDiscountFragment"
-            app:destination="@id/viewDiscountFragment" />
+            app:destination="@id/viewDiscountFragment"
+            app:enterAnim="@anim/enter_from_right" />
     </fragment>
 </navigation>

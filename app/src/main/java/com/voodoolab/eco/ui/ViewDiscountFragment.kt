@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -19,6 +18,7 @@ import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.WashAdapterRecyclerView
 import com.voodoolab.eco.interfaces.DataStateListener
+import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.models.WashModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.states.discount_state.DiscountStateEvent
@@ -47,7 +47,12 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        discountId = arguments?.get("discount_id") as Int
+        discountId = arguments?.get("id") as Int?
+        if (discountId == null) {
+            val model = arguments?.getParcelable<SpecialOfferModel>("offer_model")
+            discountId = model?.id
+        }
+        println("DEBUG: idididid ${discountId}")
         discountViewModel = ViewModelProvider(this).get(DiscountViewModel::class.java)
         return inflater.inflate(R.layout.discount_layout, container, false)
     }
@@ -79,7 +84,6 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
 
         discountViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.discountResponse?.let { response ->
-                println("DEBUG: response ${response}")
                 titleTextView?.text = response.title
                 bodyTextView?.text = response.text
                 imageStock?.let {
@@ -110,8 +114,12 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
 
     private fun washClicked(washModel: WashModel) {
         view?.let {
-
-            Navigation.findNavController(it).navigate(R.id.action_viewDiscountFragment_to_washOnMapFragment)
+            val list = adapterRecyclerView?.items
+            val bundle = bundleOf(
+                "wash_list" to list,
+                "current_wash" to washModel
+            )
+            Navigation.findNavController(it).navigate(R.id.action_viewDiscountFragment_to_washOnMapFragment, bundle)
         }
     }
 

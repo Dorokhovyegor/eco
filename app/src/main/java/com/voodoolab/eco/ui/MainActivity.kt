@@ -3,6 +3,9 @@ package com.voodoolab.eco.ui
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.os.Handler
+import android.view.View
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -14,9 +17,13 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.iid.FirebaseInstanceId
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
+import com.voodoolab.eco.helper_fragments.SendReportBottomSheet
 import com.voodoolab.eco.interfaces.*
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.CitiesResponse
@@ -33,13 +40,10 @@ class MainActivity : AppCompatActivity(),
     AuthenticateListener,
     BalanceUpClickListener,
     ChangeCityEventListener,
-    DialogInterface.OnClickListener,
-    NavController.OnDestinationChangedListener,
     DiscountClickListener {
 
     lateinit var navController: NavController
     lateinit var updateTokenViewModel: FirebaseTokenViewModel
-    lateinit var citiesViewModel: CitiesViewModels
     private var stateListener = this as DataStateListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,13 +55,15 @@ class MainActivity : AppCompatActivity(),
         initViews()
         initAndSetListeners()
         navController = Navigation.findNavController(this, R.id.frame_container)
-        navController.addOnDestinationChangedListener(this)
-
         updateTokenViewModel = ViewModelProvider(this).get(FirebaseTokenViewModel::class.java)
-        citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
 
         if (!Hawk.isBuilt())
             Hawk.init(this).build()
+
+        Handler().postDelayed({
+            showReportBottomSheet()
+        }, 1500
+        )
     }
 
     private fun initToken() {
@@ -93,23 +99,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun subscribeObservers() {
-        citiesViewModel.dataState.observe(this, Observer {
-            stateListener.onDataStateChange(it)
-            it.data?.let { citiesViewState ->
-                citiesViewState.getContentIfNotHandled()?.let {
-                    it.citiesResponse?.let {
-                        citiesViewModel.setCitiesResponse(it)
-                    }
-                }
-            }
-        })
-
-        citiesViewModel.viewState.observe(this, Observer {
-            it.citiesResponse?.let { cities ->
-                showChooseCityDialogs(cities)
-            }
-        })
-
         updateTokenViewModel.dataState.observe(this, Observer {
             stateListener.onDataStateChange(it)
             it.data?.let { tokenViewState ->
@@ -128,55 +117,9 @@ class MainActivity : AppCompatActivity(),
         })
     }
 
-    private fun findCurrentPositionOrZero(list: ArrayList<String>): Int {
-        val pref = getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-        val currentCity = pref.getString(Constants.CITY_ECO, "-1")
-        if (currentCity == "-1") {
-            return 0
-        }
-        list.withIndex().forEach {
-            if (currentCity == it.value) {
-                return it.index
-            }
-        }
-        return 0
-    }
-
-    fun showChooseCityDialogs(citiesResponse: CitiesResponse) {
-        val citiesArrayList = ArrayList<String>()
-        val citiesCoordinates = ArrayList<String>()
-
-        citiesResponse.listCities?.forEach {
-            citiesArrayList.add(it.city)
-            citiesCoordinates.add(it.coordinates.toString())
-        }
-
-        val pref = getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-
-        if (!pref.contains(Constants.CITY_ECO)) {
-            AlertDialog.Builder(this)
-                .setTitle(getString(R.string.choose_city))
-                .setSingleChoiceItems(
-                    citiesArrayList.toList().toTypedArray(),
-                    findCurrentPositionOrZero(citiesArrayList)
-                ) { _, which ->
-                    if (which >= 0) {
-                        pref
-                            .edit()
-                            .putString(Constants.CITY_ECO, citiesArrayList[which])
-                            .putString(Constants.CITY_COORDINATES, citiesCoordinates[which])
-                            .apply()
-                    }
-                }
-                .setPositiveButton("Ok", this)
-                .setCancelable(false)
-                .create()
-                .show()
-        }
-    }
-
-    override fun onClick(dialog: DialogInterface?, which: Int) {
-        Toast.makeText(this, "Город сохранен", Toast.LENGTH_SHORT).show()
+    private fun showReportBottomSheet() {
+        val bottomSheetDialog = SendReportBottomSheet(Bundle())
+        bottomSheetDialog.show(supportFragmentManager, "report")
     }
 
     override fun splashScreenComplete() {
@@ -195,6 +138,7 @@ class MainActivity : AppCompatActivity(),
             .setExitAnim(R.anim.nav_default_exit_anim)
             .build()
         navController.navigate(R.id.from_auth_To_container, null, navOptions)
+
     }
 
     override fun onBalanceUpClick() {
@@ -203,7 +147,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onDiscountClick(discountID: Int) {
         val bundle = bundleOf(
-            "discount_id" to discountID
+            "id" to discountID
         )
 
         navController.navigate(R.id.action_containerFragment_to_viewDiscountFragment, bundle)
@@ -222,22 +166,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun showDialog() {
-        citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
-    }
 
-    override fun onDestinationChanged(
-        controller: NavController,
-        destination: NavDestination,
-        arguments: Bundle?
-    ) {
-        when (destination.label) {
-            CONTAINER_FRAGMENT -> {
-                runOnUiThread {
-                    citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
-                    subscribeObservers()
-                    initToken()
-                }
-            }
-        }
     }
 }
