@@ -38,6 +38,7 @@ import com.voodoolab.eco.helper_fragments.ChooseCityFragment
 import com.voodoolab.eco.helper_fragments.ObjectInfoBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
 import com.voodoolab.eco.interfaces.DataStateListener
+import com.voodoolab.eco.interfaces.DiscountClickListener
 import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.ObjectResponse
@@ -56,6 +57,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
     lateinit var objectViewModel: ObjectInfoViewModel
     var stateHandler: DataStateListener = this
+    var discountClickListener: DiscountClickListener? = null
 
     private var map: GoogleMap? = null
     private var mapView: MapView? = null
@@ -102,10 +104,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
             if (coordinates != null) {
                 coord = ArrayList()
-                coordinates =  coordinates.replace("[","")
-                coordinates = coordinates.replace("]","")
-                coord?.add( coordinates.split(",")[0].toDouble())
-                coord?.add( coordinates.split(",")[1].toDouble())
+                coordinates = coordinates.replace("[", "")
+                coordinates = coordinates.replace("]", "")
+                coord?.add(coordinates.split(",")[0].toDouble())
+                coord?.add(coordinates.split(",")[1].toDouble())
             }
 
             city?.let {
@@ -132,8 +134,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 list.list?.let { markers ->
                     if (markers.isNotEmpty()) {
                         markers.forEach { markerResponse ->
-                            val bitmap = BitmapDescriptorFactory.fromResource(R.mipmap.marker_map_unselected)
-                            markerResponse.coordinates?.let {coordinatesString ->
+                            val bitmap =
+                                BitmapDescriptorFactory.fromResource(R.mipmap.marker_map_unselected)
+                            markerResponse.coordinates?.let { coordinatesString ->
                                 val markerOptions = MarkerOptions()
                                     .position(LatLng(coordinatesString[0], coordinatesString[1]))
                                     .icon(bitmap)
@@ -195,17 +198,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 "special_offers" to objectResponse.stocks
             )
 
-            val bottomSheetDialogFragment = ObjectInfoBottomSheet(bundle) { data: SpecialOfferModel -> navigateToSpecialOffer(data)}
-            bottomSheetDialogFragment.show(this, "objectInfoFragment")
+            val bottomSheetDialogFragment =
+                ObjectInfoBottomSheet(bundle) { data: SpecialOfferModel ->
+                    navigateToSpecialOffer(data)
+                }
+            val fragment = childFragmentManager.findFragmentByTag("objectInfoFragment")
+            if (fragment == null) {
+                bottomSheetDialogFragment.show(this, "objectInfoFragment")
+            }
         }
     }
 
     private fun navigateToSpecialOffer(model: SpecialOfferModel) {
-        view?.let {
-            Navigation.findNavController(it).navigate(R.id.action_washOnMapFragment_to_viewDiscountFragment, bundleOf(
-                "offer_model" to model
-            ))
-        }
+        discountClickListener?.onDiscountClick(model.id)
     }
 
     override fun onMarkerClick(p0: Marker?): Boolean {
@@ -275,5 +280,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 }
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainActivity) {
+            discountClickListener = context
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        discountClickListener = null
     }
 }

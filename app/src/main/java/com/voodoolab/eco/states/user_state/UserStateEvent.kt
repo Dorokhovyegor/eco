@@ -6,5 +6,10 @@ sealed class UserStateEvent {
         val token: String
     ): UserStateEvent()
 
+    class SetNewNameEvent(
+        val token: String,
+        val name: String
+    ): UserStateEvent()
+
     class None: UserStateEvent()
 }

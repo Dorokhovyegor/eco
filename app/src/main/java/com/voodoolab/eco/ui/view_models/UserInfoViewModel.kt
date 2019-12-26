@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.voodoolab.eco.models.ClearUserModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.repositories.UserRepo
+import com.voodoolab.eco.responses.UpdateNameResponse
 import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.states.user_state.UserStateEvent
 import com.voodoolab.eco.states.user_state.UserViewState
@@ -33,16 +34,20 @@ class UserInfoViewModel : ViewModel() {
             is UserStateEvent.RequestUserInfo -> {
                 UserRepo.getUserInfo(stateEvent.token)
             }
+            is UserStateEvent.SetNewNameEvent -> {
+                UserRepo.updateUserName(stateEvent.token, stateEvent.name)
+            }
             is UserStateEvent.None -> {
                 AbsentLiveData.create()
             }
         }
     }
 
-    fun setUserResponse(userResponse: UserInfoResponse) {
+    fun updateUserResponse(userResponse: UserInfoResponse?, updateNameResponse: UpdateNameResponse?) {
         val update = getCurentViewStateOrNew()
         update.clearResponse = convertDataFromRawDataToPresentData(userResponse)
         update.userResponse = userResponse
+        update.updateNameResponse = updateNameResponse
         _viewState.value = update
     }
 

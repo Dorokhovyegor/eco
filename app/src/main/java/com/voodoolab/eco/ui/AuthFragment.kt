@@ -76,15 +76,6 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
         }
     }
 
-    private var getNewPassword = View.OnClickListener {                                                // если нажать на это, то запросит пароль
-        val number = getNumberFromDecorateNumber(inputNumberEditText?.text.toString())
-        if (number?.length == 11) {
-            codeViewModel.setStateEvent(CodeStateEvent.RequestCodeEvent(number))
-        } else {
-            inputPhoneLayout?.error = "Неверный формат номера"
-        }
-    }
-
     // lifecycle methods ===========================================================================
     override fun onCreateView(
         inflater: LayoutInflater,

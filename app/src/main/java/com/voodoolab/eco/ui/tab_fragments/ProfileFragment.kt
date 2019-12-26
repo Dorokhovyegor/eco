@@ -1,5 +1,6 @@
 package com.voodoolab.eco.ui.tab_fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
@@ -7,51 +8,53 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.BalanceUpClickListener
-import com.voodoolab.eco.interfaces.ChangeCityEventListener
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.interfaces.EmptyListInterface
+import com.voodoolab.eco.interfaces.LogoutListener
 import com.voodoolab.eco.models.ClearUserModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.CitiesResponse
-import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.states.cities_state.CitiesStateEvent
+import com.voodoolab.eco.states.logout_state.LogoutStateEvent
+import com.voodoolab.eco.states.logout_state.LogoutViewState
 import com.voodoolab.eco.states.user_state.UserStateEvent
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.view_models.CitiesViewModels
+import com.voodoolab.eco.ui.view_models.LogoutViewModel
 import com.voodoolab.eco.ui.view_models.TransactionsViewModel
 import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.voodoolab.eco.utils.Constants
 import com.xw.repo.BubbleSeekBar
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
-import org.w3c.dom.Text
 
 
 class ProfileFragment : Fragment(),
     DataStateListener,
     PopupMenu.OnMenuItemClickListener,
-    EmptyListInterface,
-    DialogInterface.OnClickListener {
+    EmptyListInterface {
 
     lateinit var userViewModel: UserInfoViewModel
     lateinit var transactionViewModel: TransactionsViewModel
     lateinit var citiesViewModel: CitiesViewModels
+    lateinit var logoutViewModel: LogoutViewModel
 
     var dataStateHandler: DataStateListener = this
 
     private var onBalanceUpClickListener: BalanceUpClickListener? = null
+    private var logoutListener: LogoutListener? = null
 
     private var helloTextView: TextView? = null
     private var nameTextView: TextView? = null
@@ -69,8 +72,11 @@ class ProfileFragment : Fragment(),
     private var titleTransactions: TextView? = null
     private var emptyImageView: ImageView? = null
     private var emptyTextView: TextView? = null
-
     private var adapter: TransactionsRecyclerViewAdapter? = null
+
+    private var lastUpdateCityLocal: String? = null
+    private var lastUpdateCoordinates: String? = null
+    private var lastName: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -80,6 +86,7 @@ class ProfileFragment : Fragment(),
         userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
         transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
         citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
+        logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
 
         return inflater.inflate(R.layout.profile_fragment, container, false)
     }
@@ -94,20 +101,23 @@ class ProfileFragment : Fragment(),
         userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
         val token2 = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
         transactionViewModel.initialize(token2, this)
-        setToolbarContent()
+
+        val pref = activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
+        val city = pref?.getString(Constants.CITY_ECO, null)
+
+        if (city != null) {
+            setToolbarContent(city)
+        } else {
+            citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
+        }
+
         subscribeObservers()
         initListeners()
         initRecyclerView()
     }
 
-    private fun setToolbarContent() {
-        activity?.let {
-            val pref = it.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-            val city = pref.getString(Constants.CITY_ECO, null)
-            city?.let {
-                toolbar?.subtitle = it
-            }
-        }
+    private fun setToolbarContent(city: String?) {
+        toolbar?.subtitle = city
     }
 
     private fun findViewsFromLayout(view: View) {
@@ -120,7 +130,6 @@ class ProfileFragment : Fragment(),
         nameTextView = view.findViewById(R.id.name_text_view)
         topUpBalance = view.findViewById(R.id.topUpBalance)
         optionButton = view.findViewById(R.id.options_button)
-
         titleTransactions = view.findViewById(R.id.transactions_title)
         emptyImageView = view.findViewById(R.id.emptyListImageView)
         emptyTextView = view.findViewById(R.id.emptyListTextView)
@@ -178,8 +187,14 @@ class ProfileFragment : Fragment(),
             it.citiesResponse?.let { cities ->
                 showChooseCityDialogs(cities)
             }
-
             it.updateCityResponse?.let {
+                if (lastUpdateCityLocal != null && lastUpdateCoordinates != null) {
+                    val pref =
+                        activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
+                    pref?.edit()?.putString(Constants.CITY_ECO, lastUpdateCityLocal)
+                        ?.putString(Constants.CITY_COORDINATES, lastUpdateCoordinates)?.apply()
+                    setToolbarContent(lastUpdateCityLocal)
+                }
                 showToast("Изменения сохранены")
             }
         })
@@ -188,10 +203,31 @@ class ProfileFragment : Fragment(),
             dataStateHandler.onDataStateChange(dataState)
             dataState.data?.let { userViewState ->
                 userViewState.getContentIfNotHandled()?.let {
-                    it.userResponse?.let {
-                        userViewModel.setUserResponse(it)
+                    userViewModel.updateUserResponse(it.userResponse, it.updateNameResponse)
+                    it.updateNameResponse?.let {
+                        if (it.status == "ok") {
+                            showToast("Имя сохранено")
+                            nameTextView?.text = lastName
+                        }
                     }
                 }
+            }
+        })
+
+        logoutViewModel.dataState.observe(viewLifecycleOwner, Observer {
+            dataStateHandler.onDataStateChange(it)
+            it.data?.let { viewState ->
+                viewState.getContentIfNotHandled()?.let { state ->
+                    state.logoutResponse?.let {
+                        logoutViewModel.setLogoutResponse(it)
+                    }
+                }
+            }
+        })
+
+        logoutViewModel.viewState.observe(viewLifecycleOwner, Observer {
+            if (it.logoutResponse != null) {
+                logoutListener?.logOutComplete()
             }
         })
 
@@ -287,8 +323,6 @@ class ProfileFragment : Fragment(),
             citiesCoordinates.add(it.coordinates.toString())
         }
 
-        val pref = context?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-
         var positionCity: Int? = null
         AlertDialog.Builder(context!!)
             .setTitle(getString(R.string.choose_city))
@@ -310,6 +344,8 @@ class ProfileFragment : Fragment(),
                                 )}", citiesArrayList[it]
                             )
                         )
+                        lastUpdateCityLocal = citiesArrayList[it]
+                        lastUpdateCoordinates = citiesCoordinates[it]
                     }
                 }
             }
@@ -332,7 +368,54 @@ class ProfileFragment : Fragment(),
         }
     }
 
+    private fun showExitDialog() {
+        context?.let {
+            val builder = AlertDialog.Builder(it)
+            builder.setTitle("Выход")
+            builder.setMessage("Вы действительно хотите выйти из приложения?")
+            builder.setPositiveButton("Да") { v, d ->
+                view?.let {
+                    logoutViewModel.setStateEvent(LogoutStateEvent.LogoutEvent(Hawk.get(Constants.TOKEN)))
+                }
+
+            }
+            builder.setNegativeButton("Нет") { v, d ->
+                v.dismiss()
+            }
+            builder.show()
+        }
+    }
+
+    private fun showChangeNameDialog() {
+        context?.let {
+            val editTextView = LayoutInflater.from(it).inflate(R.layout.edit_text, null, false)
+            val builder = AlertDialog.Builder(it)
+            builder.setPositiveButton("Ok") { v, d ->
+                val name = editTextView.findViewById<EditText>(R.id.name_edit_text).text.toString()
+                lastName = name
+                userViewModel.setStateEvent(
+                    UserStateEvent.SetNewNameEvent(
+                        Hawk.get(Constants.TOKEN),
+                        name
+                    )
+                )
+            }
+            builder.setNegativeButton("Отмена") { v, d ->
+
+            }
+            builder.setCancelable(true)
+            builder.setTitle("Введите новое имя")
+            builder.setView(editTextView)
+            builder.show()
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     private fun initListeners() {
+        nameTextView?.setOnClickListener {
+            showChangeNameDialog()
+        }
+
         topUpBalance?.setOnClickListener {
             onBalanceUpClickListener?.onBalanceUpClick()
         }
@@ -342,12 +425,14 @@ class ProfileFragment : Fragment(),
         super.onAttach(context)
         if (context is MainActivity) {
             onBalanceUpClickListener = context
+            logoutListener = context
         }
     }
 
     override fun onDetach() {
         super.onDetach()
         onBalanceUpClickListener = null
+        logoutListener = null
     }
 
     override fun onDataStateChange(dataState: DataState<*>?) {
@@ -360,7 +445,8 @@ class ProfileFragment : Fragment(),
                 citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
             }
             R.id.action_exit -> {
-                // todo exit
+                println("ТУт")
+                showExitDialog()
             }
         }
         return true
@@ -371,9 +457,5 @@ class ProfileFragment : Fragment(),
         titleTransactions?.visibility = View.GONE
         emptyImageView?.visibility = View.VISIBLE
         emptyTextView?.visibility = View.VISIBLE
-    }
-
-    override fun onClick(dialog: DialogInterface?, which: Int) {
-
     }
 }

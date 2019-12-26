@@ -27,6 +27,13 @@ interface ApiService {
         @Header("Accept") accept: String
     ): LiveData<GenericApiResponse<UserInfoResponse>>
 
+    @Multipart
+    @POST("api/user/set-name")
+    fun setNewName(
+        @Header("Authorization") token: String,
+        @Part("name") name: String
+    ): LiveData<GenericApiResponse<UpdateNameResponse>>
+
     @GET("api/user/operations")
     fun getOperations(
         @Header("Authorization") token: String,
@@ -80,5 +87,10 @@ interface ApiService {
         @Header("Authorization") tokenApp: String,
         @Path("id") discountId: Int
     ): LiveData<GenericApiResponse<DiscountResponse>>
+
+    @GET("api/user/logout")
+    fun logout(
+        @Header("Authorization") tokenApp: String
+    ): LiveData<GenericApiResponse<LogoutResponse>>
 
 }

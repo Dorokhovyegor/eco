@@ -22,10 +22,14 @@
         android:label="SplashScreen">
         <action
             android:id="@+id/action_splash_destination_to_auth_destination"
-            app:destination="@+id/auth_destination" />
+            app:destination="@+id/auth_destination"
+            app:popUpTo="@+id/splash_destination"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_splash_destination_to_containerFragment"
-            app:destination="@id/containerFragment" />
+            app:destination="@id/containerFragment"
+            app:popUpTo="@+id/splash_destination"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/auth_destination"
@@ -33,7 +37,9 @@
         android:label="AuthFragment">
         <action
             android:id="@+id/from_auth_To_container"
-            app:destination="@+id/containerFragment" />
+            app:destination="@+id/containerFragment"
+            app:popUpTo="@+id/splash_destination"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/containerFragment"
@@ -46,11 +52,19 @@
             app:destination="@id/payment_destination" />
         <action
             android:id="@+id/action_containerFragment_to_viewDiscountFragment"
-            app:destination="@id/viewDiscountFragment"
+            app:destination="@+id/viewDiscountFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/exit_to_right"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@+id/containerFragment"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_containerFragment_to_auth_destination"
+            app:destination="@+id/auth_destination"
+            app:enterAnim="@anim/animation_in"
+            app:exitAnim="@anim/animation_out"
+            app:launchSingleTop="true"
             app:popUpTo="@+id/containerFragment"
             app:popUpToInclusive="false" />
     </fragment>

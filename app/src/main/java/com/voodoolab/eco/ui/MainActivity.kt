@@ -39,8 +39,8 @@ class MainActivity : AppCompatActivity(),
     SkipSplashScreenListener,
     AuthenticateListener,
     BalanceUpClickListener,
-    ChangeCityEventListener,
-    DiscountClickListener {
+    DiscountClickListener,
+    LogoutListener {
 
     lateinit var navController: NavController
     lateinit var updateTokenViewModel: FirebaseTokenViewModel
@@ -59,11 +59,6 @@ class MainActivity : AppCompatActivity(),
 
         if (!Hawk.isBuilt())
             Hawk.init(this).build()
-
-        Handler().postDelayed({
-            showReportBottomSheet()
-        }, 1500
-        )
     }
 
     private fun initToken() {
@@ -132,7 +127,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun completeAuthenticated() {
-        supportActionBar?.show()
         val navOptions: NavOptions? = NavOptions.Builder()
             .setEnterAnim(R.anim.enter_from_right)
             .setExitAnim(R.anim.nav_default_exit_anim)
@@ -149,7 +143,6 @@ class MainActivity : AppCompatActivity(),
         val bundle = bundleOf(
             "id" to discountID
         )
-
         navController.navigate(R.id.action_containerFragment_to_viewDiscountFragment, bundle)
     }
 
@@ -165,7 +158,8 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    override fun showDialog() {
-
+    override fun logOutComplete() {
+        Hawk.deleteAll()
+        navController.navigate(R.id.action_containerFragment_to_auth_destination)
     }
 }
