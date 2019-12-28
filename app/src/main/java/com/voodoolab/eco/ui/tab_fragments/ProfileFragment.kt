@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
@@ -39,6 +40,7 @@ import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.voodoolab.eco.utils.Constants
 import com.xw.repo.BubbleSeekBar
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
+import org.w3c.dom.Text
 
 
 class ProfileFragment : Fragment(),
@@ -56,21 +58,18 @@ class ProfileFragment : Fragment(),
     private var onBalanceUpClickListener: BalanceUpClickListener? = null
     private var logoutListener: LogoutListener? = null
 
-    private var helloTextView: TextView? = null
-    private var nameTextView: TextView? = null
+    private var titleTextView: TextView? = null
     private var balanceTextView: TextView? = null
-    private var topUpBalance: Button? = null
+    private var cashback: TextView? = null
+    private var topUpBalance: FloatingActionButton? = null
     private var progressBar: MaterialProgressBar? = null
     private var transactionsRecyclerView: RecyclerView? = null
-    private var transactionsProgressBar: ProgressBar? = null
+
     private var bubbleSeekBar: BubbleSeekBar? = null
     private var listPercentsTextView: List<TextView>? = null
     private var listMoneyTextView: List<TextView>? = null
     private var optionButton: ImageButton? = null
-    private var toolbar: Toolbar? = null
 
-    private var titleTransactions: TextView? = null
-    private var emptyImageView: ImageView? = null
     private var emptyTextView: TextView? = null
     private var adapter: TransactionsRecyclerViewAdapter? = null
 
@@ -88,26 +87,23 @@ class ProfileFragment : Fragment(),
         citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
         logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
 
-        return inflater.inflate(R.layout.profile_fragment, container, false)
+        return inflater.inflate(R.layout.profile_container_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         findViewsFromLayout(view)
         listPercentsTextView = initTextViewsDiscounts(view)
         listMoneyTextView = initTextViewsMoney(view)
-        toolbar = view.findViewById(R.id.toolbar)
 
         val token = Hawk.get<String>(Constants.TOKEN)
+
         userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
-        val token2 = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
-        transactionViewModel.initialize(token2, this)
+        transactionViewModel.initialize(token, this)
 
         val pref = activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
         val city = pref?.getString(Constants.CITY_ECO, null)
 
-        if (city != null) {
-            setToolbarContent(city)
-        } else {
+        if (city == null) {
             citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
         }
 
@@ -116,22 +112,15 @@ class ProfileFragment : Fragment(),
         initRecyclerView()
     }
 
-    private fun setToolbarContent(city: String?) {
-        toolbar?.subtitle = city
-    }
-
     private fun findViewsFromLayout(view: View) {
+        titleTextView = view.findViewById(R.id.main_title)
         transactionsRecyclerView = view.findViewById(R.id.transactionsRecyclerView)
         progressBar = view.findViewById(R.id.progress_bar)
         balanceTextView = view.findViewById(R.id.money_text_view)
+        cashback = view.findViewById<TextView>(R.id.cashback_value)
         bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
-        transactionsProgressBar = view.findViewById(R.id.transactions_progressBar)
-        helloTextView = view.findViewById(R.id.hello_text_view)
-        nameTextView = view.findViewById(R.id.name_text_view)
         topUpBalance = view.findViewById(R.id.topUpBalance)
         optionButton = view.findViewById(R.id.options_button)
-        titleTransactions = view.findViewById(R.id.transactions_title)
-        emptyImageView = view.findViewById(R.id.emptyListImageView)
         emptyTextView = view.findViewById(R.id.emptyListTextView)
 
         optionButton?.setOnClickListener {
@@ -193,7 +182,7 @@ class ProfileFragment : Fragment(),
                         activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
                     pref?.edit()?.putString(Constants.CITY_ECO, lastUpdateCityLocal)
                         ?.putString(Constants.CITY_COORDINATES, lastUpdateCoordinates)?.apply()
-                    setToolbarContent(lastUpdateCityLocal)
+                    titleTextView?.text = (lastUpdateCityLocal)
                 }
                 showToast("Изменения сохранены")
             }
@@ -207,7 +196,6 @@ class ProfileFragment : Fragment(),
                     it.updateNameResponse?.let {
                         if (it.status == "ok") {
                             showToast("Имя сохранено")
-                            nameTextView?.text = lastName
                         }
                     }
                 }
@@ -240,7 +228,6 @@ class ProfileFragment : Fragment(),
         })
 
         transactionViewModel.transactionsPagedList?.observe(viewLifecycleOwner, Observer {
-            transactionsProgressBar?.visibility = View.GONE
             adapter?.submitList(it)
         })
     }
@@ -252,32 +239,25 @@ class ProfileFragment : Fragment(),
             R.string.transaction_value,
             data?.balance
         )
-
-        nameTextView?.text = data?.name
-
         listMoneyTextView?.withIndex()?.forEach {
             it.value.text = getString(
                 R.string.transaction_value,
                 data?.valuesMoney?.get(it.index)
             )
         }
-
         listPercentsTextView?.withIndex()?.forEach {
             it.value.text = getString(
                 R.string.percent_value,
                 data?.valuesPercent?.get(it.index)
             )
         }
-
         data?.indicatorPosition?.let {
             if (it != -1)
                 doPercentTextViewBigger(it)
         }
-
         data?.currentProgressInPercent?.let {
             bubbleSeekBar?.setProgress(it)
         }
-
     }
 
     private fun doPercentTextViewBigger(position: Int) {
@@ -377,7 +357,6 @@ class ProfileFragment : Fragment(),
                 view?.let {
                     logoutViewModel.setStateEvent(LogoutStateEvent.LogoutEvent(Hawk.get(Constants.TOKEN)))
                 }
-
             }
             builder.setNegativeButton("Нет") { v, d ->
                 v.dismiss()
@@ -386,7 +365,7 @@ class ProfileFragment : Fragment(),
         }
     }
 
-    private fun showChangeNameDialog() {
+    /*    private fun showChangeNameDialog() {
         context?.let {
             val editTextView = LayoutInflater.from(it).inflate(R.layout.edit_text, null, false)
             val builder = AlertDialog.Builder(it)
@@ -408,14 +387,10 @@ class ProfileFragment : Fragment(),
             builder.setView(editTextView)
             builder.show()
         }
-    }
+    }*/
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initListeners() {
-        nameTextView?.setOnClickListener {
-            showChangeNameDialog()
-        }
-
         topUpBalance?.setOnClickListener {
             onBalanceUpClickListener?.onBalanceUpClick()
         }
@@ -445,7 +420,6 @@ class ProfileFragment : Fragment(),
                 citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
             }
             R.id.action_exit -> {
-                println("ТУт")
                 showExitDialog()
             }
         }
@@ -454,8 +428,6 @@ class ProfileFragment : Fragment(),
 
     override fun setEmptyState() {
         transactionsRecyclerView?.visibility = View.GONE
-        titleTransactions?.visibility = View.GONE
-        emptyImageView?.visibility = View.VISIBLE
         emptyTextView?.visibility = View.VISIBLE
     }
 }

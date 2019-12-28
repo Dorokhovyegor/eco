@@ -24,5 +24,7 @@
     <string name="googlepay_status_checking" translatable="false">Checking if Google Pay is available...</string>
     <string name="payments_show_name" translatable="false">Successfully received payment data for %s!</string>
     <string name="hello_profile_screen">Привет,</string>
+    <string name="balance_text">Баланс</string>
+    <string name="cashback_text">Кэшбэк</string>
 
 </resources>

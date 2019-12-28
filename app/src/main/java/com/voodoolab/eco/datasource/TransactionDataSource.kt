@@ -16,7 +16,7 @@ class TransactionDataSource(val token: String): PageKeyedDataSource<Int, Transac
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, TransactionData>
     ) {
-        RetrofitBuilder.apiService.getOperations(token, "application/json", FIRST_PAGE.toString(), QUANTITY.toString()).enqueue( object: retrofit2.Callback<TransactionResponse> {
+        RetrofitBuilder.apiService.getOperations("Bearer $token", "application/json", FIRST_PAGE.toString(), QUANTITY.toString()).enqueue( object: retrofit2.Callback<TransactionResponse> {
             override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {
                 t.printStackTrace()
             }
@@ -36,7 +36,7 @@ class TransactionDataSource(val token: String): PageKeyedDataSource<Int, Transac
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionData>) {
-        val call = RetrofitBuilder.apiService.getOperations(token, "application/json", params.key.toString(), QUANTITY.toString())
+        val call = RetrofitBuilder.apiService.getOperations("Bearer $token", "application/json", params.key.toString(), QUANTITY.toString())
 
         call.enqueue(object: retrofit2.Callback<TransactionResponse> {
             override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {}

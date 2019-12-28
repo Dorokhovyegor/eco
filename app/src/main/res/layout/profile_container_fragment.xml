@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        style="@style/AppTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/collapse_toolbar_gradient"
+                android:paddingBottom="56dp">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:background="@null"
+                    android:padding="16dp"
+                    android:src="@drawable/more_options_drw" />
+
+                <ImageView
+                    android:id="@+id/card_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="72dp"
+                    android:src="@mipmap/group_4660" />
+
+                <View
+                    android:id="@+id/center"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:id="@+id/balance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/card_view"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_toStartOf="@id/center"
+                    android:text="@string/balance_text"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/cash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/card_view"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_toEndOf="@id/center"
+                    android:text="@string/cashback_text"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/money_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/balance"
+                    android:layout_marginTop="12dp"
+                    android:layout_toStartOf="@id/center"
+                    android:text="25 210.50 ₽"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:id="@+id/cashback_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/cash"
+                    android:layout_marginTop="12dp"
+                    android:layout_toEndOf="@id/center"
+                    android:text="10 %"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="28sp" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/main_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:maxLength="25"
+                android:text="Профиль"
+                android:textColor="#fff"
+                android:textSize="18sp"
+                app:layout_collapseMode="pin" />
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin">
+
+
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/progress_bar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="7dp"
+        android:layout_gravity="bottom"
+        android:indeterminate="true"
+        android:visibility="visible"
+        app:layout_anchor="@id/appBar"
+        app:layout_anchorGravity="bottom"
+        app:layout_collapseMode="pin"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_showProgressBackground="false"
+        app:mpb_useIntrinsicPadding="false" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        app:layout_anchor="@id/appBar"
+        app:layout_anchorGravity="bottom|center_horizontal">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="62dp"
+            android:layout_height="wrap_content"
+            android:text="История" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="62dp"
+            android:layout_height="wrap_content"
+            android:text="КЭШБЭК" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:layout_anchor="@id/tab_layout"
+        app:layout_anchorGravity="bottom"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/cash_back_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+
+            <TextView
+                android:id="@+id/cash_back_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.25"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+
+            <TextView
+                android:id="@+id/cash_back_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.50"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+
+            <TextView
+                android:id="@+id/cash_back_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.75"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+
+            <TextView
+                android:id="@+id/cash_back_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/bubbleSeekBar"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
+
+            <com.xw.repo.BubbleSeekBar
+                android:id="@+id/bubbleSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="56dp"
+                android:layout_marginEnd="16dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:saveEnabled="false"
+                app:bsb_max="100.0"
+                app:bsb_min="0.0"
+                app:bsb_second_track_color="@color/colorPrimary"
+                app:bsb_second_track_size="1dp"
+                app:bsb_section_count="4"
+                app:bsb_show_section_mark="true"
+                app:bsb_show_thumb_text="false"
+                app:bsb_thumb_color="@color/transparent"
+                app:bsb_thumb_radius="7dp"
+                app:bsb_thumb_radius_on_dragging="1dp"
+                app:bsb_track_color="@color/grey"
+                app:bsb_track_size="1dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/level_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+
+            <TextView
+                android:id="@+id/level_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.25"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+
+            <TextView
+                android:id="@+id/level_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.50"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+
+            <TextView
+                android:id="@+id/level_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="0.75"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+
+            <TextView
+                android:id="@+id/level_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_from_Serge"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/bubbleSeekBar"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
+                app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/transactionsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="32dp"
+                android:visibility="invisible"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/balance_up"
+        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:src="@drawable/wallet_icon"
+        app:backgroundTint="@color/black"
+        app:fabSize="auto"
+        app:layout_anchor="@+id/appBar"
+        app:layout_anchorGravity="start|bottom" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
