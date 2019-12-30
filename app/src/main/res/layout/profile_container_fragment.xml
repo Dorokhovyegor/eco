@@ -148,16 +148,28 @@
         app:layout_anchorGravity="bottom|center_horizontal">
 
         <com.google.android.material.tabs.TabItem
-            android:layout_width="62dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="История" />
+            android:text="@string/history_tab" />
 
         <com.google.android.material.tabs.TabItem
-            android:layout_width="62dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="КЭШБЭК" />
+            android:text="@string/cashback_tab" />
 
     </com.google.android.material.tabs.TabLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/transactionsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_gravity="bottom"
+        app:layout_anchor="@id/tab_layout"
+        app:layout_anchorGravity="bottom"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -168,6 +180,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -312,15 +325,6 @@
                 app:layout_constraintHorizontal_bias="1"
                 app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar"
                 app:layout_constraintTop_toBottomOf="@+id/bubbleSeekBar" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/transactionsRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="32dp"
-                android:visibility="invisible"
-                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

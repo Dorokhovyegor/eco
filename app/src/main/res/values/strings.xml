@@ -26,5 +26,7 @@
     <string name="hello_profile_screen">Привет,</string>
     <string name="balance_text">Баланс</string>
     <string name="cashback_text">Кэшбэк</string>
+    <string name="history_tab">История</string>
+    <string name="cashback_tab">КЭШБЭК</string>
 
 </resources>

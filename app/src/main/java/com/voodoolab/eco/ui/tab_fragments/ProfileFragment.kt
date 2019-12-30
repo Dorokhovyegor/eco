@@ -18,6 +18,8 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.tabs.TabLayout
+import com.google.gson.JsonParser
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
@@ -53,10 +55,10 @@ class ProfileFragment : Fragment(),
     lateinit var citiesViewModel: CitiesViewModels
     lateinit var logoutViewModel: LogoutViewModel
 
-    var dataStateHandler: DataStateListener = this
+    val CASHBACK_TABLAYOUT = 1
+    val HISTORY_TABLAYOUT = 0
 
-    private var onBalanceUpClickListener: BalanceUpClickListener? = null
-    private var logoutListener: LogoutListener? = null
+    var dataStateHandler: DataStateListener = this
 
     private var titleTextView: TextView? = null
     private var balanceTextView: TextView? = null
@@ -70,12 +72,51 @@ class ProfileFragment : Fragment(),
     private var listMoneyTextView: List<TextView>? = null
     private var optionButton: ImageButton? = null
 
+    private var tabLayout: TabLayout? = null
     private var emptyTextView: TextView? = null
     private var adapter: TransactionsRecyclerViewAdapter? = null
 
     private var lastUpdateCityLocal: String? = null
     private var lastUpdateCoordinates: String? = null
     private var lastName: String? = null
+
+    private var tabListener = object : TabLayout.OnTabSelectedListener {
+        override fun onTabReselected(p0: TabLayout.Tab?) {
+
+        }
+
+        override fun onTabUnselected(p0: TabLayout.Tab?) {
+
+        }
+
+        override fun onTabSelected(p0: TabLayout.Tab?) {
+            p0?.position?.let { pos ->
+                when (pos) {
+                    CASHBACK_TABLAYOUT -> {
+                        // убираем список, удаляем слежением за изменениями
+                        transactionsRecyclerView?.visibility = View.INVISIBLE
+                        transactionViewModel.transactionsPagedList?.removeObservers(
+                            viewLifecycleOwner
+                        )
+                    }
+                    HISTORY_TABLAYOUT -> {
+                        transactionsRecyclerView?.visibility = View.VISIBLE
+                        progressBar?.visibility = View.VISIBLE
+                        transactionViewModel.transactionsPagedList?.observe(
+                            viewLifecycleOwner,
+                            Observer {
+                                println("DEBUG: it is working")
+                                progressBar?.visibility = View.INVISIBLE
+                                adapter?.submitList(it)
+                            })
+                    }
+                    else -> {
+
+                    }
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,7 +127,6 @@ class ProfileFragment : Fragment(),
         transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
         citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
         logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
-
         return inflater.inflate(R.layout.profile_container_fragment, container, false)
     }
 
@@ -96,7 +136,6 @@ class ProfileFragment : Fragment(),
         listMoneyTextView = initTextViewsMoney(view)
 
         val token = Hawk.get<String>(Constants.TOKEN)
-
         userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
         transactionViewModel.initialize(token, this)
 
@@ -108,20 +147,26 @@ class ProfileFragment : Fragment(),
         }
 
         subscribeObservers()
-        initListeners()
         initRecyclerView()
+
+        transactionsRecyclerView?.visibility = View.VISIBLE
+        progressBar?.visibility = View.VISIBLE
     }
 
     private fun findViewsFromLayout(view: View) {
         titleTextView = view.findViewById(R.id.main_title)
         transactionsRecyclerView = view.findViewById(R.id.transactionsRecyclerView)
         progressBar = view.findViewById(R.id.progress_bar)
+
         balanceTextView = view.findViewById(R.id.money_text_view)
-        cashback = view.findViewById<TextView>(R.id.cashback_value)
+        cashback = view.findViewById(R.id.money_text_view)
+
         bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
         topUpBalance = view.findViewById(R.id.topUpBalance)
         optionButton = view.findViewById(R.id.options_button)
         emptyTextView = view.findViewById(R.id.emptyListTextView)
+        tabLayout = view.findViewById(R.id.tab_layout)
+        tabLayout?.addOnTabSelectedListener(tabListener)
 
         optionButton?.setOnClickListener {
             val popup = PopupMenu(context, it)
@@ -176,6 +221,7 @@ class ProfileFragment : Fragment(),
             it.citiesResponse?.let { cities ->
                 showChooseCityDialogs(cities)
             }
+
             it.updateCityResponse?.let {
                 if (lastUpdateCityLocal != null && lastUpdateCoordinates != null) {
                     val pref =
@@ -193,11 +239,6 @@ class ProfileFragment : Fragment(),
             dataState.data?.let { userViewState ->
                 userViewState.getContentIfNotHandled()?.let {
                     userViewModel.updateUserResponse(it.userResponse, it.updateNameResponse)
-                    it.updateNameResponse?.let {
-                        if (it.status == "ok") {
-                            showToast("Имя сохранено")
-                        }
-                    }
                 }
             }
         })
@@ -215,7 +256,8 @@ class ProfileFragment : Fragment(),
 
         logoutViewModel.viewState.observe(viewLifecycleOwner, Observer {
             if (it.logoutResponse != null) {
-                logoutListener?.logOutComplete()
+                val controller = Navigation.findNavController(activity!!, R.id.common_graph)
+                controller.navigate(R.id.action_containerFragment_to_auth_destination)
             }
         })
 
@@ -228,6 +270,7 @@ class ProfileFragment : Fragment(),
         })
 
         transactionViewModel.transactionsPagedList?.observe(viewLifecycleOwner, Observer {
+            progressBar?.visibility = View.INVISIBLE
             adapter?.submitList(it)
         })
     }
@@ -274,6 +317,16 @@ class ProfileFragment : Fragment(),
             showProgressBar(it.loading)
             it.message?.let { event ->
                 event.getContentIfNotHandled()?.let {
+                    val json = JsonParser().parse(it).asJsonObject
+                    if (json.isJsonObject) {
+                        if (json.has("message")) {
+                            if (json.get("message").asString == "Unauthenticated") {
+                                val controller =
+                                    Navigation.findNavController(activity!!, R.id.common_graph)
+                                controller.navigate(R.id.action_containerFragment_to_auth_destination)
+                            }
+                        }
+                    }
                     showToast(it)
                 }
             }
@@ -356,6 +409,7 @@ class ProfileFragment : Fragment(),
             builder.setPositiveButton("Да") { v, d ->
                 view?.let {
                     logoutViewModel.setStateEvent(LogoutStateEvent.LogoutEvent(Hawk.get(Constants.TOKEN)))
+                    Hawk.deleteAll()
                 }
             }
             builder.setNegativeButton("Нет") { v, d ->
@@ -363,51 +417,6 @@ class ProfileFragment : Fragment(),
             }
             builder.show()
         }
-    }
-
-    /*    private fun showChangeNameDialog() {
-        context?.let {
-            val editTextView = LayoutInflater.from(it).inflate(R.layout.edit_text, null, false)
-            val builder = AlertDialog.Builder(it)
-            builder.setPositiveButton("Ok") { v, d ->
-                val name = editTextView.findViewById<EditText>(R.id.name_edit_text).text.toString()
-                lastName = name
-                userViewModel.setStateEvent(
-                    UserStateEvent.SetNewNameEvent(
-                        Hawk.get(Constants.TOKEN),
-                        name
-                    )
-                )
-            }
-            builder.setNegativeButton("Отмена") { v, d ->
-
-            }
-            builder.setCancelable(true)
-            builder.setTitle("Введите новое имя")
-            builder.setView(editTextView)
-            builder.show()
-        }
-    }*/
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun initListeners() {
-        topUpBalance?.setOnClickListener {
-            onBalanceUpClickListener?.onBalanceUpClick()
-        }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is MainActivity) {
-            onBalanceUpClickListener = context
-            logoutListener = context
-        }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        onBalanceUpClickListener = null
-        logoutListener = null
     }
 
     override fun onDataStateChange(dataState: DataState<*>?) {
