@@ -21,7 +21,7 @@ class TransactionsViewModel : ViewModel() {
 
             val config = PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
-                .setPageSize(5)
+                .setPageSize(15)
                 .build()
             transactionsPagedList = LivePagedListBuilder(itemDataSourceFactory, config)
                 .setBoundaryCallback(object : PagedList.BoundaryCallback<TransactionData>() {

@@ -10,7 +10,7 @@ import retrofit2.Response
 class TransactionDataSource(val token: String): PageKeyedDataSource<Int, TransactionData>() {
 
     val FIRST_PAGE = 1
-    val QUANTITY = 5
+    val QUANTITY = 15
 
     override fun loadInitial(
         params: LoadInitialParams<Int>,

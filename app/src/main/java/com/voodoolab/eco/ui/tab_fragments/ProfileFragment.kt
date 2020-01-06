@@ -1,6 +1,5 @@
 package com.voodoolab.eco.ui.tab_fragments
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
@@ -10,110 +9,69 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.Toolbar
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.JsonParser
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
-import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
-import com.voodoolab.eco.interfaces.BalanceUpClickListener
 import com.voodoolab.eco.interfaces.DataStateListener
-import com.voodoolab.eco.interfaces.EmptyListInterface
-import com.voodoolab.eco.interfaces.LogoutListener
 import com.voodoolab.eco.models.ClearUserModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.CitiesResponse
 import com.voodoolab.eco.states.cities_state.CitiesStateEvent
 import com.voodoolab.eco.states.logout_state.LogoutStateEvent
-import com.voodoolab.eco.states.logout_state.LogoutViewState
 import com.voodoolab.eco.states.user_state.UserStateEvent
-import com.voodoolab.eco.ui.MainActivity
+import com.voodoolab.eco.ui.profile_fragments.CashbackLevelFragment
+import com.voodoolab.eco.ui.profile_fragments.TransactionsFragmentList
 import com.voodoolab.eco.ui.view_models.CitiesViewModels
 import com.voodoolab.eco.ui.view_models.LogoutViewModel
-import com.voodoolab.eco.ui.view_models.TransactionsViewModel
 import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.voodoolab.eco.utils.Constants
-import com.xw.repo.BubbleSeekBar
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
-import org.w3c.dom.Text
 
+val CASHBACK_TABLAYOUT = 1
+val HISTORY_TABLAYOUT = 0
 
 class ProfileFragment : Fragment(),
     DataStateListener,
-    PopupMenu.OnMenuItemClickListener,
-    EmptyListInterface {
+    PopupMenu.OnMenuItemClickListener {
 
+    // view models
     lateinit var userViewModel: UserInfoViewModel
-    lateinit var transactionViewModel: TransactionsViewModel
     lateinit var citiesViewModel: CitiesViewModels
     lateinit var logoutViewModel: LogoutViewModel
 
-    val CASHBACK_TABLAYOUT = 1
-    val HISTORY_TABLAYOUT = 0
-
+    // state listener
     var dataStateHandler: DataStateListener = this
 
+    // views
     private var titleTextView: TextView? = null
     private var balanceTextView: TextView? = null
     private var cashback: TextView? = null
     private var topUpBalance: FloatingActionButton? = null
     private var progressBar: MaterialProgressBar? = null
-    private var transactionsRecyclerView: RecyclerView? = null
-
-    private var bubbleSeekBar: BubbleSeekBar? = null
-    private var listPercentsTextView: List<TextView>? = null
-    private var listMoneyTextView: List<TextView>? = null
     private var optionButton: ImageButton? = null
-
     private var tabLayout: TabLayout? = null
-    private var emptyTextView: TextView? = null
-    private var adapter: TransactionsRecyclerViewAdapter? = null
 
+    // temp var
     private var lastUpdateCityLocal: String? = null
     private var lastUpdateCoordinates: String? = null
-    private var lastName: String? = null
+    private var clearInfoUserModel: ClearUserModel? = null
 
     private var tabListener = object : TabLayout.OnTabSelectedListener {
-        override fun onTabReselected(p0: TabLayout.Tab?) {
+        override fun onTabReselected(p0: TabLayout.Tab?) {}
 
-        }
-
-        override fun onTabUnselected(p0: TabLayout.Tab?) {
-
-        }
+        override fun onTabUnselected(p0: TabLayout.Tab?) {}
 
         override fun onTabSelected(p0: TabLayout.Tab?) {
             p0?.position?.let { pos ->
-                when (pos) {
-                    CASHBACK_TABLAYOUT -> {
-                        // убираем список, удаляем слежением за изменениями
-                        transactionsRecyclerView?.visibility = View.INVISIBLE
-                        transactionViewModel.transactionsPagedList?.removeObservers(
-                            viewLifecycleOwner
-                        )
-                    }
-                    HISTORY_TABLAYOUT -> {
-                        transactionsRecyclerView?.visibility = View.VISIBLE
-                        progressBar?.visibility = View.VISIBLE
-                        transactionViewModel.transactionsPagedList?.observe(
-                            viewLifecycleOwner,
-                            Observer {
-                                println("DEBUG: it is working")
-                                progressBar?.visibility = View.INVISIBLE
-                                adapter?.submitList(it)
-                            })
-                    }
-                    else -> {
-
-                    }
-                }
+                loadFragment(pos)
             }
         }
     }
@@ -124,7 +82,6 @@ class ProfileFragment : Fragment(),
         savedInstanceState: Bundle?
     ): View? {
         userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
-        transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
         citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
         logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
         return inflater.inflate(R.layout.profile_container_fragment, container, false)
@@ -132,12 +89,9 @@ class ProfileFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         findViewsFromLayout(view)
-        listPercentsTextView = initTextViewsDiscounts(view)
-        listMoneyTextView = initTextViewsMoney(view)
-
+        addToolBarOffsetListener(view)
         val token = Hawk.get<String>(Constants.TOKEN)
         userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
-        transactionViewModel.initialize(token, this)
 
         val pref = activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
         val city = pref?.getString(Constants.CITY_ECO, null)
@@ -147,24 +101,17 @@ class ProfileFragment : Fragment(),
         }
 
         subscribeObservers()
-        initRecyclerView()
-
-        transactionsRecyclerView?.visibility = View.VISIBLE
-        progressBar?.visibility = View.VISIBLE
     }
 
     private fun findViewsFromLayout(view: View) {
         titleTextView = view.findViewById(R.id.main_title)
-        transactionsRecyclerView = view.findViewById(R.id.transactionsRecyclerView)
         progressBar = view.findViewById(R.id.progress_bar)
 
         balanceTextView = view.findViewById(R.id.money_text_view)
-        cashback = view.findViewById(R.id.money_text_view)
+        cashback = view.findViewById(R.id.cashback_value)
 
-        bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
         topUpBalance = view.findViewById(R.id.topUpBalance)
         optionButton = view.findViewById(R.id.options_button)
-        emptyTextView = view.findViewById(R.id.emptyListTextView)
         tabLayout = view.findViewById(R.id.tab_layout)
         tabLayout?.addOnTabSelectedListener(tabListener)
 
@@ -175,36 +122,6 @@ class ProfileFragment : Fragment(),
             inflater.inflate(R.menu.setting_menu, popup.menu)
             popup.show()
         }
-    }
-
-    private fun initRecyclerView() {
-        adapter = TransactionsRecyclerViewAdapter()
-        transactionsRecyclerView?.layoutManager = LinearLayoutManager(context)
-        transactionsRecyclerView?.adapter = adapter
-    }
-
-    private fun initTextViewsDiscounts(view: View?): List<TextView>? {
-        val textViews = ArrayList<TextView>()
-        view?.let { container ->
-            textViews.add(container.findViewById(R.id.cash_back_1) as TextView)
-            textViews.add(container.findViewById(R.id.cash_back_2) as TextView)
-            textViews.add(container.findViewById(R.id.cash_back_3) as TextView)
-            textViews.add(container.findViewById(R.id.cash_back_4) as TextView)
-            textViews.add(container.findViewById(R.id.cash_back_5) as TextView)
-        }
-        return textViews
-    }
-
-    private fun initTextViewsMoney(view: View?): List<TextView>? {
-        val textViews = ArrayList<TextView>()
-        view?.let { container ->
-            textViews.add(container.findViewById(R.id.level_1) as TextView)
-            textViews.add(container.findViewById(R.id.level_2) as TextView)
-            textViews.add(container.findViewById(R.id.level_3) as TextView)
-            textViews.add(container.findViewById(R.id.level_4) as TextView)
-            textViews.add(container.findViewById(R.id.level_5) as TextView)
-        }
-        return textViews
     }
 
     private fun subscribeObservers() {
@@ -265,51 +182,60 @@ class ProfileFragment : Fragment(),
             if (viewState.userResponse?.status == "ok") {
                 viewState.clearResponse?.let {
                     updateContent(it)
+                    clearInfoUserModel = it
                 }
             }
-        })
-
-        transactionViewModel.transactionsPagedList?.observe(viewLifecycleOwner, Observer {
-            progressBar?.visibility = View.INVISIBLE
-            adapter?.submitList(it)
         })
     }
 
     private fun updateContent(data: ClearUserModel?) {
-        bubbleSeekBar?.isEnabled = false // не дать изменять это
-
         balanceTextView?.text = getString(
             R.string.transaction_value,
             data?.balance
         )
-        listMoneyTextView?.withIndex()?.forEach {
-            it.value.text = getString(
-                R.string.transaction_value,
-                data?.valuesMoney?.get(it.index)
-            )
+        if (data != null) {
+            if (data.indicatorPosition != null && data.indicatorPosition != -1) {
+                cashback?.text = (data.valuesPercent?.get(data.indicatorPosition)).toString()
+            } else if (data.indicatorPosition == -1) {
+                cashback?.text = getString(R.string.percent_value, 0)
+            }
+        } else {
+            balanceTextView?.text = "-"
+            cashback?.text = "-"
         }
-        listPercentsTextView?.withIndex()?.forEach {
-            it.value.text = getString(
-                R.string.percent_value,
-                data?.valuesPercent?.get(it.index)
-            )
-        }
-        data?.indicatorPosition?.let {
-            if (it != -1)
-                doPercentTextViewBigger(it)
-        }
-        data?.currentProgressInPercent?.let {
-            bubbleSeekBar?.setProgress(it)
-        }
+
     }
 
-    private fun doPercentTextViewBigger(position: Int) {
-        listPercentsTextView?.forEach { textView ->
-            textView.setTextColor(resources.getColor(R.color.grey_from_Serge, null))
-            textView.textSize = 16f
+    private fun addToolBarOffsetListener(view: View) {
+        val container: RelativeLayout? = view.findViewById(R.id.info_container)
+        val appBarLayout: AppBarLayout? = view.findViewById(R.id.appBar)
+        appBarLayout?.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout1, i ->
+            run {
+                val setAlpha: Float =
+                    ((appBarLayout1.totalScrollRange + i).toFloat() / appBarLayout.totalScrollRange.toFloat())
+                container?.alpha = Math.pow(setAlpha.toDouble(), 2.0).toFloat()
+            }
+        })
+    }
+
+    private fun loadFragment(position: Int) {
+        var currentFragment: Fragment? = null
+        when (position) {
+            CASHBACK_TABLAYOUT -> {
+                currentFragment = CashbackLevelFragment()
+            }
+            HISTORY_TABLAYOUT -> {
+                currentFragment = TransactionsFragmentList()
+            }
         }
-        listPercentsTextView?.get(position)?.textSize = 32f
-        listPercentsTextView?.get(position)?.setTextColor(resources.getColor(R.color.black, null))
+
+        currentFragment?.let {
+            childFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, it, bundleOf(
+                    clearInfoUserModel to "clear_model"
+                ))
+                .commit()
+        }
     }
 
     private fun handleDataStateChange(dataState: DataState<*>?) {
@@ -433,10 +359,5 @@ class ProfileFragment : Fragment(),
             }
         }
         return true
-    }
-
-    override fun setEmptyState() {
-        transactionsRecyclerView?.visibility = View.GONE
-        emptyTextView?.visibility = View.VISIBLE
     }
 }

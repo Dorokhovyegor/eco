@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.voodoolab.eco.R
 import com.voodoolab.eco.models.SpecialOfferModel
-import com.voodoolab.eco.models.TransactionData
 import kotlinx.android.synthetic.main.special_offer_item.view.*
 
 class SpecialOffersRecyclerViewAdapter(val block: (model: SpecialOfferModel) -> Unit): PagedListAdapter<SpecialOfferModel, RecyclerView.ViewHolder>(
