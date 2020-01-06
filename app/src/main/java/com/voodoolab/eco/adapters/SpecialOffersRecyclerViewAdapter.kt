@@ -38,12 +38,19 @@ class SpecialOffersRecyclerViewAdapter(val block: (model: SpecialOfferModel) -> 
         private val date = itemView.dateTextView
 
         fun bind(specialOfferModel: SpecialOfferModel) {
-            Glide.with(itemView)
-                .load(specialOfferModel.imageUrl)
-                .placeholder(R.drawable.empty_discount)
-                .error(R.drawable.empty_discount)
-                .centerCrop()
-                .into(image)
+            //если картинки нет, тогда мы скрываем элемент
+
+            if (specialOfferModel.imageUrl == null) {
+                itemView.visibility = View.GONE
+            } else {
+                itemView.visibility = View.VISIBLE
+                Glide.with(itemView)
+                    .load(specialOfferModel.imageUrl)
+                    .placeholder(R.drawable.empty_discount)
+                    .error(R.drawable.empty_discount)
+                    .centerCrop()
+                    .into(image)
+            }
 
             title.text = specialOfferModel.title
             date.text = specialOfferModel.endTime

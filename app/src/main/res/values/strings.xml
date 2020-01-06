@@ -7,7 +7,7 @@
     <string name="on_board_text2">Получай кешбэк с каждой мойки</string>
     <string name="on_board_text3">Отслеживай все операции по карте</string>
 
-    <string name="transaction_value">%1$d ₽</string>
+    <string name="transaction_value">%1$d₽</string>
     <string name="percent_value">%1$d%%</string>
 
     <string name="replenish_offline">Пополнение %1$s</string>
@@ -28,5 +28,13 @@
     <string name="cashback_text">Кэшбэк</string>
     <string name="history_tab">История</string>
     <string name="cashback_tab">КЭШБЭК</string>
+    <string name="next_level_cachback">
+        <![CDATA[
+         До следующего уровня осталось потратить <b>%1$d₽</b>
+        ]]>
+    </string>
+    <string name="max_level">
+        Вы достигли максимального кэшбэка
+    </string>
 
 </resources>

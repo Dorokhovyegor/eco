@@ -99,7 +99,7 @@ class ProfileFragment : Fragment(),
         if (city == null) {
             citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
         }
-
+        loadFragment(HISTORY_TABLAYOUT)
         subscribeObservers()
     }
 
@@ -195,7 +195,7 @@ class ProfileFragment : Fragment(),
         )
         if (data != null) {
             if (data.indicatorPosition != null && data.indicatorPosition != -1) {
-                cashback?.text = (data.valuesPercent?.get(data.indicatorPosition)).toString()
+                cashback?.text = getString(R.string.percent_value, (data.valuesPercent?.get(data.indicatorPosition)))
             } else if (data.indicatorPosition == -1) {
                 cashback?.text = getString(R.string.percent_value, 0)
             }
@@ -220,9 +220,12 @@ class ProfileFragment : Fragment(),
 
     private fun loadFragment(position: Int) {
         var currentFragment: Fragment? = null
+        val bundle = bundleOf(
+            "user_model" to clearInfoUserModel
+        )
         when (position) {
             CASHBACK_TABLAYOUT -> {
-                currentFragment = CashbackLevelFragment()
+                currentFragment = CashbackLevelFragment(bundle)
             }
             HISTORY_TABLAYOUT -> {
                 currentFragment = TransactionsFragmentList()
@@ -231,9 +234,7 @@ class ProfileFragment : Fragment(),
 
         currentFragment?.let {
             childFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, it, bundleOf(
-                    clearInfoUserModel to "clear_model"
-                ))
+                .replace(R.id.fragment_container, it)
                 .commit()
         }
     }

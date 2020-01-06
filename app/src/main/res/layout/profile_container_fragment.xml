@@ -103,15 +103,6 @@
                 android:textSize="18sp"
                 app:layout_collapseMode="pin" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                app:layout_collapseMode="pin"
-                android:background="@null"
-                android:padding="16dp"
-                android:src="@drawable/more_options_drw" />
-
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -120,6 +111,16 @@
 
 
             </androidx.appcompat.widget.Toolbar>
+
+            <ImageButton
+                android:id="@+id/options_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                app:layout_collapseMode="pin"
+                android:background="@null"
+                android:padding="16dp"
+                android:src="@drawable/more_options_drw" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -157,7 +158,7 @@
             <com.google.android.material.tabs.TabLayout
                 android:layout_centerHorizontal="true"
                 android:id="@+id/tab_layout"
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 app:tabPaddingStart="16dp"
                 app:tabPaddingEnd="16dp"

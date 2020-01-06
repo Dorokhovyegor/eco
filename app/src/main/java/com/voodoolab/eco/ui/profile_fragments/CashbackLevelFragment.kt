@@ -2,6 +2,7 @@ package com.voodoolab.eco.ui.profile_fragments
 
 import android.os.Bundle
 import android.os.UserManager
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,27 +12,29 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.models.ClearUserModel
 import com.xw.repo.BubbleSeekBar
 
-class CashbackLevelFragment : Fragment() {
+class CashbackLevelFragment(var data: Bundle?) : Fragment() {
 
+    private var userModel: ClearUserModel? = null
     private var bubbleSeekBar: BubbleSeekBar? = null
     private var listPercentsTextView: List<TextView>? = null
     private var listMoneyTextView: List<TextView>? = null
+    private var nextLevelTextView: TextView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        userModel = data?.getParcelable("user_model")
         return inflater.inflate(R.layout.cashback_layout, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        nextLevelTextView = view.findViewById(R.id.nextLevelOfCachbackTextView)
         bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
         listPercentsTextView = initTextViewsDiscounts(view)
         listMoneyTextView = initTextViewsMoney(view)
-        setContent(
-            arguments?.get("user_model") as ClearUserModel
-        )
+        setContent(userModel)
     }
 
     private fun initTextViewsDiscounts(view: View?): List<TextView>? {
@@ -81,6 +84,16 @@ class CashbackLevelFragment : Fragment() {
         data?.currentProgressInPercent?.let {
             bubbleSeekBar?.setProgress(it)
         }
+
+        data?.nextLevelOfCashBack?.let {
+            if (it == -1) {
+                nextLevelTextView?.text = getString(R.string.max_level)
+            } else {
+                nextLevelTextView?.text = Html.fromHtml(getString(R.string.next_level_cachback, data?.nextLevelOfCashBack), 0)
+            }
+        }
+
+
     }
 
     private fun doPercentTextViewBigger(position: Int) {

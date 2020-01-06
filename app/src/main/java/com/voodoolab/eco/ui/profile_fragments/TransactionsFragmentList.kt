@@ -13,10 +13,11 @@ import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.EmptyListInterface
+import com.voodoolab.eco.models.ClearUserModel
 import com.voodoolab.eco.ui.view_models.TransactionsViewModel
 import com.voodoolab.eco.utils.Constants
 
-class TransactionsFragmentList : Fragment(), EmptyListInterface {
+class TransactionsFragmentList() : Fragment(), EmptyListInterface {
 
     lateinit var transactionViewModel: TransactionsViewModel
 
@@ -32,20 +33,21 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (view is RecyclerView) {
             view.run {
-                layoutManager = LinearLayoutManager(context)
+                println("DEBUG: Тэг епта $tag")
             }
-            subscribeObservers(view)
         }
-
         val token = Hawk.get<String>(Constants.TOKEN)
         transactionViewModel.initialize(token, this)
+        subscribeObservers(view as RecyclerView)
     }
 
-    private fun subscribeObservers(recyclerview: RecyclerView) {
+    private fun subscribeObservers(recyclerView: RecyclerView) {
         transactionViewModel.transactionsPagedList?.observe(viewLifecycleOwner, Observer {
             val adapter = TransactionsRecyclerViewAdapter()
+            recyclerView.adapter = adapter
+            recyclerView.layoutManager = LinearLayoutManager(context)
             adapter.submitList(it)
-            recyclerview.adapter = adapter
+
         })
     }
 

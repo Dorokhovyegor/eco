@@ -162,13 +162,22 @@ class UserInfoViewModel : ViewModel() {
             }
         }
 
+        var remainValue: Int? = null
+        if (currentSection == 4) {
+            remainValue = -1
+        } else {
+            remainValue = moneyValues[currentSection + 1].minus(userResponse?.data?.month_balance?.div(100)!!)
+        }
+
+
         return ClearUserModel(
             userResponse?.data?.balance?.div(100),
             userResponse?.data?.name,
             moneyValues,
             percentValues,
             currentSection,
-            currentProgress
+            currentProgress,
+            remainValue
         )
     }
 
