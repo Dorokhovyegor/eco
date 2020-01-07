@@ -173,7 +173,7 @@ class ProfileFragment : Fragment(),
 
         logoutViewModel.viewState.observe(viewLifecycleOwner, Observer {
             if (it.logoutResponse != null) {
-                val controller = Navigation.findNavController(activity!!, R.id.common_graph)
+                val controller = Navigation.findNavController(view, R.id.common_graph)
                 controller.navigate(R.id.action_containerFragment_to_auth_destination)
             }
         })

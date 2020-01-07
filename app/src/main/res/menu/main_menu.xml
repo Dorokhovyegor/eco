@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Скидки"
+    <item android:title="@string/discounts"
         android:id="@+id/discount_destination"
         android:icon="@drawable/discount_icon">
     </item>
 
-    <item android:title="Профиль"
+    <item android:title="@string/profile"
         android:id="@+id/profile_destination"
         android:icon="@drawable/profile_item">
     </item>
 
-    <item android:title="Карта"
+    <item android:title="@string/map"
         android:id="@+id/map_destination"
         android:icon="@drawable/map_icon">
     </item>

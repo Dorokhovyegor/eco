@@ -89,7 +89,6 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
                 imageStock?.let {
                     if (context != null) {
                         Glide.with(context!!)
-                            .asGif()
                             .load(response.logo)
                             .placeholder(R.drawable.empty_discount)
                             .error(R.drawable.empty_discount)

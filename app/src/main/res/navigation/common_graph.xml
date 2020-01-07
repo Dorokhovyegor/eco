@@ -54,9 +54,9 @@
             android:id="@+id/action_containerFragment_to_viewDiscountFragment"
             app:destination="@+id/viewDiscountFragment"
             app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/exit_to_right"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/endter_from_left"
+            app:popExitAnim="@anim/exit_to_right"
             app:popUpTo="@+id/containerFragment"
             app:popUpToInclusive="false" />
         <action

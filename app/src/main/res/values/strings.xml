@@ -36,5 +36,9 @@
     <string name="max_level">
         Вы достигли максимального кэшбэка
     </string>
+    <string name="empty_transactions_text">У вас еще нет операций по карте</string>
+    <string name="discounts">Скидки</string>
+    <string name="profile">Профиль</string>
+    <string name="map">Карта</string>
 
 </resources>

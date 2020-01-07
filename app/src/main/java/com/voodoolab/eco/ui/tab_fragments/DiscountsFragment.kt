@@ -52,10 +52,7 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
             ?.getString(Constants.CITY_ECO, null)
 
         val token = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
-
         specialOfferViewModel.init(token, city, this)
-
-        setToolbarContent(view)
         subscribeObserver()
     }
 
@@ -73,17 +70,6 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
         listener?.onDiscountClick(data.id)
     }
 
-    private fun setToolbarContent(view: View) {
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        activity?.let {
-            val pref = it.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-            val city = pref.getString(Constants.CITY_ECO, null)
-            city?.let {
-                toolbar.subtitle = it
-            }
-        }
-    }
-
     private fun subscribeObserver() {
         specialOfferViewModel.offersPagedList?.observe(viewLifecycleOwner, Observer {
             recyclerViewAdapter?.submitList(it)
@@ -91,7 +77,8 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
     }
 
     override fun setEmptyState() {
-
+        emptyListImageView?.visibility = View.VISIBLE
+        emptyTextView?.visibility = View.VISIBLE
     }
 
     override fun onAttach(context: Context) {

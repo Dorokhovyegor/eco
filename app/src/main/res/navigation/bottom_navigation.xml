@@ -20,9 +20,7 @@
     <fragment
         android:id="@+id/map_destination"
         android:name="com.voodoolab.eco.ui.tab_fragments.MapFragment"
-        android:label="MapFragment"
-        tools:layout="@layout/map_fragment">
-    </fragment>
+        android:label="MapFragment"></fragment>
     <fragment
         android:id="@+id/discount_destination"
         android:name="com.voodoolab.eco.ui.tab_fragments.DiscountsFragment"

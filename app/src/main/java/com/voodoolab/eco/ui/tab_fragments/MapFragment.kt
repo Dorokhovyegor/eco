@@ -109,10 +109,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 coord?.add(coordinates.split(",")[0].toDouble())
                 coord?.add(coordinates.split(",")[1].toDouble())
             }
-
-            city?.let {
-                toolbar.subtitle = it
-            }
         }
 
     }
