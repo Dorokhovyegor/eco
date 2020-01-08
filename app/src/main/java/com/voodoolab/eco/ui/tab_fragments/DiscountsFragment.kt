@@ -2,10 +2,12 @@ package com.voodoolab.eco.ui.tab_fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -22,6 +24,7 @@ import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.view_models.SpecialOffersViewModel
 import com.voodoolab.eco.utils.Constants
+import com.voodoolab.eco.utils.fadeOutAnimation
 
 class DiscountsFragment : Fragment(), EmptyListInterface {
 
@@ -32,6 +35,8 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
 
     private var emptyListImageView: ImageView? = null
     private var emptyTextView: TextView? = null
+
+    private var fakeContainer: LinearLayout? = null
 
     private var listener: DiscountClickListener?  = null
 
@@ -57,6 +62,7 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
     }
 
     private fun initViews(view: View) {
+        fakeContainer = view.findViewById(R.id.fake_items)
         emptyListImageView= view.findViewById(R.id.emptyListImageView)
         emptyTextView = view.findViewById(R.id.emptyListTextView)
 
@@ -72,13 +78,22 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
 
     private fun subscribeObserver() {
         specialOfferViewModel.offersPagedList?.observe(viewLifecycleOwner, Observer {
-            recyclerViewAdapter?.submitList(it)
+
+            Handler().postDelayed({
+                recyclerViewAdapter?.submitList(it)
+            }, 500)
+
         })
     }
 
     override fun setEmptyState() {
         emptyListImageView?.visibility = View.VISIBLE
         emptyTextView?.visibility = View.VISIBLE
+        fakeContainer?.fadeOutAnimation()
+    }
+
+    override fun firstItemLoaded() {
+        fakeContainer?.fadeOutAnimation()
     }
 
     override fun onAttach(context: Context) {

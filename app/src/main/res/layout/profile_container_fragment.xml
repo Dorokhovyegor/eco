@@ -26,12 +26,21 @@
                 app:layout_collapseMode="parallax">
 
                 <ImageView
+                    android:visibility="invisible"
                     android:id="@+id/card_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="135dp"
+                    android:layout_height="88dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="72dp"
-                    android:src="@mipmap/group_4660" />
+                    android:src="@mipmap/card_image" />
+
+                <com.elyeproj.loaderviewlibrary.LoaderImageView
+                    android:id="@+id/card_loader"
+                    app:corners="16"
+                    android:layout_width="135dp"
+                    android:layout_height="88dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="72dp" />
 
                 <View
                     android:id="@+id/center"
@@ -51,7 +60,9 @@
                     android:text="@string/balance_text"
                     android:textAlignment="center"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    android:visibility="invisible" />
+
 
                 <TextView
                     android:id="@+id/cash"
@@ -65,7 +76,8 @@
                     android:text="@string/cashback_text"
                     android:textAlignment="center"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    android:visibility="invisible" />
 
                 <TextView
                     android:id="@+id/money_text_view"
@@ -77,6 +89,30 @@
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="28sp" />
+
+                <com.elyeproj.loaderviewlibrary.LoaderTextView
+                    android:id="@+id/fake_text_view_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/card_view"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="32dp"
+                    android:textAlignment="center"
+                    android:textSize="15sp"
+                    app:corners="16" />
+
+                <com.elyeproj.loaderviewlibrary.LoaderTextView
+                    android:id="@+id/fake_text_view_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/balance"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:textAlignment="center"
+                    android:textSize="28sp"
+                    app:corners="16" />
 
                 <TextView
                     android:id="@+id/cashback_value"
@@ -126,6 +162,7 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
+
     <me.zhanghai.android.materialprogressbar.MaterialProgressBar
         android:id="@+id/progress_bar"
         style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
@@ -141,17 +178,12 @@
         app:mpb_showProgressBackground="false"
         app:mpb_useIntrinsicPadding="false" />
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        app:layout_anchor="@id/appBar"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
         <RelativeLayout
+            app:layout_anchor="@id/appBar"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
                 android:layout_width="200dp"
@@ -160,6 +192,7 @@
                 app:layout_anchorGravity="bottom|center_horizontal"
                 app:tabPaddingEnd="16dp"
                 app:tabPaddingStart="16dp">
+
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -171,14 +204,15 @@
                     android:text="@string/cashback_tab" />
 
             </com.google.android.material.tabs.TabLayout>
+
             <FrameLayout
+
                 android:id="@+id/fragment_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/tab_layout" />
 
         </RelativeLayout>
-    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/balance_up"

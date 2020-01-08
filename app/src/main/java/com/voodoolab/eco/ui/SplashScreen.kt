@@ -29,12 +29,6 @@ class SplashScreen : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val layout = view.findViewById<ConstraintLayout>(R.id.layout)
-        val animationDrawable = layout.background as AnimationDrawable
-        animationDrawable.setEnterFadeDuration(2000)
-        animationDrawable.setExitFadeDuration(4000)
-        animationDrawable.start()
-
         GlobalScope.launch {
             delay(800)
             splashScreenListener?.splashScreenComplete()

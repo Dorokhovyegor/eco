@@ -4,4 +4,6 @@ interface EmptyListInterface{
 
     fun setEmptyState()
 
+    fun firstItemLoaded()
+
 }

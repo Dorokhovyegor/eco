@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="8dp">
+
+    <com.elyeproj.loaderviewlibrary.LoaderImageView
+        app:corners="16"
+        android:id="@+id/image_loader"
+        android:layout_width="match_parent"
+        android:layout_height="186dp" />
+
+    <com.elyeproj.loaderviewlibrary.LoaderTextView
+        app:corners="16"
+        android:id="@+id/title_loader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/image_loader"
+        android:layout_marginStart="16dp"
+        android:textSize="22sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp" />
+
+    <com.elyeproj.loaderviewlibrary.LoaderTextView
+        app:corners="16"
+        android:id="@+id/date_loader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_loader"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"/>
+
+</RelativeLayout>

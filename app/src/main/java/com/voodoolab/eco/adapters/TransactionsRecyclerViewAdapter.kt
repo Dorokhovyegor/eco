@@ -49,7 +49,7 @@ class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, Transa
 
             when (transactionData.type) {
                 REPLENISH_OFFLINE -> {
-                    Glide.with(itemView).load(R.drawable.ic_balance_up).into(image)
+                    Glide.with(itemView).load(R.mipmap.balance_in).into(image)
                     transactionName?.text = itemView.resources.getString(
                         R.string.replenish_offline,
                         transactionData.wash?.address
@@ -57,22 +57,22 @@ class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, Transa
 
                 }
                 MONTH_BONUS -> {
-                    Glide.with(itemView).load(R.drawable.ic_cashback_ic).into(image)
+                    Glide.with(itemView).load(R.mipmap.cashback).into(image)
                     transactionName?.text = itemView.resources.getString(R.string.month_bonus)
                 }
                 CASHBACK -> {
-                    Glide.with(itemView).load(R.drawable.ic_cashback_ic).into(image)
+                    Glide.with(itemView).load(R.mipmap.cashback).into(image)
                     transactionName?.text = itemView.resources.getString(R.string.cashback)
                 }
                 REPLENISH_ONLINE -> {
-                    Glide.with(itemView).load(R.drawable.ic_balance_up).into(image)
+                    Glide.with(itemView).load(R.mipmap.balance_in).into(image)
                     transactionName?.text = itemView.resources.getString(
                         R.string.replenish_online,
                         transactionData.terminal?.name
                     )
                 }
                 WASTE -> {
-                    Glide.with(itemView).load(R.drawable.ic_balance_down).into(image)
+                    Glide.with(itemView).load(R.mipmap.balance_out).into(image)
                     transactionName?.text =
                         itemView.resources.getString(R.string.waste, transactionData.wash?.address)
                 }

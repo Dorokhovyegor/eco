@@ -31,6 +31,11 @@ class SpecialOffersViewModel : ViewModel() {
                     super.onZeroItemsLoaded()
                     emptyListInterface?.setEmptyState()
                 }
+
+                override fun onItemAtFrontLoaded(itemAtFront: SpecialOfferModel) {
+                    super.onItemAtFrontLoaded(itemAtFront)
+                    emptyListInterface?.firstItemLoaded()
+                }
             })
             .build()
     }

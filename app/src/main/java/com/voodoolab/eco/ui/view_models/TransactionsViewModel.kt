@@ -21,13 +21,19 @@ class TransactionsViewModel : ViewModel() {
 
             val config = PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
-                .setPageSize(15)
+                .setPageSize(5)
                 .build()
+
             transactionsPagedList = LivePagedListBuilder(itemDataSourceFactory, config)
                 .setBoundaryCallback(object : PagedList.BoundaryCallback<TransactionData>() {
                     override fun onZeroItemsLoaded() {
                         super.onZeroItemsLoaded()
                         emptyList?.setEmptyState()
+                    }
+
+                    override fun onItemAtFrontLoaded(itemAtFront: TransactionData) {
+                        super.onItemAtFrontLoaded(itemAtFront)
+                        emptyList?.firstItemLoaded()
                     }
                 })
                 .build()

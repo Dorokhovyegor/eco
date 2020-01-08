@@ -2,6 +2,8 @@ package com.voodoolab.eco.ui
 
 import android.content.Context
 import android.content.DialogInterface
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -20,6 +22,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.iid.FirebaseInstanceId
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
@@ -33,6 +36,11 @@ import com.voodoolab.eco.ui.view_models.CitiesViewModels
 import com.voodoolab.eco.ui.view_models.FirebaseTokenViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.Constants.CONTAINER_FRAGMENT
+import com.zplesac.connectionbuddy.ConnectionBuddy
+import com.zplesac.connectionbuddy.ConnectionBuddyConfiguration
+import com.zplesac.connectionbuddy.activities.ConnectionBuddyActivity
+import com.zplesac.connectionbuddy.models.ConnectivityEvent
+import java.util.*
 
 class MainActivity : AppCompatActivity(),
     DataStateListener,
@@ -40,7 +48,8 @@ class MainActivity : AppCompatActivity(),
     AuthenticateListener,
     BalanceUpClickListener,
     DiscountClickListener,
-    LogoutListener {
+    LogoutListener
+ {
 
     lateinit var navController: NavController
     lateinit var updateTokenViewModel: FirebaseTokenViewModel
@@ -54,6 +63,7 @@ class MainActivity : AppCompatActivity(),
 
         initViews()
         initAndSetListeners()
+
         navController = Navigation.findNavController(this, R.id.frame_container)
         updateTokenViewModel = ViewModelProvider(this).get(FirebaseTokenViewModel::class.java)
 
@@ -162,4 +172,5 @@ class MainActivity : AppCompatActivity(),
         Hawk.deleteAll()
         navController.navigate(R.id.action_containerFragment_to_auth_destination)
     }
+
 }

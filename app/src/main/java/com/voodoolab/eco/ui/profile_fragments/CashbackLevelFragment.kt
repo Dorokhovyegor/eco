@@ -20,6 +20,8 @@ class CashbackLevelFragment(var data: Bundle?) : Fragment() {
     private var listMoneyTextView: List<TextView>? = null
     private var nextLevelTextView: TextView? = null
 
+    //fake views
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

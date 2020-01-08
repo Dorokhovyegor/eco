@@ -3,6 +3,7 @@ package com.voodoolab.eco.ui.tab_fragments
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.MalformedJsonException
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -14,6 +15,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import com.elyeproj.loaderviewlibrary.LoaderImageView
+import com.elyeproj.loaderviewlibrary.LoaderTextView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
@@ -33,6 +36,7 @@ import com.voodoolab.eco.ui.view_models.CitiesViewModels
 import com.voodoolab.eco.ui.view_models.LogoutViewModel
 import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.voodoolab.eco.utils.Constants
+import com.voodoolab.eco.utils.fadeOutAnimation
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
 val CASHBACK_TABLAYOUT = 1
@@ -58,6 +62,9 @@ class ProfileFragment : Fragment(),
     private var progressBar: MaterialProgressBar? = null
     private var optionButton: ImageButton? = null
     private var tabLayout: TabLayout? = null
+
+    //fake views
+    private var fakeBalance: LoaderTextView? = null
 
     // temp var
     private var lastUpdateCityLocal: String? = null
@@ -145,7 +152,6 @@ class ProfileFragment : Fragment(),
                         activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
                     pref?.edit()?.putString(Constants.CITY_ECO, lastUpdateCityLocal)
                         ?.putString(Constants.CITY_COORDINATES, lastUpdateCoordinates)?.apply()
-                    titleTextView?.text = (lastUpdateCityLocal)
                 }
                 showToast("Изменения сохранены")
             }
@@ -173,8 +179,8 @@ class ProfileFragment : Fragment(),
 
         logoutViewModel.viewState.observe(viewLifecycleOwner, Observer {
             if (it.logoutResponse != null) {
-                val controller = Navigation.findNavController(view, R.id.common_graph)
-                controller.navigate(R.id.action_containerFragment_to_auth_destination)
+               /* val controller = Navigation.findNavController(view, R.id.common_graph)
+                controller.navigate(R.id.action_containerFragment_to_auth_destination)*/
             }
         })
 
@@ -189,11 +195,21 @@ class ProfileFragment : Fragment(),
     }
 
     private fun updateContent(data: ClearUserModel?) {
-        balanceTextView?.text = getString(
-            R.string.transaction_value,
-            data?.balance
-        )
         if (data != null) {
+            view?.findViewById<TextView>(R.id.balance)?.visibility = View.VISIBLE
+            view?.findViewById<TextView>(R.id.cash)?.visibility = View.VISIBLE
+            view?.findViewById<ImageView>(R.id.card_view)?.visibility = View.VISIBLE
+
+            view?.findViewById<LoaderImageView>(R.id.card_loader)?.fadeOutAnimation()
+            view?.findViewById<LoaderTextView>(R.id.fake_text_view_title)?.fadeOutAnimation()
+            view?.findViewById<LoaderTextView>(R.id.fake_text_view_value)?.fadeOutAnimation()
+
+
+            balanceTextView?.text = getString(
+                R.string.transaction_value,
+                data.balance
+            )
+
             if (data.indicatorPosition != null && data.indicatorPosition != -1) {
                 cashback?.text = getString(R.string.percent_value, (data.valuesPercent?.get(data.indicatorPosition)))
             } else if (data.indicatorPosition == -1) {
@@ -244,16 +260,20 @@ class ProfileFragment : Fragment(),
             showProgressBar(it.loading)
             it.message?.let { event ->
                 event.getContentIfNotHandled()?.let {
-                    val json = JsonParser().parse(it).asJsonObject
-                    if (json.isJsonObject) {
-                        if (json.has("message")) {
-                            if (json.get("message").asString == "Unauthenticated") {
-                                val controller =
-                                    Navigation.findNavController(activity!!, R.id.common_graph)
-                                controller.navigate(R.id.action_containerFragment_to_auth_destination)
+                    /*try {
+                        val json = JsonParser().parse(it).asJsonObject
+                        if (json.isJsonObject) {
+                            if (json.has("message")) {
+                                if (json.get("message").asString == "Unauthenticated") {
+                                    val controller =
+                                        Navigation.findNavController(activity!!, R.id.common_graph)
+                                    controller.navigate(R.id.action_containerFragment_to_auth_destination)
+                                }
                             }
                         }
-                    }
+                    } catch (e: MalformedJsonException) {
+                        e.printStackTrace()
+                    }*/
                     showToast(it)
                 }
             }

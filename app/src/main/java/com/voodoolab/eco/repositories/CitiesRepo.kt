@@ -1,8 +1,7 @@
 package com.voodoolab.eco.repositories
 
 import androidx.lifecycle.LiveData
-import com.voodoolab.eco.db.EcoDataBase
-import com.voodoolab.eco.models.CityModel
+
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.network.NetworkBoundResource
 import com.voodoolab.eco.network.RetrofitBuilder

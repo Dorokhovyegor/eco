@@ -4,10 +4,24 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginTop="32dp"
         android:id="@+id/transactionsRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/fake_items"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/fake_transaction_item"/>
+        <include layout="@layout/fake_transaction_item"/>
+        <include layout="@layout/fake_transaction_item"/>
+        <include layout="@layout/fake_transaction_item"/>
+        <include layout="@layout/fake_transaction_item"/>
+        <include layout="@layout/fake_transaction_item"/>
+
+    </LinearLayout>
 
     <ImageView
         android:layout_marginTop="32dp"

@@ -1,54 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="67dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/iconImageView"
+    <com.elyeproj.loaderviewlibrary.LoaderImageView
+        android:id="@+id/fake_image"
         android:layout_width="47dp"
         android:layout_height="47dp"
         android:layout_alignParentStart="true"
         android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        app:corners="16" />
 
-    <TextView
-        android:id="@+id/replanish_name"
-        android:layout_width="match_parent"
+    <com.elyeproj.loaderviewlibrary.LoaderTextView
+        app:corners="16"
+        android:id="@+id/fake_title"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:layout_alignTop="@id/iconImageView"
+        android:layout_alignTop="@id/fake_image"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="20dp"
-        android:layout_toEndOf="@id/iconImageView"
+        android:layout_toEndOf="@id/fake_image"
         android:textColor="@color/black"
         android:textSize="13sp" />
 
-    <TextView
+    <com.elyeproj.loaderviewlibrary.LoaderTextView
+        app:corners="16"
         android:id="@+id/valueTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/replanish_name"
+        android:layout_below="@id/fake_title"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="20dp"
-        android:layout_toEndOf="@id/iconImageView"
+        android:layout_toEndOf="@id/fake_image"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/dateTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="8dp"
-        android:textColor="#BDBDBD"
-        android:textSize="12sp" />
-
 
 </RelativeLayout>

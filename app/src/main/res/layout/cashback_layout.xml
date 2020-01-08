@@ -63,6 +63,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/bubbleSeekBar" />
 
+
     <com.xw.repo.BubbleSeekBar
         android:id="@+id/bubbleSeekBar"
         android:layout_width="match_parent"
