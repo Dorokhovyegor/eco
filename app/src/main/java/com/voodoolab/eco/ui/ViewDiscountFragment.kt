@@ -30,7 +30,6 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 class ViewDiscountFragment : Fragment(), DataStateListener {
 
     var dataStateHandler: DataStateListener = this
-
     lateinit var discountViewModel: DiscountViewModel
 
     private var titleTextView: TextView? = null
@@ -52,7 +51,6 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
             val model = arguments?.getParcelable<SpecialOfferModel>("offer_model")
             discountId = model?.id
         }
-        println("DEBUG: idididid ${discountId}")
         discountViewModel = ViewModelProvider(this).get(DiscountViewModel::class.java)
         return inflater.inflate(R.layout.discount_layout, container, false)
     }

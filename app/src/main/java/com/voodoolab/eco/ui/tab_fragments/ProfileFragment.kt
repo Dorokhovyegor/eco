@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import com.elyeproj.loaderviewlibrary.LoaderImageView
 import com.elyeproj.loaderviewlibrary.LoaderTextView
 import com.google.android.material.appbar.AppBarLayout
@@ -30,6 +31,8 @@ import com.voodoolab.eco.responses.CitiesResponse
 import com.voodoolab.eco.states.cities_state.CitiesStateEvent
 import com.voodoolab.eco.states.logout_state.LogoutStateEvent
 import com.voodoolab.eco.states.user_state.UserStateEvent
+import com.voodoolab.eco.ui.ContainerFragment
+import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.profile_fragments.CashbackLevelFragment
 import com.voodoolab.eco.ui.profile_fragments.TransactionsFragmentList
 import com.voodoolab.eco.ui.view_models.CitiesViewModels
@@ -71,6 +74,11 @@ class ProfileFragment : Fragment(),
     private var lastUpdateCoordinates: String? = null
     private var clearInfoUserModel: ClearUserModel? = null
 
+    // bundle controller data
+    var bundleOut = bundleOf(
+        "logout" to true
+    )
+
     private var tabListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabReselected(p0: TabLayout.Tab?) {}
 
@@ -98,16 +106,18 @@ class ProfileFragment : Fragment(),
         findViewsFromLayout(view)
         addToolBarOffsetListener(view)
         val token = Hawk.get<String>(Constants.TOKEN)
-        userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
+        token?.let {
+            userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
 
-        val pref = activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-        val city = pref?.getString(Constants.CITY_ECO, null)
+            val pref = activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
+            val city = pref?.getString(Constants.CITY_ECO, null)
 
-        if (city == null) {
-            citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
-        }
-        loadFragment(HISTORY_TABLAYOUT)
-        subscribeObservers()
+            if (city == null) {
+                citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
+            }
+            loadFragment(HISTORY_TABLAYOUT)
+            subscribeObservers()
+        }?:  activity?.findNavController(R.id.frame_container)?.navigate(R.id.action_containerFragment_to_auth_destination, bundleOut)
     }
 
     private fun findViewsFromLayout(view: View) {
@@ -117,7 +127,7 @@ class ProfileFragment : Fragment(),
         balanceTextView = view.findViewById(R.id.money_text_view)
         cashback = view.findViewById(R.id.cashback_value)
 
-        topUpBalance = view.findViewById(R.id.topUpBalance)
+        topUpBalance = view.findViewById(R.id.balance_up)
         optionButton = view.findViewById(R.id.options_button)
         tabLayout = view.findViewById(R.id.tab_layout)
         tabLayout?.addOnTabSelectedListener(tabListener)
@@ -179,8 +189,12 @@ class ProfileFragment : Fragment(),
 
         logoutViewModel.viewState.observe(viewLifecycleOwner, Observer {
             if (it.logoutResponse != null) {
-               /* val controller = Navigation.findNavController(view, R.id.common_graph)
-                controller.navigate(R.id.action_containerFragment_to_auth_destination)*/
+
+                view?.let {
+                    if (activity is MainActivity) {
+                        activity?.findNavController(R.id.frame_container)?.navigate(R.id.action_containerFragment_to_auth_destination, bundleOut)
+                    }
+                }
             }
         })
 
@@ -204,14 +218,16 @@ class ProfileFragment : Fragment(),
             view?.findViewById<LoaderTextView>(R.id.fake_text_view_title)?.fadeOutAnimation()
             view?.findViewById<LoaderTextView>(R.id.fake_text_view_value)?.fadeOutAnimation()
 
-
             balanceTextView?.text = getString(
                 R.string.transaction_value,
                 data.balance
             )
 
             if (data.indicatorPosition != null && data.indicatorPosition != -1) {
-                cashback?.text = getString(R.string.percent_value, (data.valuesPercent?.get(data.indicatorPosition)))
+                cashback?.text = getString(
+                    R.string.percent_value,
+                    (data.valuesPercent?.get(data.indicatorPosition))
+                )
             } else if (data.indicatorPosition == -1) {
                 cashback?.text = getString(R.string.percent_value, 0)
             }
@@ -260,20 +276,10 @@ class ProfileFragment : Fragment(),
             showProgressBar(it.loading)
             it.message?.let { event ->
                 event.getContentIfNotHandled()?.let {
-                    /*try {
-                        val json = JsonParser().parse(it).asJsonObject
-                        if (json.isJsonObject) {
-                            if (json.has("message")) {
-                                if (json.get("message").asString == "Unauthenticated") {
-                                    val controller =
-                                        Navigation.findNavController(activity!!, R.id.common_graph)
-                                    controller.navigate(R.id.action_containerFragment_to_auth_destination)
-                                }
-                            }
-                        }
-                    } catch (e: MalformedJsonException) {
-                        e.printStackTrace()
-                    }*/
+                    if (it.contains("Unauthenticated")) {
+                        Hawk.deleteAll()
+                        activity?.findNavController(R.id.frame_container)?.navigate(R.id.action_containerFragment_to_auth_destination, bundleOut)
+                    }
                     showToast(it)
                 }
             }

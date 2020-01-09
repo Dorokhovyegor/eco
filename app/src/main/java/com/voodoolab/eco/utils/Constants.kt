@@ -96,5 +96,7 @@ object Constants {
     val CITY_ECO = "city"
     val CITY_COORDINATES = "coordinates"
 
-    val CONTAINER_FRAGMENT = "ContainerFragment"
+    val CHANNEL_REPORT = "CHANNEL_REPORT"
+    val CHANNEL_SPECIAL_OFFER = "CHANNEL_SPECIAL_OFFER"
+    val CHANNEL_FREE = "CHANNEL_FREE"
 }

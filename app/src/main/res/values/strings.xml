@@ -3,6 +3,10 @@
     <string name="next_text">Далее</string>
     <string name="skip_text">Пропустить</string>
 
+    <string name="name_notification_channel_reports">Предлагать оставить отзыв</string>
+    <string name="name_notification_channel_special_offer">Сообщать о новых акциях</string>
+    <string name="name_notification_channel_other">Другие уведомления</string>
+
     <string name="on_board_text1">Федеральная картра для всех моек в одном приложении</string>
     <string name="on_board_text2">Получай кешбэк с каждой мойки</string>
     <string name="on_board_text3">Отслеживай все операции по карте</string>

@@ -1,46 +1,28 @@
 package com.voodoolab.eco.ui
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
-import android.content.DialogInterface
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
+import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.view.View
-import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.iid.FirebaseInstanceId
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_fragments.SendReportBottomSheet
 import com.voodoolab.eco.interfaces.*
 import com.voodoolab.eco.network.DataState
-import com.voodoolab.eco.responses.CitiesResponse
-import com.voodoolab.eco.states.cities_state.CitiesStateEvent
 import com.voodoolab.eco.states.firebase_token_state.UpdateTokenFireBaseStateEvent
-import com.voodoolab.eco.ui.view_models.CitiesViewModels
 import com.voodoolab.eco.ui.view_models.FirebaseTokenViewModel
 import com.voodoolab.eco.utils.Constants
-import com.voodoolab.eco.utils.Constants.CONTAINER_FRAGMENT
-import com.zplesac.connectionbuddy.ConnectionBuddy
-import com.zplesac.connectionbuddy.ConnectionBuddyConfiguration
-import com.zplesac.connectionbuddy.activities.ConnectionBuddyActivity
-import com.zplesac.connectionbuddy.models.ConnectivityEvent
-import java.util.*
 
 class MainActivity : AppCompatActivity(),
     DataStateListener,
@@ -58,15 +40,19 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        createNotificationReportChannel()
+        createNotificationSpecialOfferChannel()
+        createNotificationOthersChannel()
+
         supportActionBar?.hide()
         actionBar?.hide()
-
-        initViews()
-        initAndSetListeners()
 
         navController = Navigation.findNavController(this, R.id.frame_container)
         updateTokenViewModel = ViewModelProvider(this).get(FirebaseTokenViewModel::class.java)
 
+        initToken()
+        subscribeObservers()
         if (!Hawk.isBuilt())
             Hawk.init(this).build()
     }
@@ -83,8 +69,6 @@ class MainActivity : AppCompatActivity(),
                 if (Hawk.contains(Constants.TOKEN) && token != null) {
 
                     val applicaionToken = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
-                    println("DEBUG firebase token $token")
-
                     updateTokenViewModel.setStateEvent(
                         UpdateTokenFireBaseStateEvent.UpdateTokenEvent(
                             appToken = applicaionToken,
@@ -93,14 +77,6 @@ class MainActivity : AppCompatActivity(),
                     )
                 }
             })
-    }
-
-    private fun initViews() {
-
-    }
-
-    private fun initAndSetListeners() {
-
     }
 
     private fun subscribeObservers() {
@@ -117,7 +93,8 @@ class MainActivity : AppCompatActivity(),
 
         updateTokenViewModel.viewState.observe(this, Observer {
             it.updateTokenResponse?.let {
-
+                // ну типа сохранил
+                println("DEBUG: ${it.status}")
             }
         })
     }
@@ -126,6 +103,43 @@ class MainActivity : AppCompatActivity(),
         val bottomSheetDialog = SendReportBottomSheet(Bundle())
         bottomSheetDialog.show(supportFragmentManager, "report")
     }
+
+     // надо выполнить так скоро, как это возможно
+     private fun createNotificationReportChannel() {
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+             val name = getString(R.string.name_notification_channel_reports)
+             val importance = NotificationManager.IMPORTANCE_DEFAULT
+             val channel = NotificationChannel(Constants.CHANNEL_REPORT, name, importance)
+
+             val notificationManager =
+                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+             notificationManager.createNotificationChannel(channel)
+         }
+     }
+
+     private fun createNotificationSpecialOfferChannel() {
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+             val name = getString(R.string.name_notification_channel_special_offer)
+             val importance = NotificationManager.IMPORTANCE_DEFAULT
+             val channel = NotificationChannel(Constants.CHANNEL_SPECIAL_OFFER, name, importance)
+
+             val notificationManager =
+                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+             notificationManager.createNotificationChannel(channel)
+         }
+     }
+
+     private fun createNotificationOthersChannel() {
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+             val name = getString(R.string.name_notification_channel_other)
+             val importance = NotificationManager.IMPORTANCE_DEFAULT
+             val channel = NotificationChannel(Constants.CHANNEL_FREE, name, importance)
+
+             val notificationManager =
+                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+             notificationManager.createNotificationChannel(channel)
+         }
+     }
 
     override fun splashScreenComplete() {
         val token = Hawk.get<String>(Constants.TOKEN, null)

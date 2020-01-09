@@ -50,8 +50,8 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
     private var messageTextView: TextView? = null
 
     private var authenticateListener: AuthenticateListener? = null
-
-    private var getCodeClickListener = View.OnClickListener {                                         // получить пароль, для основной кнопки
+    private var getCodeClickListener = View.OnClickListener {
+        // получить пароль, для основной кнопки
         val number = getNumberFromDecorateNumber(inputNumberEditText?.text.toString())
         if (number?.length == 11) {
             codeViewModel.setStateEvent(CodeStateEvent.RequestCodeEvent(number))
@@ -59,14 +59,15 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
             inputPhoneLayout?.error = "Неверный формат номера"
         }
     }
-
-    private var loginClickListener = View.OnClickListener {                                           // если отправили код и хотим войти
+    private var loginClickListener = View.OnClickListener {
+        // если отправили код и хотим войти
         val number = getNumberFromDecorateNumber(inputNumberEditText?.text.toString())
         val code = inputCodeEditText?.text.toString()
         loginViewModel.setStateEvent(AuthStateEvent.LoginEvent(number, code))
     }
 
-    private var hasPasswordClickListener = View.OnClickListener {                                     // если код изначально есть и хотим его ввести
+    private var hasPasswordClickListener = View.OnClickListener {
+        // если код изначально есть и хотим его ввести
         authButton?.setOnClickListener(loginClickListener)
         inputCodeLayout?.visibility = View.VISIBLE
         inputCodeEditText?.visibility = View.VISIBLE
@@ -82,8 +83,6 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-
         KeyboardVisibilityEvent.setEventListener(activity, this)
         codeViewModel = ViewModelProvider(this).get(CodeViewModel::class.java)
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
@@ -93,6 +92,20 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initViews(view)
         initListeners()
+
+        arguments?.let {
+            if (it.containsKey("logout")) {
+                println("DEBUG: there is")
+                if (it.getBoolean("logout")) {
+                    authButton?.setOnClickListener(loginClickListener)
+                    inputCodeLayout?.visibility = View.VISIBLE
+                    inputCodeEditText?.visibility = View.VISIBLE
+                    authButton?.text = "Войти"
+                    hasPasswordTextView?.text = "Получить новый пароль"
+                }
+            }
+        }
+
         subscribeObservers()
     }
 
@@ -107,6 +120,7 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
         super.onDetach()
         authenticateListener = null
     }
+
     //==============================================================================================
     private fun initViews(view: View) {
         inputNumberEditText = view.findViewById(R.id.phone_edit_text)
@@ -142,19 +156,26 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
     private fun initListeners() {
         hasPasswordTextView?.setOnClickListener(hasPasswordClickListener)
         authButton?.setOnClickListener(getCodeClickListener)
-        inputNumberEditText?.addTextChangedListener(object: TextWatcher{
+        inputNumberEditText?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val number = getNumberFromDecorateNumber(s.toString())
                 number?.let {
                     if (it.length == 11) {
                         authButton?.isEnabled = true
-                        authButton?.background = resources.getDrawable(R.drawable.active_button_drawable, null)
+                        authButton?.background =
+                            resources.getDrawable(R.drawable.active_button_drawable, null)
                         authButton?.setTextColor(resources.getColor(R.color.white, null))
 
                     } else {
                         authButton?.isEnabled = false
-                        authButton?.background = resources.getDrawable(R.drawable.disable_button_drawable, null)
-                        authButton?.setTextColor(resources.getColor(R.color.disabled_button_grey, null))
+                        authButton?.background =
+                            resources.getDrawable(R.drawable.disable_button_drawable, null)
+                        authButton?.setTextColor(
+                            resources.getColor(
+                                R.color.disabled_button_grey,
+                                null
+                            )
+                        )
                     }
                 }
             }
@@ -205,13 +226,13 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
             }
         })
 
-        loginViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState->
+        loginViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.loginResponse?.let {
                 if (it.status == "ok") {
                     Hawk.put(Constants.TOKEN, it.responseData?.token)
                     Hawk.put(Constants.TYPE_TOKEN, it.responseData?.type)
                     authenticateListener?.completeAuthenticated()
-                 }
+                }
             }
         })
     }
@@ -272,8 +293,8 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
         var number: String? = ""
         decorateString?.let {
             it.toCharArray().forEach {
-                if(it.isDigit()) {
-                   number += it
+                if (it.isDigit()) {
+                    number += it
                 }
             }
         }

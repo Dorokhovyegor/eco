@@ -30,7 +30,7 @@ class ContainerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val bottomNavigationView = view.findViewById<BottomNavigationView>(R.id.bottom_nav_view)
 
-        val task = object : TimerTask() {
+        /*val task = object : TimerTask() {
             override fun run() {
                 val cm = activity?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
@@ -45,10 +45,7 @@ class ContainerFragment : Fragment() {
                     .show()
             }
         }
-        Timer().schedule( task, 0, 3000)
-
-
-
+        Timer().schedule( task, 0, 3000)*/
 
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.frame_for_bottom_nav_view) as NavHostFragment
