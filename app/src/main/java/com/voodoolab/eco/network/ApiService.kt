@@ -93,4 +93,23 @@ interface ApiService {
         @Header("Authorization") tokenApp: String
     ): LiveData<GenericApiResponse<LogoutResponse>>
 
+    @Multipart
+    @POST("api/reviews")
+    fun sentReport(
+        @Header("Authorization") tokenApp: String,
+        @Part("operation_id") operationId: Int?,
+        @Part("text") textReport: String? = "...",
+        @Part("stars") rating: Double?
+    ): LiveData<GenericApiResponse<ReportResponse>>
+
+    @Multipart
+    @POST("api/reviews")
+    fun sentReport(
+        @Header("Authorization") tokenApp: String,
+        @Part("operation_id") operationId: Int?,
+        @Part("text") textReport: String? = "...",
+        @Part("stars") rating: Int?
+    ): LiveData<GenericApiResponse<ReportResponse>>
+
+
 }

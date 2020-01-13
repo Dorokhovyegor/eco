@@ -29,7 +29,6 @@ class ContainerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val bottomNavigationView = view.findViewById<BottomNavigationView>(R.id.bottom_nav_view)
-
         /*val task = object : TimerTask() {
             override fun run() {
                 val cm = activity?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

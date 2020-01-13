@@ -38,14 +38,14 @@ dependencies {
     def wallet_version = "18.0.0"
     def retrofit_version = "2.6.0"
     def lifecycle_version = "2.2.0-alpha03"
-    def horizontal_progress_bar ="1.6.1"
+    def horizontal_progress_bar = "1.6.1"
     def hawk_version = "2.0.1"
     def keyboard_listener = "2.3.0"
     def coroutines_version = "1.3.2"
     def room_version = "1.1.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

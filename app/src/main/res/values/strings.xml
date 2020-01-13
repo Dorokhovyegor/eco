@@ -13,7 +13,7 @@
 
     <string name="transaction_value">%1$d₽</string>
     <string name="percent_value">%1$d%%</string>
-
+    <string name="full_address">%1$s, %2$s</string>
     <string name="replenish_offline">Пополнение %1$s</string>
     <string name="month_bonus">Месячный бонус</string>
     <string name="cashback">Кэшбэк</string>
@@ -45,5 +45,6 @@
     <string name="profile">Профиль</string>
     <string name="map">Карта</string>
     <string name="there_is_not_discounts">В вашем городе нет акций</string>
+    <string name="write_report">Написать отзыв</string>
 
 </resources>

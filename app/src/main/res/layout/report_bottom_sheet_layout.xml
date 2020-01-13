@@ -13,14 +13,14 @@
         android:src="@drawable/clear_car" />
 
     <TextView
-        android:id="@+id/costTextView"
+        android:id="@+id/valueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="24dp"
-        android:text="200 ₽"
+        android:layout_marginTop="10dp"
+        android:text=""
         android:textColor="@color/black"
-        android:textSize="38sp"
+        android:textSize="34sp"
         android:textStyle="bold" />
 
     <TextView
@@ -31,9 +31,9 @@
         android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
         android:gravity="center"
-        android:text="Понедельник, 16 ноября"
-        android:textColor="#4f4f4f"
-        android:textSize="15sp" />
+        android:text="ДД-ММ-ГГГГ"
+        android:textColor="#000"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/addressTextView"
@@ -42,16 +42,16 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="16dp"
-        android:text="Какой-то очень большой текст с адресом, который не помещается на одну строчку"
+        android:textColor="#A5A5A5"
+        android:text=""
         android:textAlignment="center"
-        android:textSize="12sp" />
+        android:textSize="14sp" />
     
     <TextView
         android:layout_gravity="center"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="38dp"
         android:textColor="@color/black"
-        android:textStyle="bold"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:text="Оцените мойку"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
@@ -67,9 +67,9 @@
         android:id="@+id/phone_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:hint="Написать отзыв"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/write_report"
         android:textColorHint="#8A828282"
         android:theme="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
         app:boxBackgroundMode="filled"
@@ -77,29 +77,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="24dp">
+        android:layout_marginTop="32dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/phone_edit_text"
+            android:id="@+id/report_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="phone"
-            android:textColor="#fff" />
+            android:inputType="text"
+            android:textColor="#000" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:tag="Хуй"
         android:id="@+id/report_button"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
+        android:textSize="16sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="32dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/active_button_drawable"
         android:text="Готово"
-        android:textAllCaps="false"
         android:textColor="@color/white" />
 
 </LinearLayout>

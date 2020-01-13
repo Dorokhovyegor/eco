@@ -99,4 +99,14 @@ object Constants {
     val CHANNEL_REPORT = "CHANNEL_REPORT"
     val CHANNEL_SPECIAL_OFFER = "CHANNEL_SPECIAL_OFFER"
     val CHANNEL_FREE = "CHANNEL_FREE"
+
+    // todo add constant for intents
+
+    val NOTIFICATION_TITLE = "title"
+    val NOTIFICATION_OPERATION_ID = "operation_id"
+    val NOTIFICATION_VALUE_OF_TRANSACTION = "value"
+    val NOTIFICATION_TYPE = "type"
+    val NOTIFICATION_WASH_MODEL = "wash"
+    val NOTIFICATION_CHANNEL = "channel"
+
 }

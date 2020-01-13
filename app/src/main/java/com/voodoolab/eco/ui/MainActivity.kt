@@ -14,15 +14,22 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.iid.FirebaseInstanceId
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_fragments.SendReportBottomSheet
+import com.voodoolab.eco.helper_fragments.view_models.ReportViewModel
 import com.voodoolab.eco.interfaces.*
+import com.voodoolab.eco.models.WashModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.states.firebase_token_state.UpdateTokenFireBaseStateEvent
+import com.voodoolab.eco.states.report_state.ReportStateEvent
+import com.voodoolab.eco.states.report_state.ReportViewState
 import com.voodoolab.eco.ui.view_models.FirebaseTokenViewModel
 import com.voodoolab.eco.utils.Constants
+import com.voodoolab.eco.utils.hasFullInfoFromBroadCast
+import com.voodoolab.eco.utils.hasFullInformationForReport
 
 class MainActivity : AppCompatActivity(),
     DataStateListener,
@@ -30,11 +37,13 @@ class MainActivity : AppCompatActivity(),
     AuthenticateListener,
     BalanceUpClickListener,
     DiscountClickListener,
-    LogoutListener
- {
+    LogoutListener,
+    SendReportInterface {
 
     lateinit var navController: NavController
     lateinit var updateTokenViewModel: FirebaseTokenViewModel
+    lateinit var reportViewModel: ReportViewModel
+
     private var stateListener = this as DataStateListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,11 +59,49 @@ class MainActivity : AppCompatActivity(),
 
         navController = Navigation.findNavController(this, R.id.frame_container)
         updateTokenViewModel = ViewModelProvider(this).get(FirebaseTokenViewModel::class.java)
+        reportViewModel = ViewModelProvider(this).get(ReportViewModel::class.java)
+
+        if (!Hawk.isBuilt())
+            Hawk.init(this).build()
 
         initToken()
         subscribeObservers()
-        if (!Hawk.isBuilt())
-            Hawk.init(this).build()
+        // for report это, есди (вроде как кликаем по уведомлению)
+        if (intent.hasFullInformationForReport()) {
+            showReportBottomSheet(
+                bundleOf(
+                    Constants.NOTIFICATION_VALUE_OF_TRANSACTION to intent.getStringExtra(
+                        Constants.NOTIFICATION_VALUE_OF_TRANSACTION
+                    ),
+                    Constants.NOTIFICATION_OPERATION_ID to intent.getStringExtra(
+                        Constants.NOTIFICATION_OPERATION_ID
+                    ),
+                    Constants.NOTIFICATION_WASH_MODEL to intent.getStringExtra(
+                        Constants.NOTIFICATION_WASH_MODEL
+                    )
+                )
+            )
+        }
+
+        if (intent.hasFullInfoFromBroadCast()) {
+            showReportBottomSheet(
+                bundleOf(
+                    Constants.NOTIFICATION_VALUE_OF_TRANSACTION to intent.getStringExtra(
+                        Constants.NOTIFICATION_VALUE_OF_TRANSACTION
+                    ),
+                    Constants.NOTIFICATION_OPERATION_ID to intent.getStringExtra(
+                        Constants.NOTIFICATION_OPERATION_ID
+                    ),
+                    Constants.NOTIFICATION_WASH_MODEL to intent.getStringExtra(
+                        Constants.NOTIFICATION_WASH_MODEL
+                    )
+                )
+            )
+        }
+
+        // todo for opening special offer
+
+        // todo add something for adding "free" notification
     }
 
     private fun initToken() {
@@ -65,9 +112,7 @@ class MainActivity : AppCompatActivity(),
                 }
                 // Get new Instance ID token
                 val token = task.result?.token
-
                 if (Hawk.contains(Constants.TOKEN) && token != null) {
-
                     val applicaionToken = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
                     updateTokenViewModel.setStateEvent(
                         UpdateTokenFireBaseStateEvent.UpdateTokenEvent(
@@ -97,49 +142,68 @@ class MainActivity : AppCompatActivity(),
                 println("DEBUG: ${it.status}")
             }
         })
+
+        reportViewModel.dataStateReport.observe(this, Observer {
+            stateListener.onDataStateChange(it)
+            it.data?.let { viewState ->
+                viewState.getContentIfNotHandled()?.let {
+                    it.reportResponse?.let {
+                        reportViewModel.setReportResponse(it)
+                    }
+                }
+            }
+        })
+
+        reportViewModel.viewState.observe(this, Observer {
+            it.reportResponse?.let {
+                window?.decorView?.let {
+                    Snackbar.make(it, "Спасибо за отзыв", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        })
     }
 
-    private fun showReportBottomSheet() {
-        val bottomSheetDialog = SendReportBottomSheet(Bundle())
+    private fun showReportBottomSheet(data: Bundle) {
+        val bottomSheetDialog = SendReportBottomSheet(data)
         bottomSheetDialog.show(supportFragmentManager, "report")
     }
 
-     // надо выполнить так скоро, как это возможно
-     private fun createNotificationReportChannel() {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-             val name = getString(R.string.name_notification_channel_reports)
-             val importance = NotificationManager.IMPORTANCE_DEFAULT
-             val channel = NotificationChannel(Constants.CHANNEL_REPORT, name, importance)
+    // надо выполнить так скоро, как это возможно
+    private fun createNotificationReportChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.name_notification_channel_reports)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(Constants.CHANNEL_REPORT, name, importance)
 
-             val notificationManager =
-                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-             notificationManager.createNotificationChannel(channel)
-         }
-     }
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 
-     private fun createNotificationSpecialOfferChannel() {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-             val name = getString(R.string.name_notification_channel_special_offer)
-             val importance = NotificationManager.IMPORTANCE_DEFAULT
-             val channel = NotificationChannel(Constants.CHANNEL_SPECIAL_OFFER, name, importance)
+    private fun createNotificationSpecialOfferChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.name_notification_channel_special_offer)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(Constants.CHANNEL_SPECIAL_OFFER, name, importance)
 
-             val notificationManager =
-                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-             notificationManager.createNotificationChannel(channel)
-         }
-     }
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 
-     private fun createNotificationOthersChannel() {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-             val name = getString(R.string.name_notification_channel_other)
-             val importance = NotificationManager.IMPORTANCE_DEFAULT
-             val channel = NotificationChannel(Constants.CHANNEL_FREE, name, importance)
+    private fun createNotificationOthersChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.name_notification_channel_other)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(Constants.CHANNEL_FREE, name, importance)
 
-             val notificationManager =
-                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-             notificationManager.createNotificationChannel(channel)
-         }
-     }
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 
     override fun splashScreenComplete() {
         val token = Hawk.get<String>(Constants.TOKEN, null)
@@ -176,7 +240,8 @@ class MainActivity : AppCompatActivity(),
         dataState?.let {
             it.message?.let {
                 it.getContentIfNotHandled()?.let {
-                    Toast.makeText(this, "Произошла ошибка", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+                    println("DEBUG ${it}")
                 }
             }
         }
@@ -187,4 +252,14 @@ class MainActivity : AppCompatActivity(),
         navController.navigate(R.id.action_containerFragment_to_auth_destination)
     }
 
+    override fun sendReportClick(id: Int?, text: String?, ratio: Double) {
+        println("DEBUG ${id} ${text} ${ratio}")
+        val applicaionToken = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
+        reportViewModel.setStateEvent(ReportStateEvent.SentReportEvent(
+            tokenApp = applicaionToken,
+            text = text,
+            operationId = id,
+            rating = ratio
+        ))
+    }
 }

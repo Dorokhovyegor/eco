@@ -235,7 +235,6 @@ class ProfileFragment : Fragment(),
             balanceTextView?.text = "-"
             cashback?.text = "-"
         }
-
     }
 
     private fun addToolBarOffsetListener(view: View) {
