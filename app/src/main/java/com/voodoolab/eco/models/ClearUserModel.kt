@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class ClearUserModel(
-    var balance: Int?,
+    var balance: Double?,
     val name: String?,
     val valuesMoney: ArrayList<Int>?,
     val valuesPercent: ArrayList<Int>?,

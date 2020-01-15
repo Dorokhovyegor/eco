@@ -39,23 +39,6 @@ class NotificationService : FirebaseMessagingService() {
                 val washString = dataMessage[NOTIFICATION_WASH_MODEL]
                 val value = dataMessage[NOTIFICATION_VALUE_OF_TRANSACTION]?.toInt()
 
-                // защитить это от падения
-                val washJson = JsonParser().parse(washString) as JsonObject
-                // get data for washModel
-                val washAddress = washJson.get("address").asString
-                val washCity = washJson.get("city").asString
-                val washCashBackValue = washJson.get("cashback").asInt
-                val washId = washJson.get("id").asInt
-                val seats = washJson.get("seats").asInt
-
-                val washModel = WashModel(
-                    id = washId,
-                    city = washCity,
-                    address = washAddress,
-                    coordinates = null,
-                    cashback = washCashBackValue,
-                    seats = seats
-                )
                 when (type) {
                     REPORT_NOTIFICATION -> {
                         sendBroadcast(
@@ -64,7 +47,7 @@ class NotificationService : FirebaseMessagingService() {
                                 putExtra(NOTIFICATION_OPERATION_ID, operationId)
                                 putExtra(NOTIFICATION_VALUE_OF_TRANSACTION, value)
                                 putExtra(NOTIFICATION_TYPE, type)
-                                putExtra(NOTIFICATION_WASH_MODEL, washModel)
+                                putExtra(NOTIFICATION_WASH_MODEL, washString)
                                 putExtra(NOTIFICATION_CHANNEL, REPORT_NOTIFICATION)
                             }
                         )

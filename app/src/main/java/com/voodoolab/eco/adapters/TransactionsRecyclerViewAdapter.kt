@@ -49,7 +49,7 @@ class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, Transa
 
             when (transactionData.type) {
                 REPLENISH_OFFLINE -> {
-                    Glide.with(itemView).load(R.mipmap.balance_in).into(image)
+                    Glide.with(itemView).load(R.drawable.balance_up).into(image)
                     transactionName?.text = itemView.resources.getString(
                         R.string.replenish_offline,
                         transactionData.wash?.address
@@ -57,22 +57,22 @@ class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, Transa
 
                 }
                 MONTH_BONUS -> {
-                    Glide.with(itemView).load(R.mipmap.cashback).into(image)
+                    Glide.with(itemView).load(R.drawable.cash_back).into(image)
                     transactionName?.text = itemView.resources.getString(R.string.month_bonus)
                 }
                 CASHBACK -> {
-                    Glide.with(itemView).load(R.mipmap.cashback).into(image)
+                    Glide.with(itemView).load(R.drawable.cash_back).into(image)
                     transactionName?.text = itemView.resources.getString(R.string.cashback)
                 }
                 REPLENISH_ONLINE -> {
-                    Glide.with(itemView).load(R.mipmap.balance_in).into(image)
+                    Glide.with(itemView).load(R.drawable.balance_up).into(image)
                     transactionName?.text = itemView.resources.getString(
                         R.string.replenish_online,
                         transactionData.terminal?.name
                     )
                 }
                 WASTE -> {
-                    Glide.with(itemView).load(R.mipmap.balance_out).into(image)
+                    Glide.with(itemView).load(R.drawable.balance_dwn).into(image)
                     transactionName?.text =
                         itemView.resources.getString(R.string.waste, transactionData.wash?.address)
                 }

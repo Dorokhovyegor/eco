@@ -6,10 +6,15 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
+import androidx.core.os.bundleOf
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.voodoolab.eco.models.WashModel
+import com.voodoolab.eco.utils.Constants.NOTIFICATION_OPERATION_ID
 import com.voodoolab.eco.utils.Constants.NOTIFICATION_VALUE_OF_TRANSACTION
+import com.voodoolab.eco.utils.Constants.NOTIFICATION_WASH_ADDRESS
+import com.voodoolab.eco.utils.Constants.NOTIFICATION_WASH_CITY
+import com.voodoolab.eco.utils.Constants.NOTIFICATION_WASH_MODEL
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import java.text.ParseException
 
@@ -82,13 +87,12 @@ fun View.fadeOutAnimation() {
 }
 
 fun Intent.hasFullInformationForReport(): Boolean { // if we have all this data that is all
-    if (hasExtra(Constants.NOTIFICATION_OPERATION_ID) && hasExtra(Constants.NOTIFICATION_TYPE) && hasExtra(
-            Constants.NOTIFICATION_WASH_MODEL
-        ) && hasExtra(NOTIFICATION_VALUE_OF_TRANSACTION)
+    if (hasExtra(NOTIFICATION_OPERATION_ID) && hasExtra(NOTIFICATION_WASH_MODEL) && hasExtra(
+            NOTIFICATION_VALUE_OF_TRANSACTION
+        )
     ) {
-        val washString = extras?.getString(Constants.NOTIFICATION_WASH_MODEL)
+        val washString = extras?.getString(NOTIFICATION_WASH_MODEL)
         return try {
-
             val washJson = JsonParser().parse(washString) as JsonObject
             // get data for washModel
             washJson.apply {
@@ -103,45 +107,51 @@ fun Intent.hasFullInformationForReport(): Boolean { // if we have all this data 
             error.printStackTrace()
             false
         }
-
     } else {
         return false
     }
 }
 
-fun Intent.hasFullInfoFromBroadCast(): Boolean {
-    if (hasExtra(Constants.NOTIFICATION_OPERATION_ID) && hasExtra(Constants.NOTIFICATION_WASH_MODEL
-        ) && hasExtra(NOTIFICATION_VALUE_OF_TRANSACTION)
-    ) {
-        val washString = extras?.getString(Constants.NOTIFICATION_WASH_MODEL)
-        return try {
-
-            val washJson = JsonParser().parse(washString) as JsonObject
-            // get data for washModel
-            washJson.apply {
-                get("address").asString
-                get("city").asString
-                get("cashback").asInt
-                get("id").asInt
-                get("seats").asInt
-            }
-            true
-        } catch (error: ParseException) {
-            error.printStackTrace()
-            false
-        } catch (npe: NullPointerException) {
-            npe.printStackTrace()
-            false
-        }
-
-    } else {
-        return false
+fun Intent.toBundle(): Bundle {
+    val bundle = Bundle()
+    // there are two sources. From the first source it will be int, from the  second it will be string.
+    var value: Int? = getIntExtra(NOTIFICATION_VALUE_OF_TRANSACTION, -1)
+    if (value == -1) {
+        value = getStringExtra(NOTIFICATION_VALUE_OF_TRANSACTION).toIntOrNull()
     }
+
+    var operationId: Int? = getIntExtra(NOTIFICATION_OPERATION_ID, -1)
+    if (operationId == -1) {
+        operationId = getStringExtra(NOTIFICATION_OPERATION_ID).toIntOrNull()
+    }
+
+    val washString = getStringExtra(NOTIFICATION_WASH_MODEL)
+    if (value != -1 && operationId != -1 && washString != null) {
+        val washJson = JsonParser().parse(washString) as JsonObject
+        val washAddress = washJson.get("address").asString
+        val washCity = washJson.get("city").asString
+        bundle.putInt(NOTIFICATION_VALUE_OF_TRANSACTION, value!!)
+        bundle.putInt(NOTIFICATION_OPERATION_ID, operationId!!)
+        bundle.putString(NOTIFICATION_WASH_ADDRESS, washAddress)
+        bundle.putString(NOTIFICATION_WASH_CITY, washCity)
+    }
+    return bundle
 }
 
-fun Bundle.hasFullReportInfo(): Boolean {
-    return containsKey(NOTIFICATION_VALUE_OF_TRANSACTION)
-            && containsKey(Constants.NOTIFICATION_OPERATION_ID)
-            && containsKey(Constants.NOTIFICATION_WASH_MODEL)
+fun String.convertToWashModel(): WashModel {
+    // защитить это от падения
+    val washJson = JsonParser().parse(this) as JsonObject
+    // get data for washModel
+    val washAddress = washJson.get("address").asString
+    val washCity = washJson.get("city").asString
+
+    return WashModel(
+        id = null,
+        city = washCity,
+        address = washAddress,
+        coordinates = null,
+        cashback = null,
+        seats = null
+    )
 }
 

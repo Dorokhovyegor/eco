@@ -3,6 +3,7 @@ package com.voodoolab.eco.ui.tab_fragments
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.text.Html
 import android.util.MalformedJsonException
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -65,9 +67,6 @@ class ProfileFragment : Fragment(),
     private var progressBar: MaterialProgressBar? = null
     private var optionButton: ImageButton? = null
     private var tabLayout: TabLayout? = null
-
-    //fake views
-    private var fakeBalance: LoaderTextView? = null
 
     // temp var
     private var lastUpdateCityLocal: String? = null
@@ -189,7 +188,6 @@ class ProfileFragment : Fragment(),
 
         logoutViewModel.viewState.observe(viewLifecycleOwner, Observer {
             if (it.logoutResponse != null) {
-
                 view?.let {
                     if (activity is MainActivity) {
                         activity?.findNavController(R.id.frame_container)?.navigate(R.id.action_containerFragment_to_auth_destination, bundleOut)
@@ -212,25 +210,21 @@ class ProfileFragment : Fragment(),
         if (data != null) {
             view?.findViewById<TextView>(R.id.balance)?.visibility = View.VISIBLE
             view?.findViewById<TextView>(R.id.cash)?.visibility = View.VISIBLE
-            view?.findViewById<ImageView>(R.id.card_view)?.visibility = View.VISIBLE
 
-            view?.findViewById<LoaderImageView>(R.id.card_loader)?.fadeOutAnimation()
-            view?.findViewById<LoaderTextView>(R.id.fake_text_view_title)?.fadeOutAnimation()
-            view?.findViewById<LoaderTextView>(R.id.fake_text_view_value)?.fadeOutAnimation()
-
-            balanceTextView?.text = getString(
-                R.string.transaction_value,
-                data.balance
-            )
+            balanceTextView?.text = Html.fromHtml(getString(
+                R.string.balance_value,
+                String.format("%.2f", data.balance).split(",")[0],  String.format("%.2f", data.balance).split(",")[1]
+            ), 0)
 
             if (data.indicatorPosition != null && data.indicatorPosition != -1) {
-                cashback?.text = getString(
+                cashback?.text = Html.fromHtml(getString(
                     R.string.percent_value,
                     (data.valuesPercent?.get(data.indicatorPosition))
-                )
+                ), 0)
             } else if (data.indicatorPosition == -1) {
-                cashback?.text = getString(R.string.percent_value, 0)
+                cashback?.text = Html.fromHtml(getString(R.string.percent_value, 0), 0)
             }
+
         } else {
             balanceTextView?.text = "-"
             cashback?.text = "-"
@@ -238,7 +232,7 @@ class ProfileFragment : Fragment(),
     }
 
     private fun addToolBarOffsetListener(view: View) {
-        val container: RelativeLayout? = view.findViewById(R.id.info_container)
+        val container: ConstraintLayout? = view.findViewById(R.id.info_container)
         val appBarLayout: AppBarLayout? = view.findViewById(R.id.appBar)
         appBarLayout?.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout1, i ->
             run {

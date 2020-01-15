@@ -2,7 +2,10 @@ package com.voodoolab.eco.ui
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -21,15 +24,14 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_fragments.SendReportBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ReportViewModel
 import com.voodoolab.eco.interfaces.*
-import com.voodoolab.eco.models.WashModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.states.firebase_token_state.UpdateTokenFireBaseStateEvent
 import com.voodoolab.eco.states.report_state.ReportStateEvent
-import com.voodoolab.eco.states.report_state.ReportViewState
 import com.voodoolab.eco.ui.view_models.FirebaseTokenViewModel
 import com.voodoolab.eco.utils.Constants
-import com.voodoolab.eco.utils.hasFullInfoFromBroadCast
 import com.voodoolab.eco.utils.hasFullInformationForReport
+import com.voodoolab.eco.utils.toBundle
+
 
 class MainActivity : AppCompatActivity(),
     DataStateListener,
@@ -49,10 +51,10 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         createNotificationReportChannel()
         createNotificationSpecialOfferChannel()
         createNotificationOthersChannel()
+        registerReceiver()
 
         supportActionBar?.hide()
         actionBar?.hide()
@@ -68,40 +70,19 @@ class MainActivity : AppCompatActivity(),
         subscribeObservers()
         // for report это, есди (вроде как кликаем по уведомлению)
         if (intent.hasFullInformationForReport()) {
-            showReportBottomSheet(
-                bundleOf(
-                    Constants.NOTIFICATION_VALUE_OF_TRANSACTION to intent.getStringExtra(
-                        Constants.NOTIFICATION_VALUE_OF_TRANSACTION
-                    ),
-                    Constants.NOTIFICATION_OPERATION_ID to intent.getStringExtra(
-                        Constants.NOTIFICATION_OPERATION_ID
-                    ),
-                    Constants.NOTIFICATION_WASH_MODEL to intent.getStringExtra(
-                        Constants.NOTIFICATION_WASH_MODEL
-                    )
-                )
-            )
+            showReportBottomSheet(intent.toBundle())
         }
+    }
 
-        if (intent.hasFullInfoFromBroadCast()) {
-            showReportBottomSheet(
-                bundleOf(
-                    Constants.NOTIFICATION_VALUE_OF_TRANSACTION to intent.getStringExtra(
-                        Constants.NOTIFICATION_VALUE_OF_TRANSACTION
-                    ),
-                    Constants.NOTIFICATION_OPERATION_ID to intent.getStringExtra(
-                        Constants.NOTIFICATION_OPERATION_ID
-                    ),
-                    Constants.NOTIFICATION_WASH_MODEL to intent.getStringExtra(
-                        Constants.NOTIFICATION_WASH_MODEL
-                    )
-                )
-            )
+    private fun registerReceiver() {
+        val broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.hasFullInformationForReport()) {
+                    showReportBottomSheet(intent.toBundle())
+                }
+            }
         }
-
-        // todo for opening special offer
-
-        // todo add something for adding "free" notification
+        registerReceiver(broadcastReceiver, IntentFilter(Constants.REPORT_NOTIFICATION_DETECTED))
     }
 
     private fun initToken() {
@@ -163,7 +144,7 @@ class MainActivity : AppCompatActivity(),
         })
     }
 
-    private fun showReportBottomSheet(data: Bundle) {
+    private fun showReportBottomSheet(data: Bundle?) {
         val bottomSheetDialog = SendReportBottomSheet(data)
         bottomSheetDialog.show(supportFragmentManager, "report")
     }
@@ -253,13 +234,14 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun sendReportClick(id: Int?, text: String?, ratio: Double) {
-        println("DEBUG ${id} ${text} ${ratio}")
         val applicaionToken = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
-        reportViewModel.setStateEvent(ReportStateEvent.SentReportEvent(
-            tokenApp = applicaionToken,
-            text = text,
-            operationId = id,
-            rating = ratio
-        ))
+        reportViewModel.setStateEvent(
+            ReportStateEvent.SentReportEvent(
+                tokenApp = applicaionToken,
+                text = text,
+                operationId = id,
+                rating = ratio
+            )
+        )
     }
 }

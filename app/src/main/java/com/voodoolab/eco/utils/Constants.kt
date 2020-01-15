@@ -108,5 +108,9 @@ object Constants {
     val NOTIFICATION_TYPE = "type"
     val NOTIFICATION_WASH_MODEL = "wash"
     val NOTIFICATION_CHANNEL = "channel"
+    val NOTIFICATION_WASH_ADDRESS = "address"
+    val NOTIFICATION_WASH_CITY = "city"
+
+    val REPORT_NOTIFICATION_DETECTED = "com.voodoolab.eco.action.NEW_REPORT_ACTION"
 
 }
