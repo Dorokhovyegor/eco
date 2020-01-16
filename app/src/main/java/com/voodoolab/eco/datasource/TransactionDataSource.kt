@@ -4,10 +4,11 @@ import androidx.paging.PageKeyedDataSource
 import com.voodoolab.eco.models.TransactionData
 import com.voodoolab.eco.network.RetrofitBuilder
 import com.voodoolab.eco.responses.TransactionResponse
+import com.voodoolab.eco.utils.Constants
 import retrofit2.Call
 import retrofit2.Response
 
-class TransactionDataSource(val token: String): PageKeyedDataSource<Int, TransactionData>() {
+class TransactionDataSource(val token: String) : PageKeyedDataSource<Int, TransactionData>() {
 
     val FIRST_PAGE = 1
     val QUANTITY = 5
@@ -16,10 +17,16 @@ class TransactionDataSource(val token: String): PageKeyedDataSource<Int, Transac
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, TransactionData>
     ) {
-        RetrofitBuilder.apiService.getOperations("Bearer $token", "application/json", FIRST_PAGE.toString(), QUANTITY.toString()).enqueue( object: retrofit2.Callback<TransactionResponse> {
+        RetrofitBuilder.apiService.getOperations(
+            "Bearer $token",
+            "application/json",
+            FIRST_PAGE.toString(),
+            QUANTITY.toString()
+        ).enqueue(object : retrofit2.Callback<TransactionResponse> {
             override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {
                 t.printStackTrace()
             }
+
             override fun onResponse(
                 call: Call<TransactionResponse>,
                 response: Response<TransactionResponse>
@@ -27,6 +34,22 @@ class TransactionDataSource(val token: String): PageKeyedDataSource<Int, Transac
 
                 response.body()?.let { transactionsResponse ->
                     transactionsResponse.data?.let {
+
+                        if (it.size != 0)
+                        it.add(
+                            0,
+                            TransactionData(
+                                null,
+                                null,
+                                Constants.TRANSACTION_HEADER_TYPE,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null
+                            )
+                        )
                         callback.onResult(it, null, FIRST_PAGE + 1)
 
                     }
@@ -36,9 +59,14 @@ class TransactionDataSource(val token: String): PageKeyedDataSource<Int, Transac
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionData>) {
-        val call = RetrofitBuilder.apiService.getOperations("Bearer $token", "application/json", params.key.toString(), QUANTITY.toString())
+        val call = RetrofitBuilder.apiService.getOperations(
+            "Bearer $token",
+            "application/json",
+            params.key.toString(),
+            QUANTITY.toString()
+        )
 
-        call.enqueue(object: retrofit2.Callback<TransactionResponse> {
+        call.enqueue(object : retrofit2.Callback<TransactionResponse> {
             override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {}
             override fun onResponse(
                 call: Call<TransactionResponse>,

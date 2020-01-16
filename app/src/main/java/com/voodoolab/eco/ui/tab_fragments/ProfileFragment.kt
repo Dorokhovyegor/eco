@@ -51,6 +51,8 @@ class ProfileFragment : Fragment(),
     DataStateListener,
     PopupMenu.OnMenuItemClickListener {
 
+    private var mainView: View? = null
+
     // view models
     lateinit var userViewModel: UserInfoViewModel
     lateinit var citiesViewModel: CitiesViewModels
@@ -98,10 +100,16 @@ class ProfileFragment : Fragment(),
         userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
         citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
         logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
-        return inflater.inflate(R.layout.profile_container_fragment, container, false)
+
+        if (mainView == null) {
+            println("DEBUG: i am here")
+            mainView = inflater.inflate(R.layout.profile_container_fragment, container, false)
+        }
+        return mainView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         findViewsFromLayout(view)
         addToolBarOffsetListener(view)
         val token = Hawk.get<String>(Constants.TOKEN)

@@ -10,10 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.voodoolab.eco.R
 import com.voodoolab.eco.models.TransactionData
+import com.voodoolab.eco.utils.Constants
 import kotlinx.android.synthetic.main.transaction_layout_item.view.*
 
-class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, TransactionsRecyclerViewAdapter.ViewHolder>(
-        TRANSACTION_COMPARATOR) {
+class TransactionsRecyclerViewAdapter :
+    PagedListAdapter<TransactionData, TransactionsRecyclerViewAdapter.ViewHolder>(
+        TRANSACTION_COMPARATOR
+    ) {
 
     val REPLENISH_OFFLINE = "replenish_offline"
     val MONTH_BONUS = "month_bonus"
@@ -21,32 +24,53 @@ class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, Transa
     val REPLENISH_ONLINE = "replenish_online"
     val WASTE = "waste"
 
+    val TRANSACTION_TYPE = 0
+    val HEADER_TYPE = 1
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.transaction_layout_item, parent, false)
+        val view: View
+        when (viewType) {
+            HEADER_TYPE -> {
+                view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.transaction_header, parent, false)
+            }
+            TRANSACTION_TYPE -> {
+                view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.transaction_layout_item, parent, false)
+            }
+            else -> {
+                view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.transaction_layout_item, parent, false)
+            }
+        }
+
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         item?.let {
-            holder.bind(it)
+            if (it.type != Constants.TRANSACTION_HEADER_TYPE)
+                holder.bind(it)
         }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        if (getItem(position)?.type == Constants.TRANSACTION_HEADER_TYPE) {
+            return HEADER_TYPE
+        }
+        return TRANSACTION_TYPE
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val image = itemView.iconImageView
-        private val transactionName = itemView.replanish_name
-        private val transactionValue = itemView.valueTextView
-        private val dateTextView = itemView.dateTextView
+        private val transactionName = itemView.description_text_view
+        private val transactionValue = itemView.value_text_view
+        private val dateTextView = itemView.data_text_view
 
         fun bind(transactionData: TransactionData) {
-            transactionValue?.text = itemView.resources.getString(
-                R.string.transaction_value,
-                transactionData.value?.div(100)
-            )
             dateTextView?.text = transactionData.createdAt
-
             when (transactionData.type) {
                 REPLENISH_OFFLINE -> {
                     Glide.with(itemView).load(R.drawable.balance_up).into(image)
@@ -54,15 +78,27 @@ class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, Transa
                         R.string.replenish_offline,
                         transactionData.wash?.address
                     )
+                    transactionValue?.text = itemView.resources.getString(
+                        R.string.transaction_value_plus,
+                        transactionData.value?.div(100)
+                    )
 
                 }
                 MONTH_BONUS -> {
                     Glide.with(itemView).load(R.drawable.cash_back).into(image)
                     transactionName?.text = itemView.resources.getString(R.string.month_bonus)
+                    transactionValue?.text = itemView.resources.getString(
+                        R.string.transaction_value_plus,
+                        transactionData.value?.div(100)
+                    )
                 }
                 CASHBACK -> {
                     Glide.with(itemView).load(R.drawable.cash_back).into(image)
                     transactionName?.text = itemView.resources.getString(R.string.cashback)
+                    transactionValue?.text = itemView.resources.getString(
+                        R.string.transaction_value_plus,
+                        transactionData.value?.div(100)
+                    )
                 }
                 REPLENISH_ONLINE -> {
                     Glide.with(itemView).load(R.drawable.balance_up).into(image)
@@ -70,11 +106,19 @@ class TransactionsRecyclerViewAdapter : PagedListAdapter<TransactionData, Transa
                         R.string.replenish_online,
                         transactionData.terminal?.name
                     )
+                    transactionValue?.text = itemView.resources.getString(
+                        R.string.transaction_value_plus,
+                        transactionData.value?.div(100)
+                    )
                 }
                 WASTE -> {
                     Glide.with(itemView).load(R.drawable.balance_dwn).into(image)
                     transactionName?.text =
                         itemView.resources.getString(R.string.waste, transactionData.wash?.address)
+                    transactionValue?.text = itemView.resources.getString(
+                        R.string.transaction_value_minus,
+                        transactionData.value?.div(100)
+                    )
                 }
             }
         }

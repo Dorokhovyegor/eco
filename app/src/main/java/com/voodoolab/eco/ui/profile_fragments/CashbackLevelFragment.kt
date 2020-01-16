@@ -68,7 +68,7 @@ class CashbackLevelFragment(var data: Bundle?) : Fragment() {
 
         listMoneyTextView?.withIndex()?.forEach {
             it.value.text = getString(
-                R.string.transaction_value,
+                R.string.money_value,
                 data?.valuesMoney?.get(it.index)
             )
         }
@@ -94,8 +94,6 @@ class CashbackLevelFragment(var data: Bundle?) : Fragment() {
                 nextLevelTextView?.text = Html.fromHtml(getString(R.string.next_level_cachback, data?.nextLevelOfCashBack), 0)
             }
         }
-
-
     }
 
     private fun doPercentTextViewBigger(position: Int) {

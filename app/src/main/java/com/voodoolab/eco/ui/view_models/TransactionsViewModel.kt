@@ -11,6 +11,8 @@ import com.voodoolab.eco.models.TransactionData
 
 class TransactionsViewModel : ViewModel() {
 
+    lateinit var token: String
+
     var transactionsPagedList: LiveData<PagedList<TransactionData>>? = null
     private var liveDataSource: LiveData<TransactionDataSource>? = null
 

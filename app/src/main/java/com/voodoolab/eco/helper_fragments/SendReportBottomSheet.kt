@@ -70,7 +70,7 @@ class SendReportBottomSheet(
         data?.let {
             val value = it.getInt(Constants.NOTIFICATION_VALUE_OF_TRANSACTION)
             view.findViewById<TextView>(R.id.valueTextView).text =
-                context?.resources?.getString(R.string.transaction_value, value.div(100))
+                context?.resources?.getString(R.string.money_value, value.div(100))
 
             val transactionId = it.getInt(Constants.NOTIFICATION_VALUE_OF_TRANSACTION)
             val wash = it.getString(Constants.NOTIFICATION_WASH_MODEL)?.convertToWashModel()

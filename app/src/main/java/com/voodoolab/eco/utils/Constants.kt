@@ -113,4 +113,7 @@ object Constants {
 
     val REPORT_NOTIFICATION_DETECTED = "com.voodoolab.eco.action.NEW_REPORT_ACTION"
 
+    val TRANSACTION_HEADER_TYPE = "header"
+    val TRANSACTION_TYPE = "transaction"
+
 }
