@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.archit.calendardaterangepicker.customviews.DateRangeCalendarView android:id="@+id/calendar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:enable_past_date="true"
+    app:selected_date_color="@color/white"
+    app:selected_date_circle_color="#2C9B1A"
+    app:range_color="#D0F5C9"
+    app:week_color="#939393"
+    app:text_size_date="12sp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" />

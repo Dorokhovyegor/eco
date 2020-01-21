@@ -17,11 +17,10 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav_view"
-        app:labelVisibilityMode="unlabeled"
+        app:labelVisibilityMode="labeled"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:elevation="22dp"
         app:itemIconTint="@drawable/icon_bottom_nav_view_state_list"
         app:menu="@menu/main_menu" />
 

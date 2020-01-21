@@ -86,6 +86,35 @@ fun View.fadeOutAnimation() {
     }
 }
 
+fun View.fadeInAnimation() {
+    this.let { animatedView ->
+        animatedView.alpha = 0f
+        animatedView.visibility = View.VISIBLE
+        val animation = animatedView.animate()
+        animation.duration = 100
+        animation.interpolator = LinearInterpolator()
+        animation.alpha(1f)
+        animation.setListener(object : Animator.AnimatorListener {
+            override fun onAnimationRepeat(animation: Animator?) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                animatedView.visibility = View.VISIBLE
+                animatedView.alpha = 1f
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+
+            }
+
+            override fun onAnimationStart(animation: Animator?) {
+
+            }
+        })
+    }
+}
+
 fun Intent.hasFullInformationForReport(): Boolean { // if we have all this data that is all
     if (hasExtra(NOTIFICATION_OPERATION_ID) && hasExtra(NOTIFICATION_WASH_MODEL) && hasExtra(
             NOTIFICATION_VALUE_OF_TRANSACTION

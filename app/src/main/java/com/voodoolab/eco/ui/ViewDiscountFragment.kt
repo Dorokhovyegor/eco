@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -37,6 +38,7 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
     private var imageStock: ImageView? = null
     private var progressBar: MaterialProgressBar? = null
     private var washRecyclerView: RecyclerView? = null
+    private var cardView: CardView? = null
 
     private var adapterRecyclerView: WashAdapterRecyclerView? = null
     private var discountId: Int? = null
@@ -60,7 +62,11 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
         bodyTextView = view.findViewById(R.id.bodyTextView)
         imageStock = view.findViewById(R.id.discountImageView)
         progressBar = view.findViewById(R.id.progress_bar)
-        washRecyclerView = view.findViewById(R.id.washRecyclerView
+        cardView  =view.findViewById(R.id.cardView)
+
+
+        washRecyclerView = view.findViewById(
+            R.id.washRecyclerView
         )
         discountId?.let {
             triggerEvent(it)
@@ -85,13 +91,15 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
                 titleTextView?.text = response.title
                 bodyTextView?.text = response.text
                 imageStock?.let {
+                    println("DEBUG ${response.logo}")
                     if (context != null) {
-                        Glide.with(context!!)
-                            .load(response.logo)
-                            .placeholder(R.drawable.empty_discount)
-                            .error(R.drawable.empty_discount)
-                            .into(it)
-
+                        if (response.logo != "") {
+                            Glide.with(context!!)
+                                .load(response.logo)
+                                .into(it)
+                        } else {
+                            cardView?.visibility = View.GONE
+                        }
                     }
                     adapterRecyclerView =
                         WashAdapterRecyclerView(response.washes) { model: WashModel ->
@@ -116,7 +124,8 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
                 "wash_list" to list,
                 "current_wash" to washModel
             )
-            Navigation.findNavController(it).navigate(R.id.action_viewDiscountFragment_to_washOnMapFragment, bundle)
+            Navigation.findNavController(it)
+                .navigate(R.id.action_viewDiscountFragment_to_washOnMapFragment, bundle)
         }
     }
 

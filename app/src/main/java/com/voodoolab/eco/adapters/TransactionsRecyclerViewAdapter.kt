@@ -73,7 +73,7 @@ class TransactionsRecyclerViewAdapter :
             dateTextView?.text = transactionData.createdAt
             when (transactionData.type) {
                 REPLENISH_OFFLINE -> {
-                    Glide.with(itemView).load(R.drawable.balance_up).into(image)
+                    Glide.with(itemView).load(R.drawable.ic_balance_up).into(image)
                     transactionName?.text = itemView.resources.getString(
                         R.string.replenish_offline,
                         transactionData.wash?.address
@@ -85,7 +85,7 @@ class TransactionsRecyclerViewAdapter :
 
                 }
                 MONTH_BONUS -> {
-                    Glide.with(itemView).load(R.drawable.cash_back).into(image)
+                    Glide.with(itemView).load(R.drawable.ic_cash_back).into(image)
                     transactionName?.text = itemView.resources.getString(R.string.month_bonus)
                     transactionValue?.text = itemView.resources.getString(
                         R.string.transaction_value_plus,
@@ -93,7 +93,7 @@ class TransactionsRecyclerViewAdapter :
                     )
                 }
                 CASHBACK -> {
-                    Glide.with(itemView).load(R.drawable.cash_back).into(image)
+                    Glide.with(itemView).load(R.drawable.ic_cash_back).into(image)
                     transactionName?.text = itemView.resources.getString(R.string.cashback)
                     transactionValue?.text = itemView.resources.getString(
                         R.string.transaction_value_plus,
@@ -101,7 +101,7 @@ class TransactionsRecyclerViewAdapter :
                     )
                 }
                 REPLENISH_ONLINE -> {
-                    Glide.with(itemView).load(R.drawable.balance_up).into(image)
+                    Glide.with(itemView).load(R.drawable.ic_balance_up).into(image)
                     transactionName?.text = itemView.resources.getString(
                         R.string.replenish_online,
                         transactionData.terminal?.name
@@ -112,7 +112,7 @@ class TransactionsRecyclerViewAdapter :
                     )
                 }
                 WASTE -> {
-                    Glide.with(itemView).load(R.drawable.balance_dwn).into(image)
+                    Glide.with(itemView).load(R.drawable.ic_balance_down).into(image)
                     transactionName?.text =
                         itemView.resources.getString(R.string.waste, transactionData.wash?.address)
                     transactionValue?.text = itemView.resources.getString(

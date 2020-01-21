@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Html
-import android.util.MalformedJsonException
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -13,27 +12,27 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
-import com.elyeproj.loaderviewlibrary.LoaderImageView
-import com.elyeproj.loaderviewlibrary.LoaderTextView
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
-import com.google.gson.JsonParser
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
+import com.voodoolab.eco.helper_fragments.FilterFullScreenDialog
+import com.voodoolab.eco.helper_fragments.FilterFullScreenDialog.Companion.TAG
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.models.ClearUserModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.CitiesResponse
 import com.voodoolab.eco.states.cities_state.CitiesStateEvent
+import com.voodoolab.eco.states.cities_state.CitiesViewState
 import com.voodoolab.eco.states.logout_state.LogoutStateEvent
 import com.voodoolab.eco.states.user_state.UserStateEvent
-import com.voodoolab.eco.ui.ContainerFragment
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.profile_fragments.CashbackLevelFragment
 import com.voodoolab.eco.ui.profile_fragments.TransactionsFragmentList
@@ -41,7 +40,6 @@ import com.voodoolab.eco.ui.view_models.CitiesViewModels
 import com.voodoolab.eco.ui.view_models.LogoutViewModel
 import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.voodoolab.eco.utils.Constants
-import com.voodoolab.eco.utils.fadeOutAnimation
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
 val CASHBACK_TABLAYOUT = 1
@@ -69,11 +67,15 @@ class ProfileFragment : Fragment(),
     private var progressBar: MaterialProgressBar? = null
     private var optionButton: ImageButton? = null
     private var tabLayout: TabLayout? = null
+    private var filterButton: ImageButton? = null
 
     // temp var
     private var lastUpdateCityLocal: String? = null
     private var lastUpdateCoordinates: String? = null
     private var clearInfoUserModel: ClearUserModel? = null
+
+    // dialogs
+    var filterDialogFragment: FilterFullScreenDialog? = null
 
     // bundle controller data
     var bundleOut = bundleOf(
@@ -92,42 +94,60 @@ class ProfileFragment : Fragment(),
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
+        citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
+        logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
-        citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
-        logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
-
-        if (mainView == null) {
-            println("DEBUG: i am here")
+        return if (mainView == null) {
             mainView = inflater.inflate(R.layout.profile_container_fragment, container, false)
+            mainView
+        } else {
+            mainView
         }
-        return mainView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         findViewsFromLayout(view)
         addToolBarOffsetListener(view)
+
+        if (view.findViewById<FrameLayout>(R.id.fragment_container).childCount == 0) {
+            childFragmentManager.beginTransaction()
+                .add(
+                    R.id.fragment_container,
+                    TransactionsFragmentList()
+                ).commit()
+
+        }
+
         val token = Hawk.get<String>(Constants.TOKEN)
         token?.let {
             userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
-
             val pref = activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
             val city = pref?.getString(Constants.CITY_ECO, null)
 
             if (city == null) {
                 citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
             }
-            loadFragment(HISTORY_TABLAYOUT)
+
             subscribeObservers()
-        }?:  activity?.findNavController(R.id.frame_container)?.navigate(R.id.action_containerFragment_to_auth_destination, bundleOut)
+
+        } ?: activity?.findNavController(R.id.frame_container)?.navigate(
+            R.id.action_containerFragment_to_auth_destination,
+            bundleOut
+        )
     }
 
     private fun findViewsFromLayout(view: View) {
+
         titleTextView = view.findViewById(R.id.main_title)
         progressBar = view.findViewById(R.id.progress_bar)
 
@@ -138,6 +158,12 @@ class ProfileFragment : Fragment(),
         optionButton = view.findViewById(R.id.options_button)
         tabLayout = view.findViewById(R.id.tab_layout)
         tabLayout?.addOnTabSelectedListener(tabListener)
+        filterButton = view.findViewById(R.id.filter_button)
+
+        filterButton?.setOnClickListener {
+            filterDialogFragment = FilterFullScreenDialog()
+            filterDialogFragment?.show(childFragmentManager, TAG)
+        }
 
         optionButton?.setOnClickListener {
             val popup = PopupMenu(context, it)
@@ -183,6 +209,15 @@ class ProfileFragment : Fragment(),
             }
         })
 
+        userViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
+            if (viewState.userResponse?.status == "ok") {
+                viewState.clearResponse?.let {
+                    updateContent(it)
+                    clearInfoUserModel = it
+                }
+            }
+        })
+
         logoutViewModel.dataState.observe(viewLifecycleOwner, Observer {
             dataStateHandler.onDataStateChange(it)
             it.data?.let { viewState ->
@@ -198,17 +233,9 @@ class ProfileFragment : Fragment(),
             if (it.logoutResponse != null) {
                 view?.let {
                     if (activity is MainActivity) {
-                        activity?.findNavController(R.id.frame_container)?.navigate(R.id.action_containerFragment_to_auth_destination, bundleOut)
+                        activity?.findNavController(R.id.frame_container)
+                            ?.navigate(R.id.action_containerFragment_to_auth_destination, bundleOut)
                     }
-                }
-            }
-        })
-
-        userViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
-            if (viewState.userResponse?.status == "ok") {
-                viewState.clearResponse?.let {
-                    updateContent(it)
-                    clearInfoUserModel = it
                 }
             }
         })
@@ -219,16 +246,21 @@ class ProfileFragment : Fragment(),
             view?.findViewById<TextView>(R.id.balance)?.visibility = View.VISIBLE
             view?.findViewById<TextView>(R.id.cash)?.visibility = View.VISIBLE
 
-            balanceTextView?.text = Html.fromHtml(getString(
-                R.string.balance_value,
-                String.format("%.2f", data.balance).split(",")[0],  String.format("%.2f", data.balance).split(",")[1]
-            ), 0)
+            balanceTextView?.text = Html.fromHtml(
+                getString(
+                    R.string.balance_value,
+                    String.format("%.2f", data.balance).split(".")[0],
+                    String.format("%.2f", data.balance).split(".")[1]
+                ), 0
+            )
 
             if (data.indicatorPosition != null && data.indicatorPosition != -1) {
-                cashback?.text = Html.fromHtml(getString(
-                    R.string.percent_value,
-                    (data.valuesPercent?.get(data.indicatorPosition))
-                ), 0)
+                cashback?.text = Html.fromHtml(
+                    getString(
+                        R.string.percent_value,
+                        (data.valuesPercent?.get(data.indicatorPosition))
+                    ), 0
+                )
             } else if (data.indicatorPosition == -1) {
                 cashback?.text = Html.fromHtml(getString(R.string.percent_value, 0), 0)
             }
@@ -256,19 +288,19 @@ class ProfileFragment : Fragment(),
         val bundle = bundleOf(
             "user_model" to clearInfoUserModel
         )
+
         when (position) {
             CASHBACK_TABLAYOUT -> {
                 currentFragment = CashbackLevelFragment(bundle)
             }
+
             HISTORY_TABLAYOUT -> {
                 currentFragment = TransactionsFragmentList()
             }
         }
 
         currentFragment?.let {
-            childFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, it)
-                .commit()
+            childFragmentManager.beginTransaction().replace(R.id.fragment_container, it).commit()
         }
     }
 
@@ -279,7 +311,8 @@ class ProfileFragment : Fragment(),
                 event.getContentIfNotHandled()?.let {
                     if (it.contains("Unauthenticated")) {
                         Hawk.deleteAll()
-                        activity?.findNavController(R.id.frame_container)?.navigate(R.id.action_containerFragment_to_auth_destination, bundleOut)
+                        activity?.findNavController(R.id.frame_container)
+                            ?.navigate(R.id.action_containerFragment_to_auth_destination, bundleOut)
                     }
                     showToast(it)
                 }

@@ -6,15 +6,23 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/colorPrimary"
-        android:elevation="12dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="Акция"
-        app:titleTextColor="@color/white" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="#EFEFEF"
+        app:elevation="0dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/arrow_back"
+            app:title="Акции"
+            app:titleTextColor="#939393" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <me.zhanghai.android.materialprogressbar.MaterialProgressBar
         android:id="@+id/progress_bar"
@@ -50,16 +58,26 @@
                 android:textSize="22sp"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/discountImageView"
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView"
+                android:layout_marginTop="32dp"
                 android:layout_width="match_parent"
-                android:layout_height="186dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardMaxElevation="0dp"
+                android:elevation="0dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
-                android:backgroundTintMode="src_atop"
-                android:scaleType="center"
-                android:src="@drawable/empty_discount" />
+                android:layout_height="186dp">
+
+                <ImageView
+                    android:id="@+id/discountImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    android:src="@drawable/empty_discount" />
+            </androidx.cardview.widget.CardView>
 
 
             <TextView
@@ -69,16 +87,27 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
+                android:textColor="@color/black"
                 android:text=""
-                android:textSize="14sp" />
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/title_objects"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="56dp"
+                android:layout_marginEnd="16dp"
+                android:text="Акция действует на мойках:"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/washRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:layout_marginTop="32dp"
-                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="32dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/bodyTextView" />

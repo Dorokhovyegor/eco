@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:title="@string/discounts"
         android:id="@+id/discount_destination"
-        android:icon="@drawable/discount_icon">
+        android:icon="@drawable/ic_discount">
     </item>
 
     <item android:title="@string/profile"
         android:id="@+id/profile_destination"
-        android:icon="@drawable/profile_item">
+        android:icon="@drawable/ic_profile">
     </item>
 
     <item android:title="@string/map"
         android:id="@+id/map_destination"
-        android:icon="@drawable/map_icon">
+        android:icon="@drawable/ic_map">
     </item>
 
 </menu>

@@ -39,10 +39,10 @@ class SpecialOffersRecyclerViewAdapter(val block: (model: SpecialOfferModel) -> 
 
         fun bind(specialOfferModel: SpecialOfferModel) {
             //если картинки нет, тогда мы скрываем элемент
-            if (specialOfferModel.imageUrl == null) {
-                itemView.visibility = View.GONE
+            if (specialOfferModel.imageUrl == "") {
+                image.visibility = View.GONE
             } else {
-                itemView.visibility = View.VISIBLE
+                image.visibility = View.VISIBLE
                 Glide.with(itemView)
                     .load(specialOfferModel.imageUrl)
                     .centerCrop()

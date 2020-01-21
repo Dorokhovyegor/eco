@@ -6,27 +6,22 @@
     xmlns:map="http://schemas.android.com/tools"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/colorPrimary"
-        android:elevation="12dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:subtitleTextColor="@color/grey_from_Serge"
-        app:titleTextColor="@color/white">
+        android:layout_height="?attr/actionBarSize"
+        android:background="#EFEFEF"
+        app:elevation="0dp"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:text="Карта с мойками"
-            android:layout_marginStart="20dp"
-            android:textColor="@color/white"
-            android:layout_marginEnd="16dp"
-            android:textSize="20sp"
-            android:textStyle="bold"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:title="Мойки в горооде"
+            app:titleTextColor="#939393" />
 
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/map_view"
@@ -34,7 +29,7 @@
         android:layout_height="0dp"
         android:tag="Карта"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintTop_toBottomOf="@+id/appBar"
         map:mapType="normal"
         map:uiRotateGestures="false" />
 
@@ -46,7 +41,7 @@
         android:layout_gravity="bottom"
         android:indeterminate="true"
         android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toBottomOf="@id/appBar"
         app:mpb_progressStyle="horizontal"
         app:mpb_showProgressBackground="false"
         app:mpb_useIntrinsicPadding="false" />

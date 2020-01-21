@@ -1,5 +1,6 @@
 package com.voodoolab.eco.ui.profile_fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.os.UserManager
 import android.text.Html
@@ -80,8 +81,10 @@ class CashbackLevelFragment(var data: Bundle?) : Fragment() {
         }
 
         data?.indicatorPosition?.let {
-            if (it != -1)
-                doPercentTextViewBigger(it)
+            if (it != -1) {
+                makePercentTextViewBigger(it)
+                makeRightSideFromCurrentPositionDarker(it)
+            }
         }
         data?.currentProgressInPercent?.let {
             bubbleSeekBar?.setProgress(it)
@@ -91,17 +94,45 @@ class CashbackLevelFragment(var data: Bundle?) : Fragment() {
             if (it == -1) {
                 nextLevelTextView?.text = getString(R.string.max_level)
             } else {
-                nextLevelTextView?.text = Html.fromHtml(getString(R.string.next_level_cachback, data?.nextLevelOfCashBack), 0)
+                nextLevelTextView?.text = Html.fromHtml(
+                    getString(R.string.next_level_cachback, data.nextLevelOfCashBack),
+                    0
+                )
             }
         }
     }
 
-    private fun doPercentTextViewBigger(position: Int) {
+    private fun makePercentTextViewBigger(position: Int) {
         listPercentsTextView?.forEach { textView ->
             textView.setTextColor(resources.getColor(R.color.grey_from_Serge, null))
             textView.textSize = 16f
         }
-        listPercentsTextView?.get(position)?.textSize = 32f
+        listPercentsTextView?.get(position)?.textSize = 34f
         listPercentsTextView?.get(position)?.setTextColor(resources.getColor(R.color.black, null))
     }
+
+    private fun makeRightSideFromCurrentPositionDarker(position: Int) {
+        listMoneyTextView?.withIndex()?.forEach { textViewWrapper ->
+            if (textViewWrapper.index > position) {
+                textViewWrapper.value.setTextColor(
+                    resources.getColor(
+                        R.color.dark_grey_from_Serge,
+                        null
+                    )
+                )
+            }
+        }
+
+        listPercentsTextView?.withIndex()?.forEach { textViewWrapper ->
+            if (textViewWrapper.index > position) {
+                textViewWrapper.value.setTextColor(
+                    resources.getColor(
+                        R.color.dark_grey_from_Serge,
+                        null
+                    )
+                )
+            }
+        }
+    }
+
 }
