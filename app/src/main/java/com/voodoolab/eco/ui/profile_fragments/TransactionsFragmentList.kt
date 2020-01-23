@@ -1,7 +1,6 @@
 package com.voodoolab.eco.ui.profile_fragments
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,11 +27,6 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface {
     private var list: RecyclerView? = null
     private var fakeContainer: LinearLayout? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,23 +36,30 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        list = view.findViewById(R.id.transactionsRecyclerView)
-        list?.layoutManager = LinearLayoutManager(context)
-        list?.adapter = myAdapter
         fakeContainer = view.findViewById(R.id.fake_items)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
         val token = Hawk.get<String>(Constants.TOKEN)
-        transactionViewModel.initialize(token, this)
+        //todo setArguments? get from shared preferences
+        transactionViewModel.updateParamsAndInitRequest(token, this, null)
         subscribeObservers()
     }
 
     private fun subscribeObservers() {
-
         transactionViewModel.transactionsPagedList?.observe(viewLifecycleOwner, Observer {
-            if (myAdapter.currentList?.size == null)
-                myAdapter.submitList(it)
+            list = view?.findViewById(R.id.transactionsRecyclerView)
+            list?.layoutManager = LinearLayoutManager(context)
+            list?.adapter = myAdapter
+            myAdapter.submitList(it)
         })
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
 
     override fun setEmptyState() {
         view?.findViewById<TextView>(R.id.emptyTextView)?.visibility = View.VISIBLE

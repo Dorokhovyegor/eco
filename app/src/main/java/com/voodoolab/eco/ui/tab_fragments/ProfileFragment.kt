@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.children
+import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -40,6 +41,7 @@ import com.voodoolab.eco.ui.view_models.CitiesViewModels
 import com.voodoolab.eco.ui.view_models.LogoutViewModel
 import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.voodoolab.eco.utils.Constants
+import com.voodoolab.eco.utils.translateYFromToViaPercent
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
 val CASHBACK_TABLAYOUT = 1
@@ -94,11 +96,10 @@ class ProfileFragment : Fragment(),
         }
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
-        citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
-        logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
+        retainInstance = true
     }
 
     override fun onCreateView(
@@ -114,19 +115,18 @@ class ProfileFragment : Fragment(),
         }
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         findViewsFromLayout(view)
         addToolBarOffsetListener(view)
+        loadFragment(tabLayout?.selectedTabPosition)
+    }
 
-        if (view.findViewById<FrameLayout>(R.id.fragment_container).childCount == 0) {
-            childFragmentManager.beginTransaction()
-                .add(
-                    R.id.fragment_container,
-                    TransactionsFragmentList()
-                ).commit()
 
-        }
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
+        citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
+        logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
 
         val token = Hawk.get<String>(Constants.TOKEN)
         token?.let {
@@ -138,16 +138,15 @@ class ProfileFragment : Fragment(),
                 citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
             }
 
-            subscribeObservers()
-
         } ?: activity?.findNavController(R.id.frame_container)?.navigate(
             R.id.action_containerFragment_to_auth_destination,
             bundleOut
         )
+
+        subscribeObservers()
     }
 
     private fun findViewsFromLayout(view: View) {
-
         titleTextView = view.findViewById(R.id.main_title)
         progressBar = view.findViewById(R.id.progress_bar)
 
@@ -165,6 +164,16 @@ class ProfileFragment : Fragment(),
             filterDialogFragment?.show(childFragmentManager, TAG)
         }
 
+        titleTextView?.setOnClickListener {
+            val token: String = Hawk.get(Constants.TOKEN)
+            userViewModel.setStateEvent(
+                UserStateEvent.SetNewNameEvent(
+                    name = "Вася",
+                    token = token
+                )
+            )
+        }
+
         optionButton?.setOnClickListener {
             val popup = PopupMenu(context, it)
             popup.setOnMenuItemClickListener(this)// to implement on click event on items of menu
@@ -174,8 +183,9 @@ class ProfileFragment : Fragment(),
         }
     }
 
+
     private fun subscribeObservers() {
-        citiesViewModel.dataState.observe(this, Observer {
+        citiesViewModel.dataState.observe(viewLifecycleOwner, Observer {
             dataStateHandler.onDataStateChange(it)
             it.data?.let { citiesViewState ->
                 citiesViewState.getContentIfNotHandled()?.let {
@@ -184,7 +194,7 @@ class ProfileFragment : Fragment(),
             }
         })
 
-        citiesViewModel.viewState.observe(this, Observer {
+        citiesViewModel.viewState.observe(viewLifecycleOwner, Observer {
             it.citiesResponse?.let { cities ->
                 showChooseCityDialogs(cities)
             }
@@ -204,17 +214,15 @@ class ProfileFragment : Fragment(),
             dataStateHandler.onDataStateChange(dataState)
             dataState.data?.let { userViewState ->
                 userViewState.getContentIfNotHandled()?.let {
-                    userViewModel.updateUserResponse(it.userResponse, it.updateNameResponse)
+                    userViewModel.setUserInfo(it.userResponse)
                 }
             }
         })
 
         userViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
-            if (viewState.userResponse?.status == "ok") {
-                viewState.clearResponse?.let {
-                    updateContent(it)
-                    clearInfoUserModel = it
-                }
+            viewState?.userResponse?.let {
+                updateContent(it)
+                clearInfoUserModel = it
             }
         })
 
@@ -246,12 +254,22 @@ class ProfileFragment : Fragment(),
             view?.findViewById<TextView>(R.id.balance)?.visibility = View.VISIBLE
             view?.findViewById<TextView>(R.id.cash)?.visibility = View.VISIBLE
 
+            titleTextView?.text = data.name
+            view?.findViewById<TextView>(R.id.money_second)?.text = Html.fromHtml(
+                getString(
+                    R.string.balance_value,
+                    data.balance_rub.toString(),
+                    data.balance_kop
+                )
+                , 0
+            )
             balanceTextView?.text = Html.fromHtml(
                 getString(
                     R.string.balance_value,
-                    String.format("%.2f", data.balance).split(".")[0],
-                    String.format("%.2f", data.balance).split(".")[1]
-                ), 0
+                    data.balance_rub.toString(),
+                    data.balance_kop
+                )
+                , 0
             )
 
             if (data.indicatorPosition != null && data.indicatorPosition != -1) {
@@ -272,35 +290,39 @@ class ProfileFragment : Fragment(),
     }
 
     private fun addToolBarOffsetListener(view: View) {
+        val name = view.findViewById<TextView>(R.id.main_title)
+        val second_balance = view.findViewById<TextView>(R.id.money_second)
+        val dp = resources.displayMetrics.density
         val container: ConstraintLayout? = view.findViewById(R.id.info_container)
         val appBarLayout: AppBarLayout? = view.findViewById(R.id.appBar)
         appBarLayout?.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout1, i ->
             run {
-                val setAlpha: Float =
+                val percent: Float =
                     ((appBarLayout1.totalScrollRange + i).toFloat() / appBarLayout.totalScrollRange.toFloat())
-                container?.alpha = Math.pow(setAlpha.toDouble(), 2.0).toFloat()
+                name.translateYFromToViaPercent(14 * dp, percent)
+                second_balance.translateYFromToViaPercent(70 * dp, percent)
+                second_balance?.alpha = 1 - Math.pow(percent.toDouble(), 10.0).toFloat()
+                container?.alpha = Math.pow(percent.toDouble(), 2.0).toFloat()
             }
         })
     }
 
-    private fun loadFragment(position: Int) {
-        var currentFragment: Fragment? = null
-        val bundle = bundleOf(
-            "user_model" to clearInfoUserModel
-        )
+    override fun onDestroyView() {
+        view?.findViewById<FrameLayout>(R.id.fragment_container)?.removeAllViews()
+        super.onDestroyView()
+    }
 
+    private fun loadFragment(position: Int?) {
         when (position) {
             CASHBACK_TABLAYOUT -> {
-                currentFragment = CashbackLevelFragment(bundle)
+                childFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, CashbackLevelFragment()).commit()
             }
 
             HISTORY_TABLAYOUT -> {
-                currentFragment = TransactionsFragmentList()
+                childFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, TransactionsFragmentList()).commit()
             }
-        }
-
-        currentFragment?.let {
-            childFragmentManager.beginTransaction().replace(R.id.fragment_container, it).commit()
         }
     }
 
@@ -357,8 +379,8 @@ class ProfileFragment : Fragment(),
             .setPositiveButton("Ok") { _, which ->
                 if (which == DialogInterface.BUTTON_POSITIVE) {
                     positionCity?.let {
-                        citiesViewModel.setStateEvent(
-                            CitiesStateEvent.UpdateCity(
+                        userViewModel.setStateEvent(
+                            UserStateEvent.SetCityEvent(
                                 "Bearer ${Hawk.get<String>(
                                     Constants.TOKEN
                                 )}", citiesArrayList[it]

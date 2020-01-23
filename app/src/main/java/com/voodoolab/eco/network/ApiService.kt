@@ -32,7 +32,16 @@ interface ApiService {
     fun setNewName(
         @Header("Authorization") token: String,
         @Part("name") name: String
-    ): LiveData<GenericApiResponse<UpdateNameResponse>>
+    ): LiveData<GenericApiResponse<UserInfoResponse>>
+
+    @GET("api/user/operations")
+    fun getOperations(
+        @Header("Authorization") token: String,
+        @Header("Accept") accept: String,
+        @Query("page") page: String,
+        @Query("qty") qty: String,
+        @Query("types[]") params: List<String>?
+    ): Call<TransactionResponse>
 
     @GET("api/user/operations")
     fun getOperations(
@@ -65,7 +74,7 @@ interface ApiService {
     fun setCity(
         @Header("Authorization") tokenApp: String,
         @Part("city") city: String?
-    ): LiveData<GenericApiResponse<UpdateCityResponse>>
+    ): LiveData<GenericApiResponse<UserInfoResponse>>
 
     @Multipart
     @POST("api/user/set-firebase-token")

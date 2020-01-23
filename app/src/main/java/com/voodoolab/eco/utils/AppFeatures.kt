@@ -17,6 +17,8 @@ import com.voodoolab.eco.utils.Constants.NOTIFICATION_WASH_CITY
 import com.voodoolab.eco.utils.Constants.NOTIFICATION_WASH_MODEL
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
 fun MaterialProgressBar.show(visible: Boolean) {
     if (visible) {
@@ -182,5 +184,16 @@ fun String.convertToWashModel(): WashModel {
         cashback = null,
         seats = null
     )
+}
+
+fun View.translateYFromToViaPercent(targetY: Float, percent: Float) {
+    val delta = targetY / 100f
+    this.translationY = percent * delta * 100
+}
+
+fun Long.toDate(): String {
+    val date = Date(this)
+    val df2 = SimpleDateFormat("yyyy-MM-dd")
+    return df2.format(date)
 }
 

@@ -8,8 +8,8 @@ import com.voodoolab.eco.utils.Constants
 import retrofit2.Call
 import retrofit2.Response
 
-class TransactionDataSource(val token: String) : PageKeyedDataSource<Int, TransactionData>() {
-
+class TransactionDataSource(val token: String, val arg: ArrayList<String>?) :
+    PageKeyedDataSource<Int, TransactionData>() {
     val FIRST_PAGE = 1
     val QUANTITY = 10
 
@@ -18,10 +18,11 @@ class TransactionDataSource(val token: String) : PageKeyedDataSource<Int, Transa
         callback: LoadInitialCallback<Int, TransactionData>
     ) {
         RetrofitBuilder.apiService.getOperations(
-            "Bearer $token",
-            "application/json",
-            FIRST_PAGE.toString(),
-            QUANTITY.toString()
+            token = "Bearer $token",
+            accept = "application/json",
+            page = FIRST_PAGE.toString(),
+            qty = QUANTITY.toString(),
+            params = arg
         ).enqueue(object : retrofit2.Callback<TransactionResponse> {
             override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {
                 t.printStackTrace()
@@ -35,20 +36,20 @@ class TransactionDataSource(val token: String) : PageKeyedDataSource<Int, Transa
                 response.body()?.let { transactionsResponse ->
                     transactionsResponse.data?.let {
                         if (it.size != 0)
-                        it.add(
-                            0,
-                            TransactionData(
-                                null,
-                                null,
-                                Constants.TRANSACTION_HEADER_TYPE,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null
+                            it.add(
+                                0,
+                                TransactionData(
+                                    null,
+                                    null,
+                                    Constants.TRANSACTION_HEADER_TYPE,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                )
                             )
-                        )
                         callback.onResult(it, null, FIRST_PAGE + 1)
 
                     }
@@ -59,10 +60,11 @@ class TransactionDataSource(val token: String) : PageKeyedDataSource<Int, Transa
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionData>) {
         val call = RetrofitBuilder.apiService.getOperations(
-            "Bearer $token",
-            "application/json",
-            params.key.toString(),
-            QUANTITY.toString()
+            token = "Bearer $token",
+            accept = "application/json",
+            page = params.key.toString(),
+            qty = QUANTITY.toString(),
+            params = arg
         )
 
         call.enqueue(object : retrofit2.Callback<TransactionResponse> {

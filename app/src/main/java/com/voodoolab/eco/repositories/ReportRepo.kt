@@ -27,7 +27,6 @@ object ReportRepo {
             }
 
             override fun createCall(): LiveData<GenericApiResponse<ReportResponse>> {
-
                 val controllerSum = rating?.div(0.5)
                 if (controllerSum?.toInt()?.rem(2) == 0) { // тут отправляем INT
                     return RetrofitBuilder.apiService.sentReport(tokenApp, operationId, text, rating.toInt())

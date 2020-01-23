@@ -34,9 +34,6 @@ class CitiesViewModels : ViewModel() {
             is CitiesStateEvent.RequestCityList -> {
                 CitiesRepo.requestListCities()
             }
-            is CitiesStateEvent.UpdateCity -> {
-                CitiesRepo.setCity(stateEvent.token, stateEvent.city)
-            }
             is CitiesStateEvent.None -> {
                 AbsentLiveData.create()
             }

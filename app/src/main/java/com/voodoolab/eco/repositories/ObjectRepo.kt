@@ -14,7 +14,7 @@ import com.voodoolab.eco.utils.GenericApiResponse
 object ObjectRepo {
 
     fun getObjectInfo(token: String, id: Int): LiveData<DataState<ObjectViewState>> {
-        return object: NetworkBoundResource<ObjectResponse, ObjectViewState>() {
+        return object : NetworkBoundResource<ObjectResponse, ObjectViewState>() {
             override fun handleApiSuccessResponse(response: ApiSuccessResponse<ObjectResponse>) {
                 result.value = DataState.data(
                     data = ObjectViewState(
@@ -24,13 +24,13 @@ object ObjectRepo {
             }
 
             override fun createCall(): LiveData<GenericApiResponse<ObjectResponse>> {
-               return RetrofitBuilder.apiService.getObjectById(token, "application/json", id)
+                return RetrofitBuilder.apiService.getObjectById(token, "application/json", id)
             }
         }.asLiveData()
     }
 
     fun getObjectList(token: String): LiveData<DataState<ListObjectViewState>> {
-        return object: NetworkBoundResource<ListObjectResponse, ListObjectViewState>() {
+        return object : NetworkBoundResource<ListObjectResponse, ListObjectViewState>() {
             override fun handleApiSuccessResponse(response: ApiSuccessResponse<ListObjectResponse>) {
                 result.value = DataState.data(
                     data = ListObjectViewState(

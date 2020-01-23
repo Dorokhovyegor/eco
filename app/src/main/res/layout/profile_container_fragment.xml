@@ -123,12 +123,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="13dp"
+                android:layout_marginTop="2dp"
                 android:maxLength="25"
-                android:text="@string/profile"
                 android:textColor="#939393"
                 android:textSize="20sp"
-                android:textStyle="bold"
+                app:layout_collapseMode="pin" />
+
+            <TextView
+
+                android:id="@+id/money_second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="30dp"
+                android:maxLength="25"
+                android:textColor="#000"
+                android:textSize="14sp"
                 app:layout_collapseMode="pin" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>

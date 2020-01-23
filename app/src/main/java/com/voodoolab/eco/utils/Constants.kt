@@ -96,6 +96,17 @@ object Constants {
     val CITY_ECO = "city"
     val CITY_COORDINATES = "coordinates"
 
+    val FILTER_SETTING = "eco_filter"
+
+    val FILTER_WASTE = "waste"
+    val FILTER_CASHBACK = "cashback"
+    val FILTER_MONTHBONUS = "month_bonus"
+    val FILTER_REPLENISH_OFFLINE = "replenish_offline"
+    val FILTER_REPLENISH_ONLINE = "replenish_online"
+
+    val FILTER_PERIOD_FROM = "period_from"
+    val FILTER_PERIOD_TO = "period_to"
+
     val CHANNEL_REPORT = "CHANNEL_REPORT"
     val CHANNEL_SPECIAL_OFFER = "CHANNEL_SPECIAL_OFFER"
     val CHANNEL_FREE = "CHANNEL_FREE"
@@ -115,5 +126,23 @@ object Constants {
 
     val TRANSACTION_HEADER_TYPE = "header"
     val TRANSACTION_TYPE = "transaction"
+
+
+
+
+    // params for request
+    val REQUEST_PARAM_WASTE ="waste"
+    val REQUEST_PARAM_CASHBACK ="cashback"
+    val REQUEST_PARAM_MONTHBONUS ="month_bonus"
+    val REQUEST_PARAM_REPLENISH_OFFLINE ="replenish_offline"
+    val REQUEST_PARAM_REPLENISH_ONLINE ="replenish_online"
+
+    val REQUEST_PARAM_PERIOD_FROM ="period_from"
+    val REQUEST_PARAM_PERIOD_TO ="period_to"
+
+    //
+
+
+
 
 }

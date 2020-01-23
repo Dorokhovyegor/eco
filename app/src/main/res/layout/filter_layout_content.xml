@@ -34,6 +34,7 @@
             style="@style/ChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:tag="replenish_offline"
             android:text="@string/balance_up_offline"
             android:textColor="@color/chip_text_state_list"
             app:checkedIconEnabled="false"
@@ -45,6 +46,7 @@
             style="@style/ChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:tag="replenish_online"
             android:text="@string/balance_up_online"
             android:textColor="@color/chip_text_state_list"
             app:checkedIconEnabled="false"
@@ -57,6 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/balance_down"
+            android:tag="waste"
             android:textColor="@color/chip_text_state_list"
             app:checkedIconEnabled="false"
             app:chipStrokeColor="@color/grey_from_Serge"
@@ -67,6 +70,7 @@
             style="@style/ChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:tag="month_bonus"
             android:text="@string/bonus_for_a_month"
             android:textColor="@color/chip_text_state_list"
             app:checkedIconEnabled="false"
@@ -77,6 +81,7 @@
             android:id="@+id/chip_cashback"
             style="@style/ChipStyle"
             android:layout_width="wrap_content"
+            android:tag="cashback"
             android:layout_height="wrap_content"
             android:text="@string/money_back"
             android:textColor="@color/chip_text_state_list"
@@ -121,11 +126,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:layout_marginBottom="109dp"
         android:inflatedId="@+id/calendarStub"
         android:layout="@layout/calendar_layout"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="109dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chip_allTime" />
 
     <Button
@@ -142,6 +147,6 @@
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"/>
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

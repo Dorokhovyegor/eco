@@ -5,7 +5,5 @@ import com.voodoolab.eco.responses.UpdateNameResponse
 import com.voodoolab.eco.responses.UserInfoResponse
 
 data class UserViewState(
-    var userResponse: UserInfoResponse? = null,
-    var clearResponse: ClearUserModel? = null,
-    var updateNameResponse: UpdateNameResponse? = null
+    var userResponse: ClearUserModel? = null
 )

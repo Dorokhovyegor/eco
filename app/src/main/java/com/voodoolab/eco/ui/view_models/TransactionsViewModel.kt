@@ -12,13 +12,16 @@ import com.voodoolab.eco.models.TransactionData
 class TransactionsViewModel : ViewModel() {
 
     lateinit var token: String
-
     var transactionsPagedList: LiveData<PagedList<TransactionData>>? = null
     private var liveDataSource: LiveData<TransactionDataSource>? = null
 
-    fun initialize(token: String?, emptyList: EmptyListInterface?) {
-        token?.let { key->
-            val itemDataSourceFactory = TransactionDataSourceFactory(key)
+    fun updateParamsAndInitRequest(
+        token: String?,
+        emptyList: EmptyListInterface?,
+        arg: ArrayList<String>?
+    ) {
+        token?.let { key ->
+            val itemDataSourceFactory = TransactionDataSourceFactory(key, arg)
             liveDataSource = itemDataSourceFactory.transactionsLiveDataSource
 
             val config = PagedList.Config.Builder()

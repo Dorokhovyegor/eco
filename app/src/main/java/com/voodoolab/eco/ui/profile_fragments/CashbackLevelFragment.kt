@@ -9,26 +9,29 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.voodoolab.eco.R
 import com.voodoolab.eco.models.ClearUserModel
+import com.voodoolab.eco.ui.view_models.UserInfoViewModel
 import com.xw.repo.BubbleSeekBar
 
-class CashbackLevelFragment(var data: Bundle?) : Fragment() {
+class CashbackLevelFragment: Fragment() {
 
-    private var userModel: ClearUserModel? = null
     private var bubbleSeekBar: BubbleSeekBar? = null
     private var listPercentsTextView: List<TextView>? = null
     private var listMoneyTextView: List<TextView>? = null
     private var nextLevelTextView: TextView? = null
 
     //fake views
+    lateinit var userViewModel: UserInfoViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        userModel = data?.getParcelable("user_model")
         return inflater.inflate(R.layout.cashback_layout, container, false)
     }
 
@@ -37,7 +40,16 @@ class CashbackLevelFragment(var data: Bundle?) : Fragment() {
         bubbleSeekBar = view.findViewById(R.id.bubbleSeekBar)
         listPercentsTextView = initTextViewsDiscounts(view)
         listMoneyTextView = initTextViewsMoney(view)
-        setContent(userModel)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        userViewModel = ViewModelProvider(parentFragment!!)[UserInfoViewModel::class.java]
+        userViewModel.viewState.observe(viewLifecycleOwner, Observer {userViewState ->
+            println("DEBUG: update content")
+            setContent(userViewState.userResponse)
+        })
     }
 
     private fun initTextViewsDiscounts(view: View?): List<TextView>? {
