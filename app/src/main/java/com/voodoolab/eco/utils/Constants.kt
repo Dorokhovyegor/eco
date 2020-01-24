@@ -103,6 +103,7 @@ object Constants {
     val FILTER_MONTHBONUS = "month_bonus"
     val FILTER_REPLENISH_OFFLINE = "replenish_offline"
     val FILTER_REPLENISH_ONLINE = "replenish_online"
+    var FILTER_ALL_TIME = "all_time"
 
     val FILTER_PERIOD_FROM = "period_from"
     val FILTER_PERIOD_TO = "period_to"

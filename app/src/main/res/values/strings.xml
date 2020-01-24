@@ -60,4 +60,5 @@
     <string name="last_week">За последнюю неделю</string>
     <string name="save">Сохранить</string>
     <string name="save_text">Сохранить</string>
+    <string name="drop_filter">Сбросить</string>
 </resources>

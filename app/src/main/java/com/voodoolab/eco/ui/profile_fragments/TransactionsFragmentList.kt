@@ -16,11 +16,12 @@ import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.EmptyListInterface
+import com.voodoolab.eco.interfaces.ParamsTransactionChangeListener
 import com.voodoolab.eco.ui.view_models.TransactionsViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.fadeOutAnimation
 
-class TransactionsFragmentList : Fragment(), EmptyListInterface {
+class TransactionsFragmentList : Fragment(), EmptyListInterface, ParamsTransactionChangeListener {
 
     lateinit var transactionViewModel: TransactionsViewModel
     private val myAdapter = TransactionsRecyclerViewAdapter()
@@ -43,7 +44,6 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface {
         super.onActivityCreated(savedInstanceState)
         transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
         val token = Hawk.get<String>(Constants.TOKEN)
-        //todo setArguments? get from shared preferences
         transactionViewModel.updateParamsAndInitRequest(token, this, null)
         subscribeObservers()
     }
@@ -57,10 +57,6 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface {
         })
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
-
     override fun setEmptyState() {
         view?.findViewById<TextView>(R.id.emptyTextView)?.visibility = View.VISIBLE
         view?.findViewById<ImageView>(R.id.emptyImageView)?.visibility = View.VISIBLE
@@ -69,5 +65,12 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface {
 
     override fun firstItemLoaded() {
         fakeContainer?.fadeOutAnimation()
+    }
+
+    override fun onParamsChanged() {
+        // todo reload data with params
+        val token = Hawk.get<String>(Constants.TOKEN)
+        transactionViewModel.updateParamsAndInitRequest(token, this, null)
+        println("DEBUG: i am here, you are very clever my boy")
     }
 }

@@ -27,6 +27,7 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_fragments.FilterFullScreenDialog
 import com.voodoolab.eco.helper_fragments.FilterFullScreenDialog.Companion.TAG
 import com.voodoolab.eco.interfaces.DataStateListener
+import com.voodoolab.eco.interfaces.ParamsTransactionChangeListener
 import com.voodoolab.eco.models.ClearUserModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.CitiesResponse
@@ -49,7 +50,8 @@ val HISTORY_TABLAYOUT = 0
 
 class ProfileFragment : Fragment(),
     DataStateListener,
-    PopupMenu.OnMenuItemClickListener {
+    PopupMenu.OnMenuItemClickListener,
+    ParamsTransactionChangeListener {
 
     private var mainView: View? = null
 
@@ -160,6 +162,7 @@ class ProfileFragment : Fragment(),
         filterButton = view.findViewById(R.id.filter_button)
 
         filterButton?.setOnClickListener {
+            
             filterDialogFragment = FilterFullScreenDialog()
             filterDialogFragment?.show(childFragmentManager, TAG)
         }
@@ -442,5 +445,10 @@ class ProfileFragment : Fragment(),
             }
         }
         return true
+    }
+
+    override fun onParamsChanged() {
+
+        //todo делай
     }
 }

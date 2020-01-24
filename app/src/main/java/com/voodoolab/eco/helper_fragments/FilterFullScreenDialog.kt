@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
+import android.widget.Button
 import androidx.appcompat.widget.Toolbar
 import androidx.asynclayoutinflater.view.AsyncLayoutInflater
 import androidx.core.widget.NestedScrollView
@@ -13,7 +14,10 @@ import androidx.fragment.app.DialogFragment
 import com.archit.calendardaterangepicker.customviews.DateRangeCalendarView
 import com.google.android.material.chip.Chip
 import com.voodoolab.eco.R
+import com.voodoolab.eco.interfaces.ParamsTransactionChangeListener
+import com.voodoolab.eco.ui.view_models.SharedViewModel
 import com.voodoolab.eco.utils.Constants
+import com.voodoolab.eco.utils.Constants.FILTER_ALL_TIME
 import com.voodoolab.eco.utils.Constants.FILTER_CASHBACK
 import com.voodoolab.eco.utils.Constants.FILTER_MONTHBONUS
 import com.voodoolab.eco.utils.Constants.FILTER_PERIOD_FROM
@@ -22,14 +26,21 @@ import com.voodoolab.eco.utils.Constants.FILTER_REPLENISH_OFFLINE
 import com.voodoolab.eco.utils.Constants.FILTER_REPLENISH_ONLINE
 import com.voodoolab.eco.utils.Constants.FILTER_WASTE
 import com.voodoolab.eco.utils.fadeInAnimation
+import com.voodoolab.eco.utils.toCalendar
 import com.voodoolab.eco.utils.toDate
 import java.util.*
+
 
 class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFinishedListener {
 
     companion object {
         val TAG = "filter"
     }
+
+
+    var paramChangeListener: ParamsTransactionChangeListener? = null
+
+    lateinit var sharedViewModel: SharedViewModel
 
     private var toolBar: Toolbar? = null
 
@@ -41,6 +52,8 @@ class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFi
 
     lateinit var allTimeChip: Chip
     lateinit var calendar: DateRangeCalendarView
+
+    lateinit var dropButton: Button
 
     override fun onStart() {
         super.onStart()
@@ -72,68 +85,125 @@ class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFi
     override fun onInflateFinished(view: View, resid: Int, parent: ViewGroup?) {
         getView()?.findViewById<NestedScrollView>(R.id.scroll)?.addView(view)
         initViews(view)
-
+        setContent()
+        initListeners()
         view.fadeInAnimation()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        println("DEBUG: name => onViewCreated")
-
         toolBar = view.findViewById(R.id.toolbar)
         toolBar?.setNavigationOnClickListener {
             dismiss()
         }
         toolBar?.inflateMenu(R.menu.filter_menu)
-        toolBar?.setOnMenuItemClickListener { item ->
-            val setting = context?.getSharedPreferences(Constants.FILTER_SETTING, Context.MODE_PRIVATE)?.edit()
-            setting?.putBoolean(FILTER_CASHBACK, cashbackChip.isChecked)
-            setting?.putBoolean(FILTER_MONTHBONUS, monthBonusChip.isChecked)
-            setting?.putBoolean(FILTER_WASTE, wasteChip.isChecked)
-            setting?.putBoolean(FILTER_REPLENISH_OFFLINE, replenishOfflineChip.isChecked)
-            setting?.putBoolean(FILTER_REPLENISH_ONLINE, replenishOnlineChip.isChecked)
-            setting?.putString(FILTER_PERIOD_FROM, calendar.startDate.time.time.toDate()) // todo convert to string "yyyy-mm-dd"
-            setting?.putString(FILTER_PERIOD_TO, calendar.startDate.time.time.toDate()) // todo convert to string "yyyy-mm-dd"
-            setting?.apply()
-            dismiss()
-            return@setOnMenuItemClickListener true
-        }
     }
 
     private fun initViews(view: View) {
         val viewStub = view.findViewById<ViewStub>(R.id.calendarStub)
         calendar = viewStub.inflate() as DateRangeCalendarView
-
         allTimeChip = view.findViewById(R.id.chip_allTime)
-
         wasteChip = view.findViewById(R.id.chip_waste)
         cashbackChip = view.findViewById(R.id.chip_cashback)
         monthBonusChip = view.findViewById(R.id.chip_month_bonus)
         replenishOnlineChip = view.findViewById(R.id.chip_replenish_online)
         replenishOfflineChip = view.findViewById(R.id.chip_replenish_offline)
+        dropButton = view.findViewById(R.id.drop_button)
     }
 
     private fun setContent() {
         val setting = context?.getSharedPreferences(Constants.FILTER_SETTING, Context.MODE_PRIVATE)
         setting?.let {
-            cashbackChip.isCheckable =  it.getBoolean(FILTER_CASHBACK, false)
-            monthBonusChip.isCheckable =  it.getBoolean(FILTER_CASHBACK, false)
-            wasteChip.isCheckable =  it.getBoolean(FILTER_CASHBACK, false)
-            replenishOfflineChip.isCheckable =  it.getBoolean(FILTER_CASHBACK, false)
-            replenishOnlineChip.isCheckable =  it.getBoolean(FILTER_CASHBACK, false)
+            cashbackChip.isChecked = it.getBoolean(FILTER_CASHBACK, false)
+            monthBonusChip.isChecked = it.getBoolean(FILTER_MONTHBONUS, false)
+            wasteChip.isChecked = it.getBoolean(FILTER_WASTE, false)
+            replenishOfflineChip.isChecked = it.getBoolean(FILTER_REPLENISH_OFFLINE, false)
+            replenishOnlineChip.isChecked = it.getBoolean(FILTER_REPLENISH_ONLINE, false)
+            allTimeChip.isChecked = it.getBoolean(FILTER_ALL_TIME, false)
 
+            if (allTimeChip.isChecked) {
+                calendar.resetAllSelectedViews()
+            } else {
+                val startDay = it.getString(FILTER_PERIOD_FROM, "")?.toCalendar()
+                val endDay = it.getString(FILTER_PERIOD_TO, "")?.toCalendar()
 
-            // todo get from shared preferences
-            it.getString(FILTER_PERIOD_FROM, "")
-            it.getString(FILTER_PERIOD_TO, "")
+                if (endDay != null && startDay != null) {
+                    if (endDay.before(startDay)) {
+                        calendar.setSelectedDateRange(startDay, startDay)
+                    } else {
+                        calendar.setSelectedDateRange(startDay, endDay)
+                    }
+                } else {
+                    allTimeChip.isChecked = true
+                    calendar.resetAllSelectedViews()
+                }
+            }
+        }
+    }
 
-            // todo select my own days
-            val startSelectionDate = Calendar.getInstance()
-            startSelectionDate.add(Calendar.MONTH, -1)
-            val endSelectionDate = startSelectionDate.clone() as Calendar
-            endSelectionDate.add(Calendar.DATE, 40)
-            calendar.setSelectedDateRange(startSelectionDate, endSelectionDate)
+    private fun initListeners() {
+        toolBar?.setOnMenuItemClickListener { item ->
+            var start: String? = null
+            var end: String? = null
+
+            if (calendar.startDate != null) {
+                start = calendar.startDate.time.time.toDate()
+            }
+
+            if (calendar.endDate == null && calendar.startDate != null) {
+                end = calendar.startDate.time.time.toDate()
+            } else if (calendar.endDate != null) {
+                end = calendar.endDate.time.time.toDate()
+            }
+
+            val map: Map<String, Any?> = mapOf(
+                FILTER_CASHBACK to cashbackChip.isChecked,
+                FILTER_MONTHBONUS to monthBonusChip.isChecked,
+                FILTER_WASTE to wasteChip.isChecked,
+                FILTER_REPLENISH_ONLINE to replenishOnlineChip.isChecked,
+                FILTER_REPLENISH_OFFLINE to replenishOfflineChip.isChecked,
+                FILTER_ALL_TIME to allTimeChip.isChecked,
+                FILTER_PERIOD_FROM to start,
+                FILTER_PERIOD_TO to end
+            )
+            sharedViewModel.setParams(map)
+            dismiss()
+            return@setOnMenuItemClickListener true
         }
 
+        dropButton.setOnClickListener {
+            sharedViewModel.setParams(null)
+            dismiss()
+        }
+
+        allTimeChip.setOnCheckedChangeListener { view, isChecked ->
+            if (isChecked) {
+                calendar.resetAllSelectedViews()
+                // alltime = true
+                // todo https://www.youtube.com/watch?v=ACK67xU1Y3s
+            }
+        }
+
+        calendar.setCalendarListener(object : DateRangeCalendarView.CalendarListener {
+            override fun onFirstDateSelected(startDate: Calendar) {
+                allTimeChip.isChecked = false
+            }
+
+            override fun onDateRangeSelected(startDate: Calendar, endDate: Calendar) {
+                allTimeChip.isChecked = false
+            }
+        })
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (parentFragment is ParamsTransactionChangeListener) {
+            paramChangeListener = parentFragment as ParamsTransactionChangeListener
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        paramChangeListener = null
     }
 }

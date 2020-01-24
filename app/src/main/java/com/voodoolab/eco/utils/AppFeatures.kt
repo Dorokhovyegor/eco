@@ -191,9 +191,26 @@ fun View.translateYFromToViaPercent(targetY: Float, percent: Float) {
     this.translationY = percent * delta * 100
 }
 
-fun Long.toDate(): String {
-    val date = Date(this)
-    val df2 = SimpleDateFormat("yyyy-MM-dd")
-    return df2.format(date)
+fun Long.toDate(): String? {
+    return try {
+        val date = Date(this)
+        val df2 = SimpleDateFormat("yyyy-MM-dd")
+        df2.format(date)
+    } catch (e: Throwable) {
+        null
+    }
+}
+
+fun String.toCalendar(): Calendar? {
+    return try {
+        val pattern = "yyyy-MM-dd"
+        val date: Date = SimpleDateFormat(pattern).parse(this)
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+        calendar
+    } catch (e: Throwable) {
+        e.printStackTrace()
+        null
+    }
 }
 
