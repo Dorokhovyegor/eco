@@ -1,6 +1,9 @@
 package com.voodoolab.eco.ui.view_models
 
+import android.graphics.pdf.PdfDocument
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -11,25 +14,20 @@ import com.voodoolab.eco.models.TransactionData
 
 class TransactionsViewModel : ViewModel() {
 
-    lateinit var token: String
     var transactionsPagedList: LiveData<PagedList<TransactionData>>? = null
-    private var liveDataSource: LiveData<TransactionDataSource>? = null
+    var map: Map<String, Any?>? = null
 
-    fun updateParamsAndInitRequest(
-        token: String?,
-        emptyList: EmptyListInterface?,
-        arg: ArrayList<String>?
-    ) {
-        token?.let { key ->
-            val itemDataSourceFactory = TransactionDataSourceFactory(key, arg)
-            liveDataSource = itemDataSourceFactory.transactionsLiveDataSource
+    private fun buildPagedList(localMap: Map<String, Any?>?, token: String, emptyList: EmptyListInterface?): LiveData<PagedList<TransactionData>> {
+        val config = PagedList.Config.Builder()
+            .setEnablePlaceholders(false)
+            .setPageSize(10)
+            .build()
 
-            val config = PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setPageSize(10)
+        if (localMap == null) {
+            return LivePagedListBuilder(TransactionDataSourceFactory(token, null), config)
                 .build()
-
-            transactionsPagedList = LivePagedListBuilder(itemDataSourceFactory, config)
+        } else {
+            return LivePagedListBuilder(TransactionDataSourceFactory(token, localMap), config)
                 .setBoundaryCallback(object : PagedList.BoundaryCallback<TransactionData>() {
                     override fun onZeroItemsLoaded() {
                         super.onZeroItemsLoaded()
@@ -43,5 +41,14 @@ class TransactionsViewModel : ViewModel() {
                 })
                 .build()
         }
+    }
+
+    fun replaceSubscription(lifecycleOwner: LifecycleOwner,
+        map: Map<String, Any?>?,
+        token: String,
+        emptyList: EmptyListInterface?) {
+        this.map = map
+        transactionsPagedList?.removeObservers(lifecycleOwner)
+        transactionsPagedList = buildPagedList(map, token, emptyList)
     }
 }

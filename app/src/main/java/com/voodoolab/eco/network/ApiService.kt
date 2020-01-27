@@ -3,6 +3,7 @@ package com.voodoolab.eco.network
 import androidx.lifecycle.LiveData
 import com.voodoolab.eco.models.CityModel
 import com.voodoolab.eco.responses.*
+import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.GenericApiResponse
 import retrofit2.Call
 import retrofit2.http.*
@@ -40,15 +41,9 @@ interface ApiService {
         @Header("Accept") accept: String,
         @Query("page") page: String,
         @Query("qty") qty: String,
-        @Query("types[]") params: List<String>?
-    ): Call<TransactionResponse>
-
-    @GET("api/user/operations")
-    fun getOperations(
-        @Header("Authorization") token: String,
-        @Header("Accept") accept: String,
-        @Query("page") page: String,
-        @Query("qty") qty: String
+        @Query("period_from") from: String?,
+        @Query("period_to") to: String?,
+        @Query("types[]") types: ArrayList<String>?
     ): Call<TransactionResponse>
 
     @GET("api/wash")

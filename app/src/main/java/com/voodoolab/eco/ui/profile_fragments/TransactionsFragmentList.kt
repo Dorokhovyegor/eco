@@ -17,16 +17,21 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.EmptyListInterface
 import com.voodoolab.eco.interfaces.ParamsTransactionChangeListener
+import com.voodoolab.eco.ui.view_models.SharedViewModel
 import com.voodoolab.eco.ui.view_models.TransactionsViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.fadeOutAnimation
 
-class TransactionsFragmentList : Fragment(), EmptyListInterface, ParamsTransactionChangeListener {
+class TransactionsFragmentList : Fragment(), EmptyListInterface {
 
     lateinit var transactionViewModel: TransactionsViewModel
+    lateinit var sharedViewModel: SharedViewModel
+
     private val myAdapter = TransactionsRecyclerViewAdapter()
     private var list: RecyclerView? = null
     private var fakeContainer: LinearLayout? = null
+
+    lateinit var token: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,23 +42,35 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface, ParamsTransacti
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        token = Hawk.get<String>(Constants.TOKEN)
         fakeContainer = view.findViewById(R.id.fake_items)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         transactionViewModel = ViewModelProvider(this).get(TransactionsViewModel::class.java)
-        val token = Hawk.get<String>(Constants.TOKEN)
-        transactionViewModel.updateParamsAndInitRequest(token, this, null)
-        subscribeObservers()
+        parentFragment?.let {
+            sharedViewModel = ViewModelProvider(it).get(SharedViewModel::class.java)
+        }
+        transactionViewModel.replaceSubscription(this, null, token, this)
+        startListeningPagedList()
+        startMagicWithPaginLibrary()
     }
 
-    private fun subscribeObservers() {
+
+    private fun startListeningPagedList() {
         transactionViewModel.transactionsPagedList?.observe(viewLifecycleOwner, Observer {
             list = view?.findViewById(R.id.transactionsRecyclerView)
             list?.layoutManager = LinearLayoutManager(context)
             list?.adapter = myAdapter
             myAdapter.submitList(it)
+        })
+    }
+
+    private fun startMagicWithPaginLibrary() {
+        sharedViewModel.getParams().observe(viewLifecycleOwner, Observer { map ->
+            transactionViewModel.replaceSubscription(this, map, token, this)
+            startListeningPagedList()
         })
     }
 
@@ -64,13 +81,8 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface, ParamsTransacti
     }
 
     override fun firstItemLoaded() {
+        view?.findViewById<TextView>(R.id.emptyTextView)?.visibility = View.INVISIBLE
+        view?.findViewById<ImageView>(R.id.emptyImageView)?.visibility = View.INVISIBLE
         fakeContainer?.fadeOutAnimation()
-    }
-
-    override fun onParamsChanged() {
-        // todo reload data with params
-        val token = Hawk.get<String>(Constants.TOKEN)
-        transactionViewModel.updateParamsAndInitRequest(token, this, null)
-        println("DEBUG: i am here, you are very clever my boy")
     }
 }

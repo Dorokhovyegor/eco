@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.asynclayoutinflater.view.AsyncLayoutInflater
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import com.archit.calendardaterangepicker.customviews.DateRangeCalendarView
 import com.google.android.material.chip.Chip
 import com.voodoolab.eco.R
@@ -36,7 +37,6 @@ class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFi
     companion object {
         val TAG = "filter"
     }
-
 
     var paramChangeListener: ParamsTransactionChangeListener? = null
 
@@ -85,7 +85,6 @@ class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFi
     override fun onInflateFinished(view: View, resid: Int, parent: ViewGroup?) {
         getView()?.findViewById<NestedScrollView>(R.id.scroll)?.addView(view)
         initViews(view)
-        setContent()
         initListeners()
         view.fadeInAnimation()
     }
@@ -109,39 +108,55 @@ class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFi
         replenishOnlineChip = view.findViewById(R.id.chip_replenish_online)
         replenishOfflineChip = view.findViewById(R.id.chip_replenish_offline)
         dropButton = view.findViewById(R.id.drop_button)
+        setContent()
     }
 
     private fun setContent() {
-        val setting = context?.getSharedPreferences(Constants.FILTER_SETTING, Context.MODE_PRIVATE)
-        setting?.let {
-            cashbackChip.isChecked = it.getBoolean(FILTER_CASHBACK, false)
-            monthBonusChip.isChecked = it.getBoolean(FILTER_MONTHBONUS, false)
-            wasteChip.isChecked = it.getBoolean(FILTER_WASTE, false)
-            replenishOfflineChip.isChecked = it.getBoolean(FILTER_REPLENISH_OFFLINE, false)
-            replenishOnlineChip.isChecked = it.getBoolean(FILTER_REPLENISH_ONLINE, false)
-            allTimeChip.isChecked = it.getBoolean(FILTER_ALL_TIME, false)
-
-            if (allTimeChip.isChecked) {
-                calendar.resetAllSelectedViews()
-            } else {
-                val startDay = it.getString(FILTER_PERIOD_FROM, "")?.toCalendar()
-                val endDay = it.getString(FILTER_PERIOD_TO, "")?.toCalendar()
-
-                if (endDay != null && startDay != null) {
-                    if (endDay.before(startDay)) {
-                        calendar.setSelectedDateRange(startDay, startDay)
-                    } else {
-                        calendar.setSelectedDateRange(startDay, endDay)
+        sharedViewModel.getParams()
+            .observe(viewLifecycleOwner, androidx.lifecycle.Observer { filterMap ->
+                filterMap?.let {
+                    if (it.containsKey(FILTER_CASHBACK)) {
+                        cashbackChip.isChecked = it[FILTER_CASHBACK] as Boolean
                     }
-                } else {
-                    allTimeChip.isChecked = true
-                    calendar.resetAllSelectedViews()
+
+                    if (it.containsKey(FILTER_MONTHBONUS)) {
+                        monthBonusChip.isChecked = it[FILTER_MONTHBONUS] as Boolean
+                    }
+
+                    if (it.containsKey(FILTER_WASTE)) {
+                        wasteChip.isChecked = it[FILTER_WASTE] as Boolean
+                    }
+
+                    if (it.containsKey(FILTER_REPLENISH_ONLINE)) {
+                        replenishOnlineChip.isChecked = it[FILTER_REPLENISH_ONLINE] as Boolean
+                    }
+
+                    if (it.containsKey(FILTER_REPLENISH_OFFLINE)) {
+                        replenishOfflineChip.isChecked = it[FILTER_REPLENISH_OFFLINE] as Boolean
+                    }
+
+                    var startSelectionDate: Calendar? = null
+                    var endSelectionDate: Calendar? = null
+
+                    if (it.containsKey(FILTER_PERIOD_FROM)) {
+                        startSelectionDate = (it[FILTER_PERIOD_FROM] as String?)?.toCalendar()
+                    }
+
+                    if (it.containsKey(FILTER_PERIOD_TO)) {
+                        endSelectionDate = (it[FILTER_PERIOD_TO] as String?)?.toCalendar()
+                    }
+
+                    if (startSelectionDate != null || endSelectionDate != null) {
+                        allTimeChip.isChecked = false
+                    }
+
+                    calendar.setSelectedDateRange(startSelectionDate, endSelectionDate)
                 }
-            }
-        }
+            })
     }
 
     private fun initListeners() {
+        // собираем данные со всех элементов и кладем их в мапу по ключам
         toolBar?.setOnMenuItemClickListener { item ->
             var start: String? = null
             var end: String? = null
@@ -162,25 +177,42 @@ class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFi
                 FILTER_WASTE to wasteChip.isChecked,
                 FILTER_REPLENISH_ONLINE to replenishOnlineChip.isChecked,
                 FILTER_REPLENISH_OFFLINE to replenishOfflineChip.isChecked,
-                FILTER_ALL_TIME to allTimeChip.isChecked,
                 FILTER_PERIOD_FROM to start,
                 FILTER_PERIOD_TO to end
             )
             sharedViewModel.setParams(map)
+            //todo включить иконку
+            paramChangeListener?.onParamsChanged(true)
             dismiss()
             return@setOnMenuItemClickListener true
         }
 
         dropButton.setOnClickListener {
-            sharedViewModel.setParams(null)
+            sharedViewModel.setParams(
+                mapOf(
+                    FILTER_CASHBACK to false,
+                    FILTER_MONTHBONUS to false,
+                    FILTER_WASTE to false,
+                    FILTER_REPLENISH_ONLINE to false,
+                    FILTER_REPLENISH_OFFLINE to false
+                )
+            )
+            //todo выключить иконку
+            paramChangeListener?.onParamsChanged(false)
             dismiss()
         }
 
         allTimeChip.setOnCheckedChangeListener { view, isChecked ->
             if (isChecked) {
                 calendar.resetAllSelectedViews()
-                // alltime = true
-                // todo https://www.youtube.com/watch?v=ACK67xU1Y3s
+                val map: Map<String, Any?> = mapOf(
+                    FILTER_CASHBACK to cashbackChip.isChecked,
+                    FILTER_MONTHBONUS to monthBonusChip.isChecked,
+                    FILTER_WASTE to wasteChip.isChecked,
+                    FILTER_REPLENISH_ONLINE to replenishOnlineChip.isChecked,
+                    FILTER_REPLENISH_OFFLINE to replenishOfflineChip.isChecked
+                )
+                sharedViewModel.setParams(map)
             }
         }
 
@@ -195,6 +227,7 @@ class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFi
         })
     }
 
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (parentFragment is ParamsTransactionChangeListener) {
@@ -202,8 +235,16 @@ class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFi
         }
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        parentFragment?.let {
+            sharedViewModel = ViewModelProvider(it).get(SharedViewModel::class.java)
+        }
+    }
+
     override fun onDetach() {
         super.onDetach()
+        sharedViewModel.getParams().removeObservers(this)
         paramChangeListener = null
     }
 }

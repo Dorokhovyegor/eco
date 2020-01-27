@@ -162,7 +162,7 @@ class ProfileFragment : Fragment(),
         filterButton = view.findViewById(R.id.filter_button)
 
         filterButton?.setOnClickListener {
-            
+
             filterDialogFragment = FilterFullScreenDialog()
             filterDialogFragment?.show(childFragmentManager, TAG)
         }
@@ -447,8 +447,12 @@ class ProfileFragment : Fragment(),
         return true
     }
 
-    override fun onParamsChanged() {
+    override fun onParamsChanged(visible: Boolean) {
+        if (visible) {
+            filterButton?.setImageDrawable(resources.getDrawable(R.drawable.ic_full_filter, null))
+        } else {
+            filterButton?.setImageDrawable(resources.getDrawable(R.drawable.ic_filter_empty, null))
+        }
 
-        //todo делай
     }
 }
