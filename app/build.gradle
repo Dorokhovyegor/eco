@@ -109,6 +109,7 @@ dependencies {
 
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
+    implementation "com.google.maps.android:android-maps-utils:0.5"
 }
 
 apply plugin: 'com.google.gms.google-services'

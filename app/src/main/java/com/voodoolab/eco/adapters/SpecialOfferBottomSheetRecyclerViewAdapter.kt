@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.voodoolab.eco.R
 import com.voodoolab.eco.models.SpecialOfferModel
 import kotlinx.android.synthetic.main.special_offer_bottom_sheet_item.view.*
@@ -45,10 +46,17 @@ class SpecialOfferBottomSheetRecyclerViewAdapter(
     inner class SpecialOfferLiteViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title = itemView.titleSpecialOffer
         val date = itemView.date
+        val image = itemView.image
+        val cardView = itemView.cardView
 
         fun bind(specialOfferModel: SpecialOfferModel) {
             title.text = specialOfferModel.title
             date.text = specialOfferModel.endTime
+            if (specialOfferModel.imageUrl == "") {
+                cardView.visibility = View.GONE
+            } else {
+                Glide.with(itemView).load(specialOfferModel.imageUrl).centerCrop().into(image)
+            }
         }
     }
 }

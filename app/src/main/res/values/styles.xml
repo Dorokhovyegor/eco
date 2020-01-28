@@ -35,4 +35,10 @@
         <item name="chipBackgroundColor">@drawable/chip_background_state_list</item>
     </style>
 
+    <style name="HappyHoursTextStyle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#FFF</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
 </resources>

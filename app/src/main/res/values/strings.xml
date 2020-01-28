@@ -34,6 +34,23 @@
     <string name="cashback_text">Кэшбэк</string>
     <string name="history_tab">История</string>
     <string name="cashback_tab">КЭШБЭК</string>
+    <string name="happy_hours_enable_time">
+           <![CDATA[
+         <font color=#E75300>Счастливые часы: %1$s — %2$s</font>
+        ]]>
+    </string>
+    <string name="happy_hours_disable_time">
+            <![CDATA[
+         <font color=#939393>Счастливые часы:</font><font color=#000> %1$s — %2$s</font>
+        ]]>
+    </string>
+
+    <string name="cashback_info">
+         <![CDATA[
+         <font color=#939393>Кэшбэк:</font><font color=#000> %1$d %%</font>
+        ]]>
+    </string>
+
     <string name="next_level_cachback">
         <![CDATA[
          До следующего уровня осталось потратить <b>%1$d₽</b>
@@ -61,4 +78,6 @@
     <string name="save">Сохранить</string>
     <string name="save_text">Сохранить</string>
     <string name="drop_filter">Сбросить</string>
+    <string name="special_offer_text">Акции:</string>
+    <string name="wash_title">Мойка</string>
 </resources>

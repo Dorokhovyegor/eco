@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
+import com.google.maps.android.ui.IconGenerator
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_fragments.ChooseCityFragment
@@ -94,7 +95,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
     }
 
-
     private fun setToolbarContent(view: View) {
         val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
         activity?.let {
@@ -110,7 +110,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 coord?.add(coordinates.split(",")[1].toDouble())
             }
         }
-
     }
 
     private fun subscribeObservers() {
@@ -128,21 +127,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         objectViewModel.viewStateListObject.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.listObjectResponse?.let { list ->
                 list.list?.let { markers ->
-                    if (markers.isNotEmpty()) {
-                        markers.forEach { markerResponse ->
-                            val bitmap =
-                                BitmapDescriptorFactory.fromResource(R.mipmap.marker_map_unselected)
-                            markerResponse.coordinates?.let { coordinatesString ->
-                                val markerOptions = MarkerOptions()
-                                    .position(LatLng(coordinatesString[0], coordinatesString[1]))
-                                    .icon(bitmap)
-                                    .title(markerResponse.address)
-                                    .draggable(false)
-                                val marker = map?.addMarker(markerOptions)
-                                marker?.tag = markerResponse.id
-                            }
-                        }
-                    }
+                    renderMarkers(markers)
                 }
             }
         })
@@ -165,6 +150,59 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         })
     }
 
+    private fun renderMarkers(list: List<ObjectResponse>) {
+        list.forEach { wash ->
+            val generator = IconGenerator(context)
+            wash.happyHoursInfo?.active?.let {
+                if (it) {
+                    generator.setBackground(context?.getDrawable(R.drawable.ic_happy_hours))
+                    val bitmap = BitmapDescriptorFactory.fromBitmap(
+                        generator.makeIcon()
+                    )
+
+                    wash.coordinates?.let { coordinatesString ->
+                        val markerOptions = MarkerOptions()
+                            .position(LatLng(coordinatesString[0], coordinatesString[1]))
+                            .icon(bitmap)
+                            .draggable(false)
+                        val marker = map?.addMarker(markerOptions)
+                        marker?.tag = wash.id
+                    }
+                } else {
+                    generator.setBackground(context?.getDrawable(R.drawable.ic_regular_hours))
+                    generator.setTextAppearance(R.style.HappyHoursTextStyle)
+                    val dp = resources.displayMetrics.density
+                    val paddingTop = (14 * dp).toInt()
+                    val paddingLeft: Int
+                    if (wash.cashback?.compareTo(9)!! > 0) {
+                        paddingLeft = (10 * dp).toInt()
+                    } else {
+                        paddingLeft = (13 * dp).toInt()
+                    }
+                    generator.setContentPadding(paddingLeft, paddingTop, 0, 0)
+                    val bitmap = BitmapDescriptorFactory.fromBitmap(
+                        generator.makeIcon(
+                            context?.getString(
+                                R.string.percent_value,
+                                wash.cashback
+                            )
+                        )
+                    )
+
+                    wash.coordinates?.let { coordinatesString ->
+                        val markerOptions = MarkerOptions()
+                            .position(LatLng(coordinatesString[0], coordinatesString[1]))
+                            .icon(bitmap)
+                            .draggable(false)
+                        val marker = map?.addMarker(markerOptions)
+                        marker?.tag = wash.id
+                    }
+                }
+            }
+        }
+    }
+
+
     private fun showToast(message: String?) {
         message?.let {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -186,12 +224,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private fun openBottomSheet(objectResponse: ObjectResponse) {
         childFragmentManager.run {
             val bundle = bundleOf(
-                "id" to objectResponse.id,
-                "city" to objectResponse.city,
-                "address" to objectResponse.address,
-                "seats" to objectResponse.seats,
-                "cashback" to objectResponse.cashback,
-                "special_offers" to objectResponse.stocks
+                "object_info" to objectResponse
             )
 
             val bottomSheetDialogFragment =
@@ -222,7 +255,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 map?.moveCamera(
                     CameraUpdateFactory.newLatLngZoom(LatLng(it[0], it[1]), 11f)
                 )
-
             }
         }
     }
