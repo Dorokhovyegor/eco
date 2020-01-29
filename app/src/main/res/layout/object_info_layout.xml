@@ -26,7 +26,6 @@
         android:layout_height="wrap_content"/>
 
     <include
-
         android:id="@+id/details_info"
         layout="@layout/regular_information_object_layout"/>
 

@@ -2,40 +2,28 @@ package com.voodoolab.eco.ui.tab_fragments
 
 import android.content.Context
 import android.content.DialogInterface
-import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
-import android.provider.SyncStateContract
-import android.view.*
-import android.widget.Button
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.maps.android.ui.IconGenerator
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.clustering.Cluster
+import com.google.maps.android.clustering.ClusterManager
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
-import com.voodoolab.eco.helper_fragments.ChooseCityFragment
 import com.voodoolab.eco.helper_fragments.ObjectInfoBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
 import com.voodoolab.eco.interfaces.DataStateListener
@@ -46,15 +34,17 @@ import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.states.object_state.ListObjectStateEvent
 import com.voodoolab.eco.states.object_state.ObjectStateEvent
 import com.voodoolab.eco.ui.MainActivity
+import com.voodoolab.eco.ui.map_ui.ClusterWash
+import com.voodoolab.eco.ui.map_ui.DefaultWashClusterRenderer
 import com.voodoolab.eco.utils.Constants
-import com.voodoolab.eco.utils.convertFromStringToLatLng
 import com.voodoolab.eco.utils.show
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
-import java.nio.BufferUnderflowException
 
 
-class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
-    DataStateListener, DialogInterface.OnClickListener {
+class MapFragment : Fragment(), OnMapReadyCallback,
+    DataStateListener, DialogInterface.OnClickListener,
+    ClusterManager.OnClusterClickListener<ClusterWash>,
+    ClusterManager.OnClusterItemClickListener<ClusterWash> {
 
     lateinit var objectViewModel: ObjectInfoViewModel
     var stateHandler: DataStateListener = this
@@ -65,6 +55,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private var progressBar: MaterialProgressBar? = null
     private var optionsButton: ImageButton? = null
     private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
+
+    private var clusterManager: ClusterManager<ClusterWash>? = null
 
     private var coord: ArrayList<Double>? = null
 
@@ -151,55 +143,45 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     private fun renderMarkers(list: List<ObjectResponse>) {
-        list.forEach { wash ->
-            val generator = IconGenerator(context)
-            wash.happyHoursInfo?.active?.let {
-                if (it) {
-                    generator.setBackground(context?.getDrawable(R.drawable.ic_happy_hours))
-                    val bitmap = BitmapDescriptorFactory.fromBitmap(
-                        generator.makeIcon()
-                    )
+        clusterManager = ClusterManager(context, map)
+        clusterManager?.renderer =
+            DefaultWashClusterRenderer(context, map, clusterManager)
+        map?.setOnCameraIdleListener(clusterManager)
+        map?.setOnMarkerClickListener(clusterManager)
+        clusterManager?.setOnClusterClickListener(this)
+        clusterManager?.setOnClusterItemClickListener(this)
 
-                    wash.coordinates?.let { coordinatesString ->
-                        val markerOptions = MarkerOptions()
-                            .position(LatLng(coordinatesString[0], coordinatesString[1]))
-                            .icon(bitmap)
-                            .draggable(false)
-                        val marker = map?.addMarker(markerOptions)
-                        marker?.tag = wash.id
-                    }
-                } else {
-                    generator.setBackground(context?.getDrawable(R.drawable.ic_regular_hours))
-                    generator.setTextAppearance(R.style.HappyHoursTextStyle)
-                    val dp = resources.displayMetrics.density
-                    val paddingTop = (14 * dp).toInt()
-                    val paddingLeft: Int
-                    if (wash.cashback?.compareTo(9)!! > 0) {
-                        paddingLeft = (10 * dp).toInt()
-                    } else {
-                        paddingLeft = (13 * dp).toInt()
-                    }
-                    generator.setContentPadding(paddingLeft, paddingTop, 0, 0)
-                    val bitmap = BitmapDescriptorFactory.fromBitmap(
-                        generator.makeIcon(
-                            context?.getString(
-                                R.string.percent_value,
-                                wash.cashback
+        list.forEach { wash ->
+            println("DEBUGMAP: ${wash.coordinates} ${wash.address}")
+            val iconHappy = R.drawable.ic_happy_hours
+            val iconUnhappy = R.drawable.ic_regular_hours
+            if (wash.coordinates != null) {
+                wash.happyHoursInfo?.active?.let {
+                    if (it) {
+                        clusterManager?.addItem(
+                            ClusterWash(
+                                wash.id,
+                                LatLng(wash.coordinates[0], wash.coordinates[1]),
+                                wash.cashback,
+                                wash.happyHoursInfo.active,
+                                iconHappy
                             )
                         )
-                    )
-
-                    wash.coordinates?.let { coordinatesString ->
-                        val markerOptions = MarkerOptions()
-                            .position(LatLng(coordinatesString[0], coordinatesString[1]))
-                            .icon(bitmap)
-                            .draggable(false)
-                        val marker = map?.addMarker(markerOptions)
-                        marker?.tag = wash.id
+                    } else {
+                        clusterManager?.addItem(
+                            ClusterWash(
+                                wash.id,
+                                LatLng(wash.coordinates[0], wash.coordinates[1]),
+                                wash.cashback,
+                                wash.happyHoursInfo.active,
+                                iconUnhappy
+                            )
+                        )
                     }
                 }
             }
         }
+        clusterManager?.cluster()
     }
 
 
@@ -233,7 +215,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 }
             val fragment = childFragmentManager.findFragmentByTag("objectInfoFragment")
             if (fragment == null) {
-                bottomSheetDialogFragment.show(this, "objectInfoFragment")
+                bottomSheetDialogFragment.show(childFragmentManager, "objectInfoFragment")
             }
         }
     }
@@ -242,14 +224,31 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         discountClickListener?.onDiscountClick(model.id)
     }
 
-    override fun onMarkerClick(p0: Marker?): Boolean {
-        showObject(p0?.tag.toString())
-        return false
+    override fun onClusterClick(p0: Cluster<ClusterWash>?): Boolean {
+        val builder = LatLngBounds.builder()
+        p0?.items?.let { items ->
+            for (item in items) {
+                builder.include(item.location)
+            }
+            val bounds = builder.build()
+            try {
+                map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 300))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        return true
     }
+
+    override fun onClusterItemClick(p0: ClusterWash?): Boolean {
+        showObject(p0?.id.toString())
+        map?.animateCamera(CameraUpdateFactory.newLatLngZoom(p0?.location, 15f))
+        return true
+    }
+
 
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
-        map?.setOnMarkerClickListener(this)
         coord?.let {
             if (it.size == 2) {
                 map?.moveCamera(
