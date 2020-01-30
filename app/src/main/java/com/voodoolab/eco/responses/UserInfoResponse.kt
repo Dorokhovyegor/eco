@@ -9,5 +9,4 @@ data class UserInfoResponse(
     @SerializedName("status") val status: String?,
     @SerializedName("data") val data: UserInfo?,
     @SerializedName("month_cash_back") val month_cash_back: List<LevelCashBack>?
-
 )

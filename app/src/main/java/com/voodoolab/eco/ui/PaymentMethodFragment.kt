@@ -9,22 +9,23 @@ import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import com.google.android.material.textfield.TextInputEditText
 import com.voodoolab.eco.R
 
 class PaymentMethodFragment : Fragment() {
 
-    private var price: EditText? = null
+    private var price: TextInputEditText? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.payment_method_layout, container, false)
+        return inflater.inflate(R.layout.payment_method_layout, null)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        price = view.findViewById(R.id.price_input)
+        price = view.findViewById(R.id.money)
         val goToWebViewButton = view.findViewById<Button>(R.id.web_button)
         goToWebViewButton?.setOnClickListener {
             activity?.let {
@@ -38,5 +39,7 @@ class PaymentMethodFragment : Fragment() {
                 }
             }
         }
+
+        price?.requestFocus()
     }
 }

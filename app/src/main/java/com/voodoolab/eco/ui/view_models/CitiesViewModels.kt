@@ -24,7 +24,6 @@ class CitiesViewModels : ViewModel() {
     val dataState: LiveData<DataState<CitiesViewState>> = Transformations
         .switchMap(_citiesStateEvent) {stateEvent->
             stateEvent?.let {
-                // todo handle this event
                 handleStateEvent(it)
             }
         }
@@ -40,10 +39,9 @@ class CitiesViewModels : ViewModel() {
         }
     }
 
-    fun updateCityResonse(citiesResponse: CitiesResponse?, updateCityResponse: UpdateCityResponse?) {
+    fun setCitiesResponse(citiesResponse: CitiesResponse?) {
         val update = getCurrentViewStateOrNew()
         update.citiesResponse = citiesResponse
-        update.updateCityResponse = updateCityResponse
         _citiesViewState.value = update
     }
 

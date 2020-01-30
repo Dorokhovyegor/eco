@@ -13,7 +13,7 @@
     <string name="money_value">%1$d ₽</string>
     <string name="balance_value">
           <![CDATA[
-        %1$s.<font color=#7B7B7B>%2$s ₽</font>
+        %1$s<font color=#7B7B7B> ₽</font>
         ]]>
     </string>
     <string name="percent_value"> %1$d %%</string>
@@ -80,4 +80,8 @@
     <string name="drop_filter">Сбросить</string>
     <string name="special_offer_text">Акции:</string>
     <string name="wash_title">Мойка</string>
+    <string name="balance">Баланс</string>
+    <string name="input_value_and_choose_payment_method">Введите сумму и выберите способ оплаты</string>
+    <string name="input_value">Введите сумму оплаты</string>
+    <string name="card_method">Картой</string>
 </resources>

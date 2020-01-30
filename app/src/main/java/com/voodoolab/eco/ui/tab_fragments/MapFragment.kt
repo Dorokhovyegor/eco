@@ -87,11 +87,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     }
 
+    // fixme это какая-то жуть
     private fun setToolbarContent(view: View) {
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
         activity?.let {
             val pref = it.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-            val city = pref.getString(Constants.CITY_ECO, null)
             var coordinates = pref.getString(Constants.CITY_COORDINATES, null)
 
             if (coordinates != null) {
@@ -152,7 +151,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         clusterManager?.setOnClusterItemClickListener(this)
 
         list.forEach { wash ->
-            println("DEBUGMAP: ${wash.coordinates} ${wash.address}")
             val iconHappy = R.drawable.ic_happy_hours
             val iconUnhappy = R.drawable.ic_regular_hours
             if (wash.coordinates != null) {

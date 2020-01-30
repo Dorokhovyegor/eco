@@ -1,6 +1,5 @@
 package com.voodoolab.eco.ui.tab_fragments
 
-import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Html
@@ -12,13 +11,10 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
-import androidx.core.view.children
-import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
@@ -32,7 +28,6 @@ import com.voodoolab.eco.models.ClearUserModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.CitiesResponse
 import com.voodoolab.eco.states.cities_state.CitiesStateEvent
-import com.voodoolab.eco.states.cities_state.CitiesViewState
 import com.voodoolab.eco.states.logout_state.LogoutStateEvent
 import com.voodoolab.eco.states.user_state.UserStateEvent
 import com.voodoolab.eco.ui.MainActivity
@@ -73,9 +68,6 @@ class ProfileFragment : Fragment(),
     private var tabLayout: TabLayout? = null
     private var filterButton: ImageButton? = null
 
-    // temp var
-    private var lastUpdateCityLocal: String? = null
-    private var lastUpdateCoordinates: String? = null
     private var clearInfoUserModel: ClearUserModel? = null
 
     // dialogs
@@ -133,12 +125,6 @@ class ProfileFragment : Fragment(),
         val token = Hawk.get<String>(Constants.TOKEN)
         token?.let {
             userViewModel.setStateEvent(UserStateEvent.RequestUserInfo(token))
-            val pref = activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-            val city = pref?.getString(Constants.CITY_ECO, null)
-
-            if (city == null) {
-                citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
-            }
 
         } ?: activity?.findNavController(R.id.frame_container)?.navigate(
             R.id.action_containerFragment_to_auth_destination,
@@ -162,19 +148,12 @@ class ProfileFragment : Fragment(),
         filterButton = view.findViewById(R.id.filter_button)
 
         filterButton?.setOnClickListener {
-
             filterDialogFragment = FilterFullScreenDialog()
             filterDialogFragment?.show(childFragmentManager, TAG)
         }
 
-        titleTextView?.setOnClickListener {
-            val token: String = Hawk.get(Constants.TOKEN)
-            userViewModel.setStateEvent(
-                UserStateEvent.SetNewNameEvent(
-                    name = "Вася",
-                    token = token
-                )
-            )
+        topUpBalance?.setOnClickListener {
+            activity?.findNavController(R.id.frame_container)?.navigate(R.id.payment_destination, null)
         }
 
         optionButton?.setOnClickListener {
@@ -186,30 +165,19 @@ class ProfileFragment : Fragment(),
         }
     }
 
-
     private fun subscribeObservers() {
         citiesViewModel.dataState.observe(viewLifecycleOwner, Observer {
             dataStateHandler.onDataStateChange(it)
             it.data?.let { citiesViewState ->
                 citiesViewState.getContentIfNotHandled()?.let {
-                    citiesViewModel.updateCityResonse(it.citiesResponse, it.updateCityResponse)
+                    citiesViewModel.setCitiesResponse(it.citiesResponse)
                 }
             }
         })
 
         citiesViewModel.viewState.observe(viewLifecycleOwner, Observer {
             it.citiesResponse?.let { cities ->
-                showChooseCityDialogs(cities)
-            }
-
-            it.updateCityResponse?.let {
-                if (lastUpdateCityLocal != null && lastUpdateCoordinates != null) {
-                    val pref =
-                        activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-                    pref?.edit()?.putString(Constants.CITY_ECO, lastUpdateCityLocal)
-                        ?.putString(Constants.CITY_COORDINATES, lastUpdateCoordinates)?.apply()
-                }
-                showToast("Изменения сохранены")
+                showChooseCityDialogs(cities, clearInfoUserModel?.city)
             }
         })
 
@@ -224,6 +192,9 @@ class ProfileFragment : Fragment(),
 
         userViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState?.userResponse?.let {
+                if (it.city == null)
+                    citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
+
                 updateContent(it)
                 clearInfoUserModel = it
             }
@@ -256,23 +227,15 @@ class ProfileFragment : Fragment(),
         if (data != null) {
             view?.findViewById<TextView>(R.id.balance)?.visibility = View.VISIBLE
             view?.findViewById<TextView>(R.id.cash)?.visibility = View.VISIBLE
-
-            titleTextView?.text = data.name
             view?.findViewById<TextView>(R.id.money_second)?.text = Html.fromHtml(
                 getString(
                     R.string.balance_value,
-                    data.balance_rub.toString(),
-                    data.balance_kop
+                    data.balance_rub.toString()
                 )
                 , 0
             )
             balanceTextView?.text = Html.fromHtml(
-                getString(
-                    R.string.balance_value,
-                    data.balance_rub.toString(),
-                    data.balance_kop
-                )
-                , 0
+                getString(R.string.balance_value, data.balance_rub.toString()), 0
             )
 
             if (data.indicatorPosition != null && data.indicatorPosition != -1) {
@@ -345,21 +308,16 @@ class ProfileFragment : Fragment(),
         }
     }
 
-    private fun findCurrentPositionOrZero(list: ArrayList<String>): Int {
-        val pref = activity?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-        val currentCity = pref?.getString(Constants.CITY_ECO, "-1")
-        if (currentCity == "-1") {
-            return 0
-        }
+    private fun findCurrentPositionOrZero(list: ArrayList<String>, city: String?): Int {
         list.withIndex().forEach {
-            if (currentCity == it.value) {
+            if (city == it.value) {
                 return it.index
             }
         }
         return 0
     }
 
-    private fun showChooseCityDialogs(citiesResponse: CitiesResponse) {
+    private fun showChooseCityDialogs(citiesResponse: CitiesResponse, currentString: String?) {
         val citiesArrayList = ArrayList<String>()
         val citiesCoordinates = ArrayList<String>()
 
@@ -373,7 +331,7 @@ class ProfileFragment : Fragment(),
             .setTitle(getString(R.string.choose_city))
             .setSingleChoiceItems(
                 citiesArrayList.toList().toTypedArray(),
-                findCurrentPositionOrZero(citiesArrayList)
+                findCurrentPositionOrZero(citiesArrayList, currentString)
             ) { _, which ->
                 if (which >= 0) {
                     positionCity = which
@@ -384,13 +342,10 @@ class ProfileFragment : Fragment(),
                     positionCity?.let {
                         userViewModel.setStateEvent(
                             UserStateEvent.SetCityEvent(
-                                "Bearer ${Hawk.get<String>(
-                                    Constants.TOKEN
-                                )}", citiesArrayList[it]
+                                Hawk.get<String>(Constants.TOKEN),
+                                citiesArrayList[it]
                             )
                         )
-                        lastUpdateCityLocal = citiesArrayList[it]
-                        lastUpdateCoordinates = citiesCoordinates[it]
                     }
                 }
             }
@@ -416,15 +371,15 @@ class ProfileFragment : Fragment(),
     private fun showExitDialog() {
         context?.let {
             val builder = AlertDialog.Builder(it)
-            builder.setTitle("Выход")
-            builder.setMessage("Вы действительно хотите выйти из приложения?")
-            builder.setPositiveButton("Да") { v, d ->
+            builder.setTitle("Хотите выйти из аккаунта?")
+            builder.setMessage("После выхода вам не будут приходить PUSH-уведомления.")
+            builder.setPositiveButton("Выйти") { _, _ ->
                 view?.let {
                     logoutViewModel.setStateEvent(LogoutStateEvent.LogoutEvent(Hawk.get(Constants.TOKEN)))
                     Hawk.deleteAll()
                 }
             }
-            builder.setNegativeButton("Нет") { v, d ->
+            builder.setNegativeButton("Отменить") { v, _ ->
                 v.dismiss()
             }
             builder.show()

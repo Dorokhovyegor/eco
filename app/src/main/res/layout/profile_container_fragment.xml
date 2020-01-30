@@ -11,7 +11,6 @@
         android:layout_height="wrap_content"
         android:background="@drawable/collapse_toolbar_gradient"
         app:elevation="0dp">
-
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarLayout"
             android:layout_width="match_parent"
@@ -29,6 +28,7 @@
                 app:layout_collapseMode="parallax">
 
                 <ImageView
+                    app:layout_constraintTop_toTopOf="parent"
                     android:layout_width="match_parent"
                     android:layout_height="228dp"
                     android:layout_margin="1dp"
@@ -90,7 +90,6 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -125,12 +124,13 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="2dp"
                 android:maxLength="25"
+                android:text="@string/balance"
+                android:textStyle="bold"
                 android:textColor="#939393"
                 android:textSize="20sp"
                 app:layout_collapseMode="pin" />
 
             <TextView
-
                 android:id="@+id/money_second"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -144,7 +144,6 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
-
     <me.zhanghai.android.materialprogressbar.MaterialProgressBar
         android:id="@+id/progress_bar"
         style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
@@ -165,7 +164,6 @@
         android:layout_height="600dp"
         app:layout_anchor="@id/appBar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="200dp"

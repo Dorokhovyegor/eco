@@ -2,19 +2,17 @@ package com.voodoolab.eco.repositories
 
 import androidx.lifecycle.LiveData
 import com.voodoolab.eco.models.ClearUserModel
-
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.network.NetworkBoundResource
 import com.voodoolab.eco.network.RetrofitBuilder
 import com.voodoolab.eco.responses.CitiesResponse
-import com.voodoolab.eco.responses.UpdateCityResponse
 import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.states.cities_state.CitiesViewState
 import com.voodoolab.eco.states.user_state.UserViewState
 import com.voodoolab.eco.utils.ApiSuccessResponse
 import com.voodoolab.eco.utils.GenericApiResponse
 
-object CitiesRepo{
+object CitiesRepo {
 
     fun requestListCities(): LiveData<DataState<CitiesViewState>> {
         return object : NetworkBoundResource<CitiesResponse, CitiesViewState>() {
@@ -27,7 +25,7 @@ object CitiesRepo{
             }
 
             override fun createCall(): LiveData<GenericApiResponse<CitiesResponse>> {
-                return RetrofitBuilder.apiService.getAllCities( "application/json")
+                return RetrofitBuilder.apiService.getAllCities("application/json")
             }
         }.asLiveData()
     }
@@ -37,28 +35,57 @@ object CitiesRepo{
             override fun handleApiSuccessResponse(response: ApiSuccessResponse<UserInfoResponse>) {
                 result.value = DataState.data(
                     data = UserViewState(
-                        userResponse  = convertDataFromRawDataToPresentData(response.body)
+                        userResponse = convertDataWithoutCashBackInfo(response.body)
                     )
                 )
             }
+
             override fun createCall(): LiveData<GenericApiResponse<UserInfoResponse>> {
-                return RetrofitBuilder.apiService.setCity(token, city)
+                return RetrofitBuilder.apiService.setCity("Bearer ${token}", city)
             }
         }.asLiveData()
     }
 
+    private fun convertDataWithoutCashBackInfo(userResponse: UserInfoResponse?): ClearUserModel? {
+        println("DEBUG Юзер ответ ${userResponse.toString()}")
+        userResponse?.let { rawResponse ->
+            println(
+                "DEBUG Юзер модель ${ClearUserModel(
+                    rawResponse.data?.balance?.div(100),
+                    rawResponse.data?.name,
+                    rawResponse.data?.city,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                )}"
+            )
+            return ClearUserModel(
+                rawResponse.data?.balance?.div(100),
+                rawResponse.data?.name,
+                userResponse.data?.city,
+                null,
+                null,
+                null,
+                null,
+                null
+            )
 
-    // fixme это надо внедрить в NetworkBoundResource
+        }
+        return null
+    }
+
     private fun convertDataFromRawDataToPresentData(userResponse: UserInfoResponse?): ClearUserModel? {
-        userResponse?.let {rawResponse ->
+        userResponse?.let { rawResponse ->
             val moneyValues = ArrayList<Int>()
             val percentValues = ArrayList<Int>()
             rawResponse.month_cash_back?.forEach {
-                it.value?.let {money ->
+                it.value?.let { money ->
                     moneyValues.add(money.div(100))
                 }
 
-                it.percent?.let {percent ->
+                it.percent?.let { percent ->
                     percentValues.add(percent)
                 }
             }
@@ -98,7 +125,7 @@ object CitiesRepo{
 
             var currentSection = -1
 
-            rawResponse.data?.month_balance?.let { month_spend ->
+            rawResponse.data?.month_spent?.let { month_spend ->
                 currentSection = when (month_spend.div(100)) {
                     in rangeList[0] -> {
                         -1
@@ -122,10 +149,10 @@ object CitiesRepo{
             }
 
             when (currentSection) {
-                -1 ->  currentProgress = 0f // мы не вышли даже на вервую секцию
-                4 ->  currentProgress = 100f // выше последней секции
+                -1 -> currentProgress = 0f // мы не вышли даже на вервую секцию
+                4 -> currentProgress = 100f // выше последней секции
                 else -> {
-                    val p = rawResponse.data?.month_balance?.div(100)
+                    val p = rawResponse.data?.month_spent?.div(100)
                     val firstRange = rangeList[currentSection + 1].first
                     val endRange = rangeList[currentSection + 1].last
 
@@ -154,13 +181,16 @@ object CitiesRepo{
                 }
             }
 
-            val remainValue: Int?= if (currentSection == 4) {
+            val remainValue: Int? = if (currentSection == 4) {
                 -1
             } else {
-                moneyValues[currentSection + 1].minus(rawResponse.data?.month_balance?.div(100)!!)
+                moneyValues[currentSection + 1].minus(rawResponse.data?.month_spent?.div(100)!!)
             }
 
-            val kop = if(rawResponse.data?.balance?.rem(100).toString().length == 2) rawResponse.data?.balance?.rem(100).toString() else "0${rawResponse.data?.balance?.rem(100)}"
+            val kop =
+                if (rawResponse.data?.balance?.rem(100).toString().length == 2) rawResponse.data?.balance?.rem(
+                    100
+                ).toString() else "0${rawResponse.data?.balance?.rem(100)}"
 
             return ClearUserModel(
                 rawResponse.data?.balance?.div(100),

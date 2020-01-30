@@ -31,22 +31,6 @@ object UserRepo {
         }.asLiveData()
     }
 
-    fun updateUserName(token: String, name: String): LiveData<DataState<UserViewState>> {
-        return object : NetworkBoundResource<UserInfoResponse, UserViewState>() {
-            override fun handleApiSuccessResponse(response: ApiSuccessResponse<UserInfoResponse>) {
-                result.value = DataState.data(
-                    data = UserViewState(
-                        userResponse = convertDataFromRawDataToPresentData(response.body)
-                    )
-                )
-            }
-
-            override fun createCall(): LiveData<GenericApiResponse<UserInfoResponse>> {
-                return RetrofitBuilder.apiService.setNewName("Bearer $token", name)
-            }
-        }.asLiveData()
-    }
-
     fun logout(token: String): LiveData<DataState<LogoutViewState>> {
         return object : NetworkBoundResource<LogoutResponse, LogoutViewState>() {
             override fun handleApiSuccessResponse(response: ApiSuccessResponse<LogoutResponse>) {
@@ -112,7 +96,7 @@ object UserRepo {
 
             var currentSection = -1
 
-            rawResponse.data?.month_balance?.let { month_spend ->
+            rawResponse.data?.month_spent?.let { month_spend ->
                 currentSection = when (month_spend.div(100)) {
                     in rangeList[0] -> {
                         -1
@@ -139,7 +123,7 @@ object UserRepo {
                 -1 -> currentProgress = 0f // мы не вышли даже на вервую секцию
                 4 -> currentProgress = 100f // выше последней секции
                 else -> {
-                    val p = rawResponse.data?.month_balance?.div(100)
+                    val p = rawResponse.data?.month_spent?.div(100)
                     val firstRange = rangeList[currentSection + 1].first
                     val endRange = rangeList[currentSection + 1].last
 
@@ -171,7 +155,7 @@ object UserRepo {
             val remainValue: Int? = if (currentSection == 4) {
                 -1
             } else {
-                moneyValues[currentSection + 1].minus(rawResponse.data?.month_balance?.div(100)!!)
+                moneyValues[currentSection + 1].minus(rawResponse.data?.month_spent?.div(100)!!)
             }
 
             val kop =

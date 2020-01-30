@@ -35,14 +35,8 @@ class UserInfoViewModel : ViewModel() {
             is UserStateEvent.RequestUserInfo -> {
                 UserRepo.getUserInfo(stateEvent.token)
             }
-            is UserStateEvent.SetNewNameEvent -> {
-                UserRepo.updateUserName(stateEvent.token, stateEvent.name)
-            }
             is UserStateEvent.SetCityEvent -> {
                 CitiesRepo.setCity(stateEvent.token, stateEvent.cityName)
-            }
-            is UserStateEvent.None -> {
-                AbsentLiveData.create()
             }
         }
     }

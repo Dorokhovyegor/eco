@@ -28,13 +28,6 @@ interface ApiService {
         @Header("Accept") accept: String
     ): LiveData<GenericApiResponse<UserInfoResponse>>
 
-    @Multipart
-    @POST("api/user/set-name")
-    fun setNewName(
-        @Header("Authorization") token: String,
-        @Part("name") name: String
-    ): LiveData<GenericApiResponse<UserInfoResponse>>
-
     @GET("api/user/operations")
     fun getOperations(
         @Header("Authorization") token: String,
@@ -65,7 +58,7 @@ interface ApiService {
     ): LiveData<GenericApiResponse<CitiesResponse>>
 
     @Multipart
-    @POST("api/user/set-city")
+    @POST("api/v1/users/set-city")
     fun setCity(
         @Header("Authorization") tokenApp: String,
         @Part("city") city: String?
