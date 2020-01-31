@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -39,6 +40,7 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
     private var progressBar: MaterialProgressBar? = null
     private var washRecyclerView: RecyclerView? = null
     private var cardView: CardView? = null
+    private var toolbar: Toolbar? = null
 
     private var adapterRecyclerView: WashAdapterRecyclerView? = null
     private var discountId: Int? = null
@@ -62,9 +64,13 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
         bodyTextView = view.findViewById(R.id.bodyTextView)
         imageStock = view.findViewById(R.id.discountImageView)
         progressBar = view.findViewById(R.id.progress_bar)
-        cardView  =view.findViewById(R.id.cardView)
+        cardView = view.findViewById(R.id.cardView)
+        toolbar = view.findViewById(R.id.toolbar)
 
-
+        toolbar?.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
+        }
+        
         washRecyclerView = view.findViewById(
             R.id.washRecyclerView
         )

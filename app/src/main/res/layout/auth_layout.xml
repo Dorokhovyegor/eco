@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/white">
 
     <ImageView
-        android:id="@+id/image_view"
+        android:id="@+id/imageTop"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#C2505555"
-        tools:layout_editor_absoluteX="42dp"
-        tools:layout_editor_absoluteY="36dp" />
-
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_auth_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <me.zhanghai.android.materialprogressbar.MaterialProgressBar
         android:id="@+id/progress_bar"
@@ -32,48 +28,56 @@
         app:mpb_showProgressBackground="false"
         app:mpb_useIntrinsicPadding="false" />
 
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Войдите в ECO"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/imageTop" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/phone_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:hint="Номер телефона"
-        android:textColorHint="@color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Введите телефонный номер"
+        android:textColorHint="#5C5C5C"
         android:theme="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
-        app:boxBackgroundColor="#66000000"
-        app:boxBackgroundMode="filled"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:boxBackgroundColor="#fff"
+        app:boxBackgroundMode="outline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="32dp"
-        app:layout_constraintVertical_bias="0.1">
+        app:layout_constraintTop_toBottomOf="@id/title">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/phone_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="phone"
-            android:textColor="#fff" />
+            android:textColor="#000" />
 
     </com.google.android.material.textfield.TextInputLayout>
-
-
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/password_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:textColorHint="@color/white"
-        android:layout_marginEnd="32dp"
-        android:visibility="invisible"
-        android:hint="Пароль"
+        android:layout_marginEnd="16dp"
+        android:hint="Введите код"
+        android:textColorHint="#5C5C5C"
         android:theme="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
-        app:boxBackgroundColor="#66000000"
-        app:boxBackgroundMode="filled"
+        android:visibility="invisible"
+        app:boxBackgroundColor="#fff"
+        app:boxBackgroundMode="outline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/phone_input_layout">
@@ -83,84 +87,62 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
-            android:textColor="#fff" />
-
+            android:textColor="#000" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:id="@+id/message_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="Вам отправлено SMS с кодом"
-        android:textAlignment="center"
-        android:textColor="#E0E0E0"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/timer_textview" />
-
-
-    <TextView
-        android:id="@+id/timer_textview"
-        android:layout_width="match_parent"
-        android:layout_height="19dp"
-        android:layout_marginBottom="32dp"
-        android:text="Отправить SMS повторно 0:25"
-        android:textAlignment="center"
-        android:textColor="#93C13D"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/auth_button"/>
-
-    <TextView
-        android:id="@+id/has_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:padding="16dp"
-        android:text="Уже есть пароль"
-        android:textAlignment="center"
-        android:textColor="#93C13D"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/auth_button" />
-
     <Button
-        android:id="@+id/auth_button"
+        android:id="@+id/repeatButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:background="@null"
+        android:text="Отправить СМС повторно"
+        android:textAllCaps="false"
+        android:textColor="#2C9B1A"
+        android:textSize="15sp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/password_input_layout" />
+
+    <TextView
+        android:id="@+id/smsInfo"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Вам отправлено СМС с паролем \n Повторная отправка будет доступна через 00:45"
+        android:textAlignment="center"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/password_input_layout" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/disable_button_drawable"
-        android:text="Получить пароль"
-        android:textAllCaps="false"
-        android:textColor="#888888"
-        app:layout_constraintBottom_toTopOf="@+id/go_to_map_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_input_layout" />
+        android:layout_marginBottom="32dp"
+        android:text="Нет карты? Узнайте, как и где получить"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/go_to_map_button" />
 
     <Button
         android:id="@+id/go_to_map_button"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/help_button_drawable"
-        android:text="Где купить карту?"
+        android:layout_height="40dp"
+        android:layout_gravity="end"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/green_button_drawable"
+        android:drawableStart="@drawable/ic_info_white"
+        android:drawablePadding="-50dp"
+        android:paddingStart="75dp"
+        android:text="@string/how_to_get_card"
+        android:textAlignment="center"
         android:textAllCaps="false"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@id/helper_text" />
-
-    <TextView
-        android:id="@+id/helper_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="Найдите ближайшую точку продажи \n бонусных карт."
-        android:textAlignment="center"
-        android:textColor="#E0E0E0"
-        app:layout_constraintBottom_toBottomOf="@+id/image_view" />
-
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

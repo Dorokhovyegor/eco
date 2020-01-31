@@ -1,5 +1,6 @@
 package com.voodoolab.eco.ui.tab_fragments
 
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Html
@@ -22,6 +23,7 @@ import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_fragments.FilterFullScreenDialog
 import com.voodoolab.eco.helper_fragments.FilterFullScreenDialog.Companion.TAG
+import com.voodoolab.eco.interfaces.BalanceUpClickListener
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.interfaces.ParamsTransactionChangeListener
 import com.voodoolab.eco.models.ClearUserModel
@@ -49,6 +51,9 @@ class ProfileFragment : Fragment(),
     ParamsTransactionChangeListener {
 
     private var mainView: View? = null
+
+    // interfaces
+    var listener: BalanceUpClickListener? = null
 
     // view models
     lateinit var userViewModel: UserInfoViewModel
@@ -101,12 +106,8 @@ class ProfileFragment : Fragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return if (mainView == null) {
-            mainView = inflater.inflate(R.layout.profile_container_fragment, container, false)
-            mainView
-        } else {
-            mainView
-        }
+        return inflater.inflate(R.layout.profile_container_fragment, container, false)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -153,7 +154,7 @@ class ProfileFragment : Fragment(),
         }
 
         topUpBalance?.setOnClickListener {
-            activity?.findNavController(R.id.frame_container)?.navigate(R.id.payment_destination, null)
+            listener?.onBalanceUpClick()
         }
 
         optionButton?.setOnClickListener {
@@ -388,6 +389,18 @@ class ProfileFragment : Fragment(),
 
     override fun onDataStateChange(dataState: DataState<*>?) {
         handleDataStateChange(dataState)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is BalanceUpClickListener) {
+            listener = context
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {

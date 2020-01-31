@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
+import androidx.navigation.ui.NavigationUI
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.iid.FirebaseInstanceId
@@ -51,14 +52,14 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         createNotificationReportChannel()
         createNotificationSpecialOfferChannel()
         createNotificationOthersChannel()
         registerReceiver()
 
-        supportActionBar?.hide()
         actionBar?.hide()
-
+        supportActionBar?.hide()
         navController = Navigation.findNavController(this, R.id.frame_container)
         updateTokenViewModel = ViewModelProvider(this).get(FirebaseTokenViewModel::class.java)
         reportViewModel = ViewModelProvider(this).get(ReportViewModel::class.java)
@@ -196,12 +197,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun completeAuthenticated() {
-        val navOptions: NavOptions? = NavOptions.Builder()
-            .setEnterAnim(R.anim.enter_from_right)
-            .setExitAnim(R.anim.nav_default_exit_anim)
-            .build()
-        navController.navigate(R.id.from_auth_To_container, null, navOptions)
-
+        navController.navigate(R.id.from_auth_To_container)
     }
 
     override fun onBalanceUpClick() {
@@ -215,7 +211,9 @@ class MainActivity : AppCompatActivity(),
         navController.navigate(R.id.action_containerFragment_to_viewDiscountFragment, bundle)
     }
 
-    override fun onSupportNavigateUp(): Boolean = navController.navigateUp()
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp()
+    }
 
     override fun onDataStateChange(dataState: DataState<*>?) {
         dataState?.let {
@@ -244,4 +242,6 @@ class MainActivity : AppCompatActivity(),
             )
         )
     }
+
+
 }

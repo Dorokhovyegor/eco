@@ -84,4 +84,5 @@
     <string name="input_value_and_choose_payment_method">Введите сумму и выберите способ оплаты</string>
     <string name="input_value">Введите сумму оплаты</string>
     <string name="card_method">Картой</string>
+    <string name="how_to_get_card">Как получить карту?</string>
 </resources>

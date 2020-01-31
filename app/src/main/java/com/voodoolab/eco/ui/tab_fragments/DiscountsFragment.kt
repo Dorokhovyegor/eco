@@ -78,10 +78,9 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
 
     private fun subscribeObserver() {
         specialOfferViewModel.offersPagedList?.observe(viewLifecycleOwner, Observer {
-
             Handler().postDelayed({
                 recyclerViewAdapter?.submitList(it)
-            }, 500)
+            }, 200)
 
         })
     }

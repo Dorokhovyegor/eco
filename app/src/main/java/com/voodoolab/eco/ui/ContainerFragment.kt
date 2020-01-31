@@ -50,10 +50,6 @@ class ContainerFragment : Fragment() {
             childFragmentManager.findFragmentById(R.id.frame_for_bottom_nav_view) as NavHostFragment
         NavigationUI.setupWithNavController(bottomNavigationView, navHostFragment.navController)
     }
-
-    override fun onResume() {
-        super.onResume()
-    }
 }
 
 

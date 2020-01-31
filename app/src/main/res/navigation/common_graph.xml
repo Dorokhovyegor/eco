@@ -38,6 +38,10 @@
         <action
             android:id="@+id/from_auth_To_container"
             app:destination="@+id/containerFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/endter_from_left"
+            app:popExitAnim="@anim/exit_to_right"
             app:popUpTo="@+id/splash_destination"
             app:popUpToInclusive="true" />
     </fragment>
@@ -46,8 +50,6 @@
         android:name="com.voodoolab.eco.ui.ContainerFragment"
         android:label="ContainerFragment" >
         <action
-            app:popUpTo="@id/containerFragment"
-            app:popUpToInclusive="false"
             android:id="@+id/action_containerFragment_to_payment_destination"
             app:destination="@id/payment_destination" />
         <action

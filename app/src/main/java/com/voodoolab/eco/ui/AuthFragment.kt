@@ -28,6 +28,7 @@ import com.voodoolab.eco.states.code_state.CodeStateEvent
 import com.voodoolab.eco.ui.view_models.CodeViewModel
 import com.voodoolab.eco.ui.view_models.LoginViewModel
 import com.voodoolab.eco.utils.Constants
+import com.voodoolab.eco.utils.show
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
@@ -43,39 +44,15 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
     private var inputCodeEditText: EditText? = null
     private var inputCodeLayout: TextInputLayout? = null
     private var inputPhoneLayout: TextInputLayout? = null
-    private var timerTextView: TextView? = null
-    private var authButton: Button? = null
-    private var progressBar: MaterialProgressBar? = null
+
+    private var infoSMSTextView: TextView? = null
+    private var getInfoAboutCardButton: Button? = null
     private var hasPasswordTextView: TextView? = null
     private var messageTextView: TextView? = null
 
-    private var authenticateListener: AuthenticateListener? = null
-    private var getCodeClickListener = View.OnClickListener {
-        // получить пароль, для основной кнопки
-        val number = getNumberFromDecorateNumber(inputNumberEditText?.text.toString())
-        if (number?.length == 11) {
-            codeViewModel.setStateEvent(CodeStateEvent.RequestCodeEvent(number))
-        } else {
-            inputPhoneLayout?.error = "Неверный формат номера"
-        }
-    }
-    private var loginClickListener = View.OnClickListener {
-        // если отправили код и хотим войти
-        val number = getNumberFromDecorateNumber(inputNumberEditText?.text.toString())
-        val code = inputCodeEditText?.text.toString()
-        loginViewModel.setStateEvent(AuthStateEvent.LoginEvent(number, code))
-    }
+    private var progressBar: MaterialProgressBar? = null
 
-    private var hasPasswordClickListener = View.OnClickListener {
-        // если код изначально есть и хотим его ввести
-        authButton?.setOnClickListener(loginClickListener)
-        inputCodeLayout?.visibility = View.VISIBLE
-        inputCodeEditText?.visibility = View.VISIBLE
-        authButton?.text = "Войти"
-        if (it is TextView) {
-            it.text = "Получить новый пароль"
-        }
-    }
+    private var authenticateListener: AuthenticateListener? = null
 
     // lifecycle methods ===========================================================================
     override fun onCreateView(
@@ -92,20 +69,6 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initViews(view)
         initListeners()
-
-        arguments?.let {
-            if (it.containsKey("logout")) {
-                println("DEBUG: there is")
-                if (it.getBoolean("logout")) {
-                    authButton?.setOnClickListener(loginClickListener)
-                    inputCodeLayout?.visibility = View.VISIBLE
-                    inputCodeEditText?.visibility = View.VISIBLE
-                    authButton?.text = "Войти"
-                    hasPasswordTextView?.text = "Получить новый пароль"
-                }
-            }
-        }
-
         subscribeObservers()
     }
 
@@ -126,57 +89,40 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
         inputNumberEditText = view.findViewById(R.id.phone_edit_text)
         inputCodeEditText = view.findViewById(R.id.password_input_edit_text)
         inputCodeLayout = view.findViewById(R.id.password_input_layout)
-        timerTextView = view.findViewById(R.id.timer_textview)
-        authButton = view.findViewById(R.id.auth_button)
-        progressBar = view.findViewById(R.id.progress_bar)
-        hasPasswordTextView = view.findViewById(R.id.has_password)
-        messageTextView = view.findViewById(R.id.message_text_view)
         inputPhoneLayout = view.findViewById(R.id.phone_input_layout)
-
-        authButton?.isEnabled = false
+        progressBar = view.findViewById(R.id.progress_bar)
 
         val mask = MaskImpl.createTerminated(PredefinedSlots.RUS_PHONE_NUMBER)
         val watcher = MaskFormatWatcher(mask)
         inputNumberEditText?.let {
             watcher.installOn(it)
         }
-
-        val image = view.findViewById<ImageView>(R.id.image_view)
-        val path = "android.resource://com.voodoolab.eco/" + R.raw.video2
-        context?.let {
-            Glide
-                .with(it)
-                .asGif()
-                .load(Uri.parse(path))
-                .centerCrop()
-                .into(image)
-        }
     }
 
     private fun initListeners() {
-        hasPasswordTextView?.setOnClickListener(hasPasswordClickListener)
-        authButton?.setOnClickListener(getCodeClickListener)
         inputNumberEditText?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val number = getNumberFromDecorateNumber(s.toString())
                 number?.let {
                     if (it.length == 11) {
-                        authButton?.isEnabled = true
-                        authButton?.background =
-                            resources.getDrawable(R.drawable.active_button_drawable, null)
-                        authButton?.setTextColor(resources.getColor(R.color.white, null))
-
-                    } else {
-                        authButton?.isEnabled = false
-                        authButton?.background =
-                            resources.getDrawable(R.drawable.disable_button_drawable, null)
-                        authButton?.setTextColor(
-                            resources.getColor(
-                                R.color.disabled_button_grey,
-                                null
-                            )
-                        )
+                        codeViewModel.setStateEvent(CodeStateEvent.RequestCodeEvent(number))
                     }
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
+        })
+
+        inputCodeEditText?.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString().length == 6) {
+                    loginViewModel.setStateEvent(AuthStateEvent.LoginEvent(getNumberFromDecorateNumber(inputNumberEditText?.text.toString()), s.toString()))
                 }
             }
 
@@ -207,10 +153,9 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
                 if (it.status == "ok") {
                     inputCodeEditText?.visibility = View.VISIBLE
                     inputCodeLayout?.visibility = View.VISIBLE
+                    infoSMSTextView?.visibility = View.VISIBLE
                     inputCodeEditText?.requestFocus()
                     startTimer()
-                    authButton?.text = "Войти"
-                    authButton?.setOnClickListener(loginClickListener)
                 }
             }
         })
@@ -238,12 +183,10 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
     }
 
     private fun startTimer() {
-        messageTextView?.visibility = View.VISIBLE
-        timerTextView?.visibility = View.VISIBLE
-        hasPasswordTextView?.visibility = View.GONE
+        // todo do it like here https://abhiandroid.com/ui/countdown-timer
     }
 
-    private fun changeViewForVisibleKeyboard(visible: Boolean) {
+    /*private fun changeViewForVisibleKeyboard(visible: Boolean) {
         if (visible) {
             val paramPhoneInput = inputPhoneLayout?.layoutParams as ConstraintLayout.LayoutParams
             paramPhoneInput.verticalBias = 0.0f
@@ -260,26 +203,18 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
             authButton?.requestLayout()
         }
     }
-
+*/
     private fun handleDataStateChange(dataState: DataState<*>?) {
         dataState?.let {
             // handle loading
-            showProgressBar(it.loading)
+            progressBar?.show(it.loading)
 
             // handle message
             it.message?.let { event ->
                 event.getContentIfNotHandled()?.let {
-                    showToast(it)
+                    showToast(it)   // todo snackbar instead
                 }
             }
-        }
-    }
-
-    private fun showProgressBar(visible: Boolean) {
-        if (visible) {
-            progressBar?.visibility = View.VISIBLE
-        } else {
-            progressBar?.visibility = View.GONE
         }
     }
 
@@ -307,7 +242,7 @@ class AuthFragment : Fragment(), DataStateListener, KeyboardVisibilityEventListe
     }
 
     override fun onVisibilityChanged(isOpen: Boolean) {
-        changeViewForVisibleKeyboard(isOpen)
+        //changeViewForVisibleKeyboard(isOpen)
     }
     // =============================================================================================
 }
