@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
-        android:src="@drawable/clear_car" />
+        android:src="@drawable/ic_wash_bottom_sheet" />
 
     <TextView
         android:id="@+id/valueTextView"
@@ -61,6 +61,7 @@
         android:layout_marginTop="16dp"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
+        android:theme="@style/RatingBar"
         android:layout_height="wrap_content"/>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -73,6 +74,7 @@
         android:textColorHint="#8A828282"
         android:theme="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
         app:boxBackgroundMode="filled"
+        app:boxBackgroundColor="#fff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -92,13 +94,14 @@
         android:id="@+id/report_button"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="32dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/active_button_drawable"
-        android:text="Готово"
+        android:background="@drawable/black_button_drawable"
+        android:textAllCaps="false"
+        android:text="@string/comlete"
         android:textColor="@color/white" />
 
 </LinearLayout>

@@ -1,8 +1,5 @@
 package com.voodoolab.eco.ui
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,10 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.snackbar.Snackbar
 import com.voodoolab.eco.R
-import kotlinx.android.synthetic.main.container_fragment.*
-import java.util.*
 
 
 class ContainerFragment : Fragment() {
@@ -45,7 +39,6 @@ class ContainerFragment : Fragment() {
             }
         }
         Timer().schedule( task, 0, 3000)*/
-
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.frame_for_bottom_nav_view) as NavHostFragment
         NavigationUI.setupWithNavController(bottomNavigationView, navHostFragment.navController)

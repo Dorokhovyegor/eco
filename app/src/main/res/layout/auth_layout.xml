@@ -51,7 +51,7 @@
         android:textColorHint="#5C5C5C"
         android:theme="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
         app:boxBackgroundColor="#fff"
-        app:boxBackgroundMode="outline"
+        app:boxBackgroundMode="filled"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title">
@@ -77,7 +77,7 @@
         android:theme="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
         android:visibility="invisible"
         app:boxBackgroundColor="#fff"
-        app:boxBackgroundMode="outline"
+        app:boxBackgroundMode="filled"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/phone_input_layout">
@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:background="@null"
-        android:text="Отправить СМС повторно"
+        android:text="@string/repeatSms_text"
         android:textAllCaps="false"
         android:textColor="#2C9B1A"
         android:textSize="15sp"
@@ -110,12 +110,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
-        android:text="Вам отправлено СМС с паролем \n Повторная отправка будет доступна через 00:45"
         android:textAlignment="center"
         android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/password_input_layout" />
 
     <TextView
+        android:id="@+id/infoCardTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -124,10 +124,12 @@
         android:text="Нет карты? Узнайте, как и где получить"
         android:textAlignment="center"
         android:textColor="@color/black"
+        app:layout_constraintVertical_bias="1.0"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@id/go_to_map_button" />
 
     <Button
+        android:elevation="0dp"
         android:id="@+id/go_to_map_button"
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -136,6 +138,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/green_button_drawable"
+        app:layout_constraintVertical_bias="1.0"
         android:drawableStart="@drawable/ic_info_white"
         android:drawablePadding="-50dp"
         android:paddingStart="75dp"

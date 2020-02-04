@@ -14,9 +14,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
-import androidx.navigation.ui.NavigationUI
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.iid.FirebaseInstanceId
@@ -220,7 +218,6 @@ class MainActivity : AppCompatActivity(),
             it.message?.let {
                 it.getContentIfNotHandled()?.let {
                     Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-                    println("DEBUG ${it}")
                 }
             }
         }
@@ -236,7 +233,7 @@ class MainActivity : AppCompatActivity(),
         reportViewModel.setStateEvent(
             ReportStateEvent.SentReportEvent(
                 tokenApp = applicaionToken,
-                text = text,
+                text = if (text == "") "..." else text,
                 operationId = id,
                 rating = ratio
             )

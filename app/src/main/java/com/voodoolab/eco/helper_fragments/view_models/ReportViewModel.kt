@@ -11,6 +11,7 @@ import com.voodoolab.eco.states.report_state.ReportStateEvent
 import com.voodoolab.eco.states.report_state.ReportViewState
 
 class ReportViewModel : ViewModel() {
+
     private val _stateEventReport: MutableLiveData<ReportStateEvent> = MutableLiveData()
     private val _viewStateReport: MutableLiveData<ReportViewState> = MutableLiveData()
 
@@ -27,10 +28,6 @@ class ReportViewModel : ViewModel() {
     private fun handleStateEvent(stateEvent: ReportStateEvent): LiveData<DataState<ReportViewState>> {
         return when (stateEvent) {
             is ReportStateEvent.SentReportEvent -> {
-                println("DEBUG token ${stateEvent.tokenApp}")
-                println("DEBUG token ${stateEvent.operationId}")
-                println("DEBUG token ${stateEvent.text}")
-                println("DEBUG token ${stateEvent.rating}")
                 return ReportRepo.sendReport(stateEvent.tokenApp, stateEvent.operationId, stateEvent.text, stateEvent.rating)
             }
         }
@@ -52,4 +49,5 @@ class ReportViewModel : ViewModel() {
     fun setStateEvent(event: ReportStateEvent) {
         _stateEventReport.value = event
     }
+
 }

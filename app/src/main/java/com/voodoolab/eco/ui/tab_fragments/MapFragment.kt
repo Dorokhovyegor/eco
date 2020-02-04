@@ -8,16 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.clustering.Cluster
@@ -39,6 +35,11 @@ import com.voodoolab.eco.ui.map_ui.DefaultWashClusterRenderer
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.show
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
+import kotlin.math.absoluteValue
+import com.google.android.gms.maps.CameraUpdateFactory
+import android.content.res.Resources.NotFoundException
+import com.google.android.gms.maps.model.MapStyleOptions
+import android.content.res.Resources
 
 
 class MapFragment : Fragment(), OnMapReadyCallback,
@@ -75,6 +76,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         optionsButton = view.findViewById(R.id.options_button)
         progressBar = view.findViewById(R.id.progress_bar)
         mapView = view.findViewById(R.id.map_view)
+
+
         mapView?.getMapAsync(this)
         mapView?.onCreate(savedInstanceState)
         val token = Hawk.get<String>(Constants.TOKEN)
@@ -240,13 +243,37 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     override fun onClusterItemClick(p0: ClusterWash?): Boolean {
         showObject(p0?.id.toString())
-        map?.animateCamera(CameraUpdateFactory.newLatLngZoom(p0?.location, 15f))
+
+        var delta =
+            (map?.projection?.visibleRegion?.farLeft?.latitude?.minus(map?.projection?.visibleRegion?.nearLeft?.latitude!!))?.absoluteValue!!
+        map?.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    p0?.location?.latitude?.minus(
+                        delta.div(4)
+                    )!!, p0.location.longitude
+                ), 15f
+            )
+        )
         return true
     }
 
 
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = map?.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    context, R.raw.map_style
+                )
+            )
+
+        } catch (e: NotFoundException) {
+
+        }
+
         coord?.let {
             if (it.size == 2) {
                 map?.moveCamera(

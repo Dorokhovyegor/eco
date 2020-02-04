@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import android.view.ViewStub
 import android.widget.Button
 import androidx.appcompat.widget.Toolbar
-import androidx.asynclayoutinflater.view.AsyncLayoutInflater
-import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.archit.calendardaterangepicker.customviews.DateRangeCalendarView
@@ -17,8 +15,6 @@ import com.google.android.material.chip.Chip
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.ParamsTransactionChangeListener
 import com.voodoolab.eco.ui.view_models.SharedViewModel
-import com.voodoolab.eco.utils.Constants
-import com.voodoolab.eco.utils.Constants.FILTER_ALL_TIME
 import com.voodoolab.eco.utils.Constants.FILTER_CASHBACK
 import com.voodoolab.eco.utils.Constants.FILTER_MONTHBONUS
 import com.voodoolab.eco.utils.Constants.FILTER_PERIOD_FROM
@@ -26,13 +22,12 @@ import com.voodoolab.eco.utils.Constants.FILTER_PERIOD_TO
 import com.voodoolab.eco.utils.Constants.FILTER_REPLENISH_OFFLINE
 import com.voodoolab.eco.utils.Constants.FILTER_REPLENISH_ONLINE
 import com.voodoolab.eco.utils.Constants.FILTER_WASTE
-import com.voodoolab.eco.utils.fadeInAnimation
 import com.voodoolab.eco.utils.toCalendar
 import com.voodoolab.eco.utils.toDate
 import java.util.*
 
 
-class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFinishedListener {
+class FilterFullScreenDialog : DialogFragment() {
 
     companion object {
         val TAG = "filter"
@@ -76,18 +71,18 @@ class FilterFullScreenDialog : DialogFragment(), AsyncLayoutInflater.OnInflateFi
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        context?.let {
+        /*context?.let {
             AsyncLayoutInflater(it).inflate(R.layout.filter_layout_content, container, this)
-        }
+        }*/
         return inflater.inflate(R.layout.filter_layout, container, false)
     }
 
-    override fun onInflateFinished(view: View, resid: Int, parent: ViewGroup?) {
+  /*  override fun onInflateFinished(view: View, resid: Int, parent: ViewGroup?) {
         getView()?.findViewById<NestedScrollView>(R.id.scroll)?.addView(view)
         initViews(view)
         initListeners()
         view.fadeInAnimation()
-    }
+    }*/
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

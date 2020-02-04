@@ -4,9 +4,10 @@ import android.animation.Animator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
-import androidx.core.os.bundleOf
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.voodoolab.eco.models.WashModel
@@ -117,11 +118,82 @@ fun View.fadeInAnimation() {
     }
 }
 
+fun ViewGroup.openFromUp(screenMetric: Float?) {
+    this.let { animatedView ->
+        val animation = animatedView.animate()
+        animatedView.visibility = View.VISIBLE
+        animation.duration = 300
+        animation.interpolator = FastOutSlowInInterpolator()
+        animation.translationYBy(500 * screenMetric!!)
+        animation.setListener(object : Animator.AnimatorListener {
+            override fun onAnimationRepeat(animation: Animator?) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+
+            }
+
+            override fun onAnimationStart(animation: Animator?) {
+
+            }
+        })
+    }
+}
+
+fun ViewGroup.closeToUp(screenMetric: Float?) {
+    this.let {animatedView ->
+        val animation = animatedView.animate()
+        animatedView.visibility = View.VISIBLE
+        animation.duration = 300
+        animation.interpolator = FastOutSlowInInterpolator()
+        animation.translationYBy(-500 * screenMetric!!)
+        animation.setListener(object : Animator.AnimatorListener {
+            override fun onAnimationRepeat(animation: Animator?) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                animatedView.translationY = -500 * screenMetric
+                animatedView.visibility = View.INVISIBLE
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+
+            }
+
+            override fun onAnimationStart(animation: Animator?) {
+
+            }
+        })
+    }
+}
+
 fun Intent.hasFullInformationForReport(): Boolean { // if we have all this data that is all
     if (hasExtra(NOTIFICATION_OPERATION_ID) && hasExtra(NOTIFICATION_WASH_MODEL) && hasExtra(
             NOTIFICATION_VALUE_OF_TRANSACTION
         )
     ) {
+
+        println("DEBUG: operationID = ${getIntExtra(NOTIFICATION_OPERATION_ID, -1)}")
+        println("DEBUG: wash_model_string = ${getStringExtra(NOTIFICATION_WASH_MODEL)}")
+        println(
+            "DEBUG: value of transaction = ${getIntExtra(
+                NOTIFICATION_VALUE_OF_TRANSACTION,
+                -1
+            )}"
+        )
+        println(
+            "DEBUG: value of transaction = ${getIntExtra(
+                NOTIFICATION_VALUE_OF_TRANSACTION,
+                -1
+            )}"
+        )
+
         val washString = extras?.getString(NOTIFICATION_WASH_MODEL)
         return try {
             val washJson = JsonParser().parse(washString) as JsonObject

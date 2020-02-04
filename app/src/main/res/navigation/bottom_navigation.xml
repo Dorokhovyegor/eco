@@ -18,4 +18,8 @@
         android:name="com.voodoolab.eco.ui.tab_fragments.DiscountsFragment"
         android:label="DiscountsFragment"
         tools:layout="@layout/discounts_fragment" />
+    <fragment
+        android:id="@+id/start_washing"
+        android:name="com.voodoolab.eco.ui.tab_fragments.WashingFragment"
+        android:label="WashingFragment" />
 </navigation>

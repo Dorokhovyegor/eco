@@ -85,4 +85,16 @@
     <string name="input_value">Введите сумму оплаты</string>
     <string name="card_method">Картой</string>
     <string name="how_to_get_card">Как получить карту?</string>
+    <string name="time_text">   <![CDATA[
+         <font color=#000000>Вам отправлено СМС с паролем <p></br></p></font><font color=#939393>Повторная отправка будет доступна через %1$s</font>
+        ]]>
+        </string>
+    <string name="repeatSms_text">Отправить СМС повторно</string>
+    <string name="comlete">Готово</string>
+    <string name="how_to_sart_wash">Как начать мойку?</string>
+    <string name="scanner_qr_code_step">На терминале ECO отсканируйте QR-код</string>
+    <string name="start_button_text">В приложении нажмите на кнопку «Начать»</string>
+    <string name="complete_text">Хорошо</string>
+    <string name="qr_scanner_text">QR-сканнер</string>
+    <string name="rationale_camera">Этому приложению нужен доступ к камере, чтобы отсканировать QR-code</string>
 </resources>

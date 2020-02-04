@@ -10,6 +10,10 @@
         android:icon="@drawable/ic_profile">
     </item>
 
+    <item android:title="Начать мойку"
+        android:id="@+id/start_washing"
+        android:icon="@drawable/ic_start_washing"/>
+
     <item android:title="@string/map"
         android:id="@+id/map_destination"
         android:icon="@drawable/ic_map">

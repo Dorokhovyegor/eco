@@ -2,6 +2,7 @@ package com.voodoolab.eco.helper_fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +18,6 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.SendReportInterface
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.utils.Constants
-import com.voodoolab.eco.utils.convertToWashModel
 
 
 class SendReportBottomSheet(
@@ -42,8 +42,8 @@ class SendReportBottomSheet(
             ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 val bottomSheet =
-                    (dialog as BottomSheetDialog).findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                BottomSheetBehavior.from<View>(bottomSheet).apply {
+                    (dialog as BottomSheetDialog).findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)!!
+                BottomSheetBehavior.from(bottomSheet).apply {
                     state = BottomSheetBehavior.STATE_EXPANDED
                     peekHeight = 360
                 }
@@ -70,15 +70,19 @@ class SendReportBottomSheet(
         data?.let {
             val value = it.getInt(Constants.NOTIFICATION_VALUE_OF_TRANSACTION)
             view.findViewById<TextView>(R.id.valueTextView).text =
-                context?.resources?.getString(R.string.money_value, value.div(100))
-
-            val transactionId = it.getInt(Constants.NOTIFICATION_VALUE_OF_TRANSACTION)
-            val wash = it.getString(Constants.NOTIFICATION_WASH_MODEL)?.convertToWashModel()
+                Html.fromHtml(
+                    context?.resources?.getString(
+                        R.string.balance_value,
+                        value.div(100).toString()
+                    ), 0
+                )
+            val transactionId = it.getInt(Constants.NOTIFICATION_OPERATION_ID)
+            val address = it.getString(Constants.NOTIFICATION_WASH_ADDRESS)
+            val city = it.getString(Constants.NOTIFICATION_WASH_CITY)
 
             view.findViewById<TextView>(R.id.dateTextView).text //todo data
-
             view.findViewById<TextView>(R.id.addressTextView).text =
-                getString(R.string.full_address, wash?.city, wash?.address)
+                getString(R.string.full_address, city, address)
 
             button = view.findViewById(R.id.report_button)
             inputReport = view.findViewById(R.id.report_edit_text)

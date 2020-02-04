@@ -34,14 +34,14 @@ android {
 }
 
 dependencies {
-    def nav_version = "2.1.0"
+    def nav_version = "2.2.0"
     def page_indicator = "1.0.3"
     def glide_version = "4.10.0"
     def decoro_version = "1.3.5"
     def bubbleseekbar_version = "3.4"
     def wallet_version = "18.0.0"
     def retrofit_version = "2.6.0"
-    def lifecycle_version = "2.2.0-alpha03"
+    def lifecycle_version = "2.2.0"
     def horizontal_progress_bar = "1.6.1"
     def hawk_version = "2.0.1"
     def keyboard_listener = "2.3.0"
@@ -90,7 +90,7 @@ dependencies {
     implementation 'com.eightbitlab:supportrenderscriptblur:1.0.2'
     implementation 'com.eightbitlab:blurview:1.6.3'
 
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.1.0'
 
     implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:$keyboard_listener"
 
@@ -111,9 +111,13 @@ dependencies {
 
     implementation 'com.archit.calendar:awesome-calendar:1.1.5'
 
-    implementation "androidx.viewpager2:viewpager2:1.0.0"
-
     implementation "com.google.maps.android:android-maps-utils:0.5"
+
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+
+    implementation 'me.dm7.barcodescanner:zxing:1.9.13'
+
+    implementation 'pub.devrel:easypermissions:3.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
