@@ -35,23 +35,16 @@
         android:layout_marginTop="12dp"
         android:text="Войдите в ECO"
         android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="22sp"
-        android:textStyle="bold"
+        style="@style/TextViewTitle"
         app:layout_constraintTop_toBottomOf="@id/imageTop" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/phone_input_layout"
+        style="@style/TextInputStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Введите телефонный номер"
-        android:textColorHint="#5C5C5C"
-        android:theme="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
-        app:boxBackgroundColor="#fff"
-        app:boxBackgroundMode="filled"
+        android:hint="@string/input_phone_number"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title">
@@ -59,7 +52,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/phone_edit_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:inputType="phone"
             android:textColor="#000" />
 
@@ -67,17 +60,12 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/password_input_layout"
+        style="@style/TextInputStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Введите код"
-        android:textColorHint="#5C5C5C"
-        android:theme="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+        android:hint="@string/input_code_text"
         android:visibility="invisible"
-        app:boxBackgroundColor="#fff"
-        app:boxBackgroundMode="filled"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/phone_input_layout">
@@ -86,26 +74,23 @@
             android:id="@+id/password_input_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
+            android:inputType="numberPassword"
             android:textColor="#000" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/repeatButton"
+        style="@style/GreenButtonWithoutBackground"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
-        android:background="@null"
         android:text="@string/repeatSms_text"
-        android:textAllCaps="false"
-        android:textColor="#2C9B1A"
-        android:textSize="15sp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/password_input_layout" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/smsInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -114,38 +99,31 @@
         android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/password_input_layout" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/infoCardTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
-        android:text="Нет карты? Узнайте, как и где получить"
+        android:text="@string/without_card_text"
         android:textAlignment="center"
         android:textColor="@color/black"
-        app:layout_constraintVertical_bias="1.0"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@id/go_to_map_button" />
+        app:layout_constraintBottom_toTopOf="@id/go_to_map_button"
+        app:layout_constraintVertical_bias="1.0" />
 
-    <Button
-        android:elevation="0dp"
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/go_to_map_button"
+        style="@style/GreenButtonWithBackGround"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_gravity="end"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="40dp"
-        android:background="@drawable/green_button_drawable"
-        app:layout_constraintVertical_bias="1.0"
-        android:drawableStart="@drawable/ic_info_white"
-        android:drawablePadding="-50dp"
-        android:paddingStart="75dp"
         android:text="@string/how_to_get_card"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:icon="@drawable/ic_info_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -97,4 +97,7 @@
     <string name="complete_text">Хорошо</string>
     <string name="qr_scanner_text">QR-сканнер</string>
     <string name="rationale_camera">Этому приложению нужен доступ к камере, чтобы отсканировать QR-code</string>
+    <string name="input_phone_number">Введите телефонный номер</string>
+    <string name="without_card_text">Нет карты? Узнайте, как и где получить</string>
+    <string name="input_code_text">Введите код</string>
 </resources>
