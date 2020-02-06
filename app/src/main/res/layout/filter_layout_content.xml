@@ -8,15 +8,13 @@
 
     <TextView
         android:id="@+id/title_operation"
+        style="@style/TextViewTitleMain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="16dp"
         android:text="@string/type_operation"
-        android:textColor="@color/black"
-        android:textSize="22sp"
-        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.chip.ChipGroup
@@ -36,10 +34,7 @@
             android:layout_height="wrap_content"
             android:tag="replenish_offline"
             android:text="@string/balance_up_offline"
-            android:textColor="@color/chip_text_state_list"
-            app:checkedIconEnabled="false"
-            app:chipStrokeColor="@color/grey_from_Serge"
-            app:chipStrokeWidth="1dp" />
+            android:checked="false" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_replenish_online"
@@ -47,23 +42,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:tag="replenish_online"
-            android:text="@string/balance_up_online"
-            android:textColor="@color/chip_text_state_list"
-            app:checkedIconEnabled="false"
-            app:chipStrokeColor="@color/grey_from_Serge"
-            app:chipStrokeWidth="1dp" />
+            android:text="@string/balance_up_online"/>
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_waste"
             style="@style/ChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/balance_down"
             android:tag="waste"
-            android:textColor="@color/chip_text_state_list"
-            app:checkedIconEnabled="false"
-            app:chipStrokeColor="@color/grey_from_Serge"
-            app:chipStrokeWidth="1dp" />
+            android:text="@string/balance_down" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_month_bonus"
@@ -71,37 +58,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:tag="month_bonus"
-            android:text="@string/bonus_for_a_month"
-            android:textColor="@color/chip_text_state_list"
-            app:checkedIconEnabled="false"
-            app:chipStrokeColor="@color/grey_from_Serge"
-            app:chipStrokeWidth="1dp" />
+            android:text="@string/bonus_for_a_month" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_cashback"
             style="@style/ChipStyle"
             android:layout_width="wrap_content"
-            android:tag="cashback"
             android:layout_height="wrap_content"
-            android:text="@string/money_back"
-            android:textColor="@color/chip_text_state_list"
-            app:checkedIconEnabled="false"
-            app:chipStrokeColor="@color/grey_from_Serge"
-            app:chipStrokeWidth="1dp" />
+            android:tag="cashback"
+            android:text="@string/money_back" />
 
     </com.google.android.material.chip.ChipGroup>
 
     <TextView
         android:id="@+id/title_date_range"
+        style="@style/TextViewTitleMain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="16dp"
         android:text="@string/date_range"
-        android:textColor="@color/black"
-        android:textSize="22sp"
-        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/chipGroupType" />
 
     <com.google.android.material.chip.Chip
@@ -113,13 +90,8 @@
         android:layout_marginTop="32dp"
         android:checked="true"
         android:text="@string/all_time"
-        android:textColor="@color/chip_text_state_list"
-        app:checkedIconEnabled="false"
-        app:chipStrokeColor="@color/grey_from_Serge"
-        app:chipStrokeWidth="1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_date_range" />
-
 
     <ViewStub
         android:id="@+id/calendarStub"
@@ -133,18 +105,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chip_allTime" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/drop_button"
+        style="@style/BlackButtonWithBlackStroke"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
-        android:background="@drawable/black_button_drawable"
         android:text="@string/drop_filter"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textAllCaps="true"
+        app:elevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />

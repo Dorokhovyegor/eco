@@ -33,7 +33,7 @@ fun LinearLayout.fadeOutAnimation() {
     this.let { animatedView ->
         animatedView.alpha = 1f
         val animation = animatedView.animate()
-        animation.duration = 350
+        animation.duration = 110
         animation.interpolator = LinearInterpolator()
         animation.alpha(0f)
         animation.setListener(object : Animator.AnimatorListener {
@@ -63,7 +63,7 @@ fun View.fadeOutAnimation() {
     this.let { animatedView ->
         animatedView.alpha = 1f
         val animation = animatedView.animate()
-        animation.duration = 350
+        animation.duration = 110
         animation.interpolator = LinearInterpolator()
         animation.alpha(0f)
         animation.setListener(object : Animator.AnimatorListener {
@@ -94,7 +94,7 @@ fun View.fadeInAnimation() {
         animatedView.alpha = 0f
         animatedView.visibility = View.VISIBLE
         val animation = animatedView.animate()
-        animation.duration = 100
+        animation.duration = 150
         animation.interpolator = LinearInterpolator()
         animation.alpha(1f)
         animation.setListener(object : Animator.AnimatorListener {

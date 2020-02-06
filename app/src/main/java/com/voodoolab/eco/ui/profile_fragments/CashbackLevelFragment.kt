@@ -44,10 +44,8 @@ class CashbackLevelFragment: Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         userViewModel = ViewModelProvider(parentFragment!!)[UserInfoViewModel::class.java]
         userViewModel.viewState.observe(viewLifecycleOwner, Observer {userViewState ->
-            println("DEBUG: update content")
             setContent(userViewState.userResponse)
         })
     }

@@ -63,7 +63,6 @@ class TransactionDataSource(val token: String, val map: Map<String, Any?>?) :
                     call: Call<TransactionResponse>,
                     response: Response<TransactionResponse>
                 ) {
-                    println("DEBUG оп!")
                     response.body()?.let { transactionsResponse ->
                         transactionsResponse.data?.let {
                             if (it.size != 0) {

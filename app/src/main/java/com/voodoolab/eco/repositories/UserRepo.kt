@@ -165,8 +165,7 @@ object UserRepo {
 
             return ClearUserModel(
                 rawResponse.data?.balance?.div(100),
-                kop,
-                rawResponse.data?.name,
+                rawResponse.data?.city,
                 moneyValues,
                 percentValues,
                 currentSection,

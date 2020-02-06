@@ -2,6 +2,7 @@ package com.voodoolab.eco.ui.tab_fragments
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.res.Resources.NotFoundException
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +14,13 @@ import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.maps.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.orhanobut.hawk.Hawk
@@ -32,14 +37,11 @@ import com.voodoolab.eco.states.object_state.ObjectStateEvent
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.map_ui.ClusterWash
 import com.voodoolab.eco.ui.map_ui.DefaultWashClusterRenderer
+import com.voodoolab.eco.ui.view_models.SharedCityViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.show
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import kotlin.math.absoluteValue
-import com.google.android.gms.maps.CameraUpdateFactory
-import android.content.res.Resources.NotFoundException
-import com.google.android.gms.maps.model.MapStyleOptions
-import android.content.res.Resources
 
 
 class MapFragment : Fragment(), OnMapReadyCallback,
@@ -48,6 +50,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     ClusterManager.OnClusterItemClickListener<ClusterWash> {
 
     lateinit var objectViewModel: ObjectInfoViewModel
+    lateinit var sharedCityViewModel: SharedCityViewModel
+
     var stateHandler: DataStateListener = this
     var discountClickListener: DiscountClickListener? = null
 
@@ -58,7 +62,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
 
     private var clusterManager: ClusterManager<ClusterWash>? = null
-
     private var coord: ArrayList<Double>? = null
 
     override fun onCreateView(
@@ -66,7 +69,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        objectViewModel = ViewModelProvider(this).get(ObjectInfoViewModel::class.java)
+        objectViewModel = ViewModelProvider(this)[ObjectInfoViewModel::class.java]
+        parentFragment?.let {
+            sharedCityViewModel = ViewModelProvider(it)[SharedCityViewModel::class.java]
+        }
         val view = inflater.inflate(R.layout.map_fragment, container, false)
         return view
     }
@@ -76,34 +82,22 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         optionsButton = view.findViewById(R.id.options_button)
         progressBar = view.findViewById(R.id.progress_bar)
         mapView = view.findViewById(R.id.map_view)
-
-
         mapView?.getMapAsync(this)
         mapView?.onCreate(savedInstanceState)
         val token = Hawk.get<String>(Constants.TOKEN)
         objectViewModel.setStateEventForListObject(ListObjectStateEvent.RequestAllObjectEvent("Bearer $token"))
         subscribeObservers()
-        setToolbarContent(view)
+        subscribeCityInfo()
     }
 
     override fun onClick(dialog: DialogInterface?, which: Int) {
 
     }
 
-    // fixme это какая-то жуть
-    private fun setToolbarContent(view: View) {
-        activity?.let {
-            val pref = it.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-            var coordinates = pref.getString(Constants.CITY_COORDINATES, null)
-
-            if (coordinates != null) {
-                coord = ArrayList()
-                coordinates = coordinates.replace("[", "")
-                coordinates = coordinates.replace("]", "")
-                coord?.add(coordinates.split(",")[0].toDouble())
-                coord?.add(coordinates.split(",")[1].toDouble())
-            }
-        }
+    private fun subscribeCityInfo() {
+        sharedCityViewModel.getCoord().observe(viewLifecycleOwner, Observer { coordinates ->
+            coord = coordinates
+        })
     }
 
     private fun subscribeObservers() {
@@ -261,25 +255,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
-        try {
-            // Customise the styling of the base map using a JSON object defined
-            // in a raw resource file.
-            val success = map?.setMapStyle(
-                MapStyleOptions.loadRawResourceStyle(
-                    context, R.raw.map_style
-                )
+        if (coord?.size == 2) {
+            map?.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(LatLng(coord!![0], coord!![1]), 11f)
             )
-
-        } catch (e: NotFoundException) {
-
-        }
-
-        coord?.let {
-            if (it.size == 2) {
-                map?.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(LatLng(it[0], it[1]), 11f)
-                )
-            }
         }
     }
 

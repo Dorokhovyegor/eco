@@ -25,6 +25,22 @@ class TransactionsViewModel : ViewModel() {
 
         if (localMap == null) {
             return LivePagedListBuilder(TransactionDataSourceFactory(token, null), config)
+                .setBoundaryCallback(object : PagedList.BoundaryCallback<TransactionData>() {
+                    override fun onZeroItemsLoaded() {
+                        super.onZeroItemsLoaded()
+                        emptyList?.setEmptyState()
+                    }
+
+                    override fun onItemAtFrontLoaded(itemAtFront: TransactionData) {
+                        super.onItemAtFrontLoaded(itemAtFront)
+                        emptyList?.firstItemLoaded()
+                    }
+
+                    override fun onItemAtEndLoaded(itemAtEnd: TransactionData) {
+                        super.onItemAtEndLoaded(itemAtEnd)
+                        emptyList?.lastItemLoaded()
+                    }
+                })
                 .build()
         } else {
             return LivePagedListBuilder(TransactionDataSourceFactory(token, localMap), config)
@@ -37,6 +53,11 @@ class TransactionsViewModel : ViewModel() {
                     override fun onItemAtFrontLoaded(itemAtFront: TransactionData) {
                         super.onItemAtFrontLoaded(itemAtFront)
                         emptyList?.firstItemLoaded()
+                    }
+
+                    override fun onItemAtEndLoaded(itemAtEnd: TransactionData) {
+                        super.onItemAtEndLoaded(itemAtEnd)
+                        emptyList?.lastItemLoaded()
                     }
                 })
                 .build()

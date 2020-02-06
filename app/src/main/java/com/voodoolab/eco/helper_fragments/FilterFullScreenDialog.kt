@@ -2,6 +2,7 @@ package com.voodoolab.eco.helper_fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import com.voodoolab.eco.utils.Constants.FILTER_PERIOD_TO
 import com.voodoolab.eco.utils.Constants.FILTER_REPLENISH_OFFLINE
 import com.voodoolab.eco.utils.Constants.FILTER_REPLENISH_ONLINE
 import com.voodoolab.eco.utils.Constants.FILTER_WASTE
+import com.voodoolab.eco.utils.fadeInAnimation
 import com.voodoolab.eco.utils.toCalendar
 import com.voodoolab.eco.utils.toDate
 import java.util.*
@@ -71,18 +73,9 @@ class FilterFullScreenDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        /*context?.let {
-            AsyncLayoutInflater(it).inflate(R.layout.filter_layout_content, container, this)
-        }*/
         return inflater.inflate(R.layout.filter_layout, container, false)
     }
 
-  /*  override fun onInflateFinished(view: View, resid: Int, parent: ViewGroup?) {
-        getView()?.findViewById<NestedScrollView>(R.id.scroll)?.addView(view)
-        initViews(view)
-        initListeners()
-        view.fadeInAnimation()
-    }*/
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -91,11 +84,23 @@ class FilterFullScreenDialog : DialogFragment() {
             dismiss()
         }
         toolBar?.inflateMenu(R.menu.filter_menu)
+        initViews(view.findViewById<View>(R.id.content))
+
     }
 
     private fun initViews(view: View) {
         val viewStub = view.findViewById<ViewStub>(R.id.calendarStub)
-        calendar = viewStub.inflate() as DateRangeCalendarView
+        // календарь слишком долго считается, поэтому делаю задержку
+        Handler().postDelayed({
+            calendar = viewStub.inflate() as DateRangeCalendarView
+        },100)
+
+        Handler().postDelayed({
+            setContent()
+            initListeners()
+            view.fadeInAnimation()
+        }, 150)
+
         allTimeChip = view.findViewById(R.id.chip_allTime)
         wasteChip = view.findViewById(R.id.chip_waste)
         cashbackChip = view.findViewById(R.id.chip_cashback)
@@ -103,7 +108,7 @@ class FilterFullScreenDialog : DialogFragment() {
         replenishOnlineChip = view.findViewById(R.id.chip_replenish_online)
         replenishOfflineChip = view.findViewById(R.id.chip_replenish_offline)
         dropButton = view.findViewById(R.id.drop_button)
-        setContent()
+
     }
 
     private fun setContent() {

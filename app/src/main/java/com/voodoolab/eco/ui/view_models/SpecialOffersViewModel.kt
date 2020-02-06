@@ -16,7 +16,6 @@ class SpecialOffersViewModel : ViewModel() {
     private var liveDataSource: LiveData<SpecialOffersDataSource>? = null
 
     fun init(token: String, city: String?, emptyListInterface: EmptyListInterface?) {
-
         val factory = SpecialOffersDataSourceFactory(token, city)
         liveDataSource = factory.offersLiveDataSource
 

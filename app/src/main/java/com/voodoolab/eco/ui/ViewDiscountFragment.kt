@@ -70,7 +70,7 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
         toolbar?.setNavigationOnClickListener {
             requireActivity().onBackPressed()
         }
-        
+
         washRecyclerView = view.findViewById(
             R.id.washRecyclerView
         )
@@ -96,17 +96,20 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
             viewState.discountResponse?.let { response ->
                 titleTextView?.text = response.title
                 bodyTextView?.text = response.text
+
                 imageStock?.let {
-                    println("DEBUG ${response.logo}")
+
                     if (context != null) {
                         if (response.logo != "") {
                             Glide.with(context!!)
                                 .load(response.logo)
                                 .into(it)
                         } else {
-                            cardView?.visibility = View.GONE
+                            it.visibility = View.GONE
                         }
                     }
+
+                        // fixme это действие долгое
                     adapterRecyclerView =
                         WashAdapterRecyclerView(response.washes) { model: WashModel ->
                             washClicked(model)

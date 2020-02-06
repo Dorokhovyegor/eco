@@ -22,6 +22,7 @@ import com.voodoolab.eco.interfaces.DiscountClickListener
 import com.voodoolab.eco.interfaces.EmptyListInterface
 import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.ui.MainActivity
+import com.voodoolab.eco.ui.view_models.SharedCityViewModel
 import com.voodoolab.eco.ui.view_models.SpecialOffersViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.fadeOutAnimation
@@ -29,15 +30,14 @@ import com.voodoolab.eco.utils.fadeOutAnimation
 class DiscountsFragment : Fragment(), EmptyListInterface {
 
     private lateinit var specialOfferViewModel: SpecialOffersViewModel
+    private lateinit var sharedCityViewModel: SharedCityViewModel
 
     private var specialOffersRecyclerView: RecyclerView? = null
     private var recyclerViewAdapter: SpecialOffersRecyclerViewAdapter? = null
 
     private var emptyListImageView: ImageView? = null
     private var emptyTextView: TextView? = null
-
     private var fakeContainer: LinearLayout? = null
-
     private var listener: DiscountClickListener?  = null
 
     override fun onCreateView(
@@ -51,13 +51,9 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initViews(view)
         specialOfferViewModel = ViewModelProvider(this).get(SpecialOffersViewModel::class.java)
-
-        val city = activity
-            ?.getSharedPreferences(Constants.SETTINGS, Context.MODE_PRIVATE)
-            ?.getString(Constants.CITY_ECO, null)
-
-        val token = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
-        specialOfferViewModel.init(token, city, this)
+        parentFragment?.let {
+            sharedCityViewModel = ViewModelProvider(it)[SharedCityViewModel::class.java]
+        }
         subscribeObserver()
     }
 
@@ -77,11 +73,16 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
     }
 
     private fun subscribeObserver() {
+        sharedCityViewModel.getCity().observe(viewLifecycleOwner, Observer {
+            val token = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
+            specialOfferViewModel.init(token, it, this)
+        })
+
         specialOfferViewModel.offersPagedList?.observe(viewLifecycleOwner, Observer {
+            println("MapFragment cnjsdofsrjiigjohsiofdihoshsghgskj")
             Handler().postDelayed({
                 recyclerViewAdapter?.submitList(it)
-            }, 200)
-
+            }, 100)
         })
     }
 
@@ -93,6 +94,10 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
 
     override fun firstItemLoaded() {
         fakeContainer?.fadeOutAnimation()
+    }
+
+    override fun lastItemLoaded() {
+
     }
 
     override fun onAttach(context: Context) {

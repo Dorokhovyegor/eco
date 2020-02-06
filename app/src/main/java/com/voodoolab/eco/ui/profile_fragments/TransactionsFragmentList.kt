@@ -16,13 +16,14 @@ import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.TransactionsRecyclerViewAdapter
 import com.voodoolab.eco.interfaces.EmptyListInterface
-import com.voodoolab.eco.interfaces.ParamsTransactionChangeListener
+import com.voodoolab.eco.models.TransactionData
 import com.voodoolab.eco.ui.view_models.SharedViewModel
 import com.voodoolab.eco.ui.view_models.TransactionsViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.fadeOutAnimation
 
 class TransactionsFragmentList : Fragment(), EmptyListInterface {
+    val TAG = "TransactionsFragmentList"
 
     lateinit var transactionViewModel: TransactionsViewModel
     lateinit var sharedViewModel: SharedViewModel
@@ -52,9 +53,9 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface {
         parentFragment?.let {
             sharedViewModel = ViewModelProvider(it).get(SharedViewModel::class.java)
         }
-        transactionViewModel.replaceSubscription(this, null, token, this)
-        startListeningPagedList()
-        startMagicWithPaginLibrary()
+        transactionViewModel.replaceSubscription(viewLifecycleOwner, null, token, this)
+        startListeningPagedList()       // ждем новостей от pagedList
+        startMagicWithPagingLibrary()   // ждем новостей от filter
     }
 
 
@@ -67,9 +68,9 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface {
         })
     }
 
-    private fun startMagicWithPaginLibrary() {
+    private fun startMagicWithPagingLibrary() {
         sharedViewModel.getParams().observe(viewLifecycleOwner, Observer { map ->
-            transactionViewModel.replaceSubscription(this, map, token, this)
+            transactionViewModel.replaceSubscription(viewLifecycleOwner, map, token, this)
             startListeningPagedList()
         })
     }
@@ -84,5 +85,9 @@ class TransactionsFragmentList : Fragment(), EmptyListInterface {
         view?.findViewById<TextView>(R.id.emptyTextView)?.visibility = View.INVISIBLE
         view?.findViewById<ImageView>(R.id.emptyImageView)?.visibility = View.INVISIBLE
         fakeContainer?.fadeOutAnimation()
+    }
+
+    override fun lastItemLoaded() {
+
     }
 }

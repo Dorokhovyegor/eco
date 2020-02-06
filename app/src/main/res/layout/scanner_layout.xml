@@ -16,6 +16,7 @@
         android:textColor="@color/white"
         android:paddingStart="16dp"
         android:paddingBottom="16dp"
+        android:visibility="invisible"
         android:paddingEnd="16dp"
         android:paddingTop="16dp"
         android:layout_width="match_parent"

@@ -35,7 +35,7 @@ object CitiesRepo {
             override fun handleApiSuccessResponse(response: ApiSuccessResponse<UserInfoResponse>) {
                 result.value = DataState.data(
                     data = UserViewState(
-                        userResponse = convertDataWithoutCashBackInfo(response.body)
+                        userResponse = convertDataFromRawDataToPresentData(response.body)
                     )
                 )
             }
@@ -44,36 +44,6 @@ object CitiesRepo {
                 return RetrofitBuilder.apiService.setCity("Bearer ${token}", city)
             }
         }.asLiveData()
-    }
-
-    private fun convertDataWithoutCashBackInfo(userResponse: UserInfoResponse?): ClearUserModel? {
-        println("DEBUG Юзер ответ ${userResponse.toString()}")
-        userResponse?.let { rawResponse ->
-            println(
-                "DEBUG Юзер модель ${ClearUserModel(
-                    rawResponse.data?.balance?.div(100),
-                    rawResponse.data?.name,
-                    rawResponse.data?.city,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                )}"
-            )
-            return ClearUserModel(
-                rawResponse.data?.balance?.div(100),
-                rawResponse.data?.name,
-                userResponse.data?.city,
-                null,
-                null,
-                null,
-                null,
-                null
-            )
-
-        }
-        return null
     }
 
     private fun convertDataFromRawDataToPresentData(userResponse: UserInfoResponse?): ClearUserModel? {
@@ -194,8 +164,7 @@ object CitiesRepo {
 
             return ClearUserModel(
                 rawResponse.data?.balance?.div(100),
-                kop,
-                rawResponse.data?.name,
+                rawResponse.data?.city,
                 moneyValues,
                 percentValues,
                 currentSection,

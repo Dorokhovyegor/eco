@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.archit.calendardaterangepicker.customviews.DateRangeCalendarView android:id="@+id/calendar"
+<com.archit.calendardaterangepicker.customviews.DateRangeCalendarView
+    android:id="@+id/calendar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:enable_past_date="true"

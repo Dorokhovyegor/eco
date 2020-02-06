@@ -35,10 +35,9 @@ import com.voodoolab.eco.states.user_state.UserStateEvent
 import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.profile_fragments.CashbackLevelFragment
 import com.voodoolab.eco.ui.profile_fragments.TransactionsFragmentList
-import com.voodoolab.eco.ui.view_models.CitiesViewModels
-import com.voodoolab.eco.ui.view_models.LogoutViewModel
-import com.voodoolab.eco.ui.view_models.UserInfoViewModel
+import com.voodoolab.eco.ui.view_models.*
 import com.voodoolab.eco.utils.Constants
+import com.voodoolab.eco.utils.fadeInAnimation
 import com.voodoolab.eco.utils.translateYFromToViaPercent
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
@@ -59,6 +58,7 @@ class ProfileFragment : Fragment(),
     lateinit var userViewModel: UserInfoViewModel
     lateinit var citiesViewModel: CitiesViewModels
     lateinit var logoutViewModel: LogoutViewModel
+    lateinit var sharedViewModel: SharedCityViewModel
 
     // state listener
     var dataStateHandler: DataStateListener = this
@@ -122,6 +122,10 @@ class ProfileFragment : Fragment(),
         userViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
         citiesViewModel = ViewModelProvider(this).get(CitiesViewModels::class.java)
         logoutViewModel = ViewModelProvider(this).get(LogoutViewModel::class.java)
+
+        parentFragment?.let {
+            sharedViewModel = ViewModelProvider(it).get(SharedCityViewModel::class.java)
+        }
 
         val token = Hawk.get<String>(Constants.TOKEN)
         token?.let {
@@ -195,9 +199,10 @@ class ProfileFragment : Fragment(),
             viewState?.userResponse?.let {
                 if (it.city == null)
                     citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
-
                 updateContent(it)
-                clearInfoUserModel = it
+                sharedViewModel.setCity(it.city)
+                sharedViewModel.setCoord(Hawk.get(it.city) as ArrayList<Double>)
+                clearInfoUserModel = it.copy()
             }
         })
 
@@ -226,8 +231,6 @@ class ProfileFragment : Fragment(),
 
     private fun updateContent(data: ClearUserModel?) {
         if (data != null) {
-            view?.findViewById<TextView>(R.id.balance)?.visibility = View.VISIBLE
-            view?.findViewById<TextView>(R.id.cash)?.visibility = View.VISIBLE
             view?.findViewById<TextView>(R.id.money_second)?.text = Html.fromHtml(
                 getString(
                     R.string.balance_value,
@@ -249,6 +252,11 @@ class ProfileFragment : Fragment(),
             } else if (data.indicatorPosition == -1) {
                 cashback?.text = Html.fromHtml(getString(R.string.percent_value, 0), 0)
             }
+
+            view?.findViewById<TextView>(R.id.balance)?.fadeInAnimation()
+            view?.findViewById<TextView>(R.id.cash)?.fadeInAnimation()
+            balanceTextView?.fadeInAnimation()
+            cashback?.fadeInAnimation()
 
         } else {
             balanceTextView?.text = "-"

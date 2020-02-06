@@ -3,7 +3,6 @@ package com.voodoolab.eco.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +25,7 @@ class TransactionsRecyclerViewAdapter :
 
     val TRANSACTION_TYPE = 0
     val HEADER_TYPE = 1
+    val FOOTER_TYPE = 2
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -39,6 +39,10 @@ class TransactionsRecyclerViewAdapter :
                 view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.transaction_layout_item, parent, false)
             }
+            FOOTER_TYPE -> {
+                view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.footer_layout, parent, false)
+            }
             else -> {
                 view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.transaction_layout_item, parent, false)
@@ -51,7 +55,7 @@ class TransactionsRecyclerViewAdapter :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         item?.let {
-            if (it.type != Constants.TRANSACTION_HEADER_TYPE)
+            if (it.type != Constants.TRANSACTION_HEADER_TYPE && it.type != Constants.TRANSACTION_FOOTER_TYPE)
                 holder.bind(it)
         }
     }
@@ -59,6 +63,8 @@ class TransactionsRecyclerViewAdapter :
     override fun getItemViewType(position: Int): Int {
         if (getItem(position)?.type == Constants.TRANSACTION_HEADER_TYPE) {
             return HEADER_TYPE
+        } else if (getItem(position)?.type == Constants.TRANSACTION_FOOTER_TYPE) {
+            return FOOTER_TYPE
         }
         return TRANSACTION_TYPE
     }

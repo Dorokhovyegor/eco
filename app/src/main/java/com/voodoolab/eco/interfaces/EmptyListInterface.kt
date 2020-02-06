@@ -6,4 +6,6 @@ interface EmptyListInterface{
 
     fun firstItemLoaded()
 
+    fun lastItemLoaded()
+
 }

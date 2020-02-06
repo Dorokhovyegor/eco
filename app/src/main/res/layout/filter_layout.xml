@@ -26,7 +26,14 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:isScrollContainer="true" />
+        android:layout_height="match_parent"
+        android:isScrollContainer="true">
+
+        <include
+            android:visibility="invisible"
+            android:id="@+id/content"
+            layout="@layout/filter_layout_content"/>
+
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
