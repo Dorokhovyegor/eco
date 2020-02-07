@@ -238,8 +238,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     override fun onClusterItemClick(p0: ClusterWash?): Boolean {
         showObject(p0?.id.toString())
 
-        var delta =
-            (map?.projection?.visibleRegion?.farLeft?.latitude?.minus(map?.projection?.visibleRegion?.nearLeft?.latitude!!))?.absoluteValue!!
+        var delta = (map?.projection?.visibleRegion?.farLeft?.latitude?.minus(map?.projection?.visibleRegion?.nearLeft?.latitude!!))?.absoluteValue!!
         map?.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(

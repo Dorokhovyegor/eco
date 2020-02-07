@@ -15,14 +15,14 @@ class SpecialOffersDataSource(val token: String, val city: String?) :
     PageKeyedDataSource<Int, SpecialOfferModel>() {
 
     val FIRST_PAGE = 1
-    val QUANTITY = 5
+    val QUANTITY = 10
 
     override fun loadInitial(
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, SpecialOfferModel>
     ) {
         RetrofitBuilder.apiService.getSpecialOffers(
-            token,
+            "Bearer ${token}",
             city,
             FIRST_PAGE.toString(),
             QUANTITY.toString()
@@ -30,12 +30,14 @@ class SpecialOffersDataSource(val token: String, val city: String?) :
             object : retrofit2.Callback<SpecialOffersResponse> {
                 override fun onFailure(call: Call<SpecialOffersResponse>, t: Throwable) {
                     t.printStackTrace()
+                    println("DEBUG: i am fail")
                 }
 
                 override fun onResponse(
                     call: Call<SpecialOffersResponse>,
                     response: Response<SpecialOffersResponse>
                 ) {
+                    println("DEBUG: i am good")
                     response.body()?.let { responseList ->
                         val convertResponse = ArrayList<SpecialOfferModel>()
                         responseList.offers?.forEach {
@@ -66,7 +68,7 @@ class SpecialOffersDataSource(val token: String, val city: String?) :
         callback: LoadCallback<Int, SpecialOfferModel>
     ) {
         RetrofitBuilder.apiService.getSpecialOffers(
-            token,
+            "Bearer ${token}",
             city,
             params.key.toString(),
             QUANTITY.toString()
@@ -82,7 +84,6 @@ class SpecialOffersDataSource(val token: String, val city: String?) :
                 ) {
                     val key = params.key + 1
                     response.body()?.let { specialOffersResponse ->
-
                         val convertResponse = ArrayList<SpecialOfferModel>()
                         specialOffersResponse.offers?.forEach {
                             convertResponse.add(

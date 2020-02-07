@@ -1,13 +1,10 @@
 package com.voodoolab.eco.ui.view_models
 
-import android.graphics.pdf.PdfDocument
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.voodoolab.eco.datasource.TransactionDataSource
 import com.voodoolab.eco.datasource.TransactionDataSourceFactory
 import com.voodoolab.eco.interfaces.EmptyListInterface
 import com.voodoolab.eco.models.TransactionData
@@ -17,7 +14,11 @@ class TransactionsViewModel : ViewModel() {
     var transactionsPagedList: LiveData<PagedList<TransactionData>>? = null
     var map: Map<String, Any?>? = null
 
-    private fun buildPagedList(localMap: Map<String, Any?>?, token: String, emptyList: EmptyListInterface?): LiveData<PagedList<TransactionData>> {
+    private fun buildPagedList(
+        localMap: Map<String, Any?>?,
+        token: String,
+        emptyList: EmptyListInterface?
+    ): LiveData<PagedList<TransactionData>> {
         val config = PagedList.Config.Builder()
             .setEnablePlaceholders(false)
             .setPageSize(10)
@@ -64,11 +65,12 @@ class TransactionsViewModel : ViewModel() {
         }
     }
 
-    fun replaceSubscription(lifecycleOwner: LifecycleOwner,
+    fun replaceSubscription(
+        lifecycleOwner: LifecycleOwner,
         map: Map<String, Any?>?,
         token: String,
-        emptyList: EmptyListInterface?) {
-        this.map = map
+        emptyList: EmptyListInterface?
+    ) {
         transactionsPagedList?.removeObservers(lifecycleOwner)
         transactionsPagedList = buildPagedList(map, token, emptyList)
     }

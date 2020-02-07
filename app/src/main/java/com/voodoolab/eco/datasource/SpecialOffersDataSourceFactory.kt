@@ -11,14 +11,8 @@ class SpecialOffersDataSourceFactory(
     val offersLiveDataSource = MutableLiveData<SpecialOffersDataSource>()
 
     override fun create(): androidx.paging.DataSource<Int, SpecialOfferModel> {
-        if (city != null) {
             val offersDataSource = SpecialOffersDataSource(token, city)
             offersLiveDataSource.postValue(offersDataSource)
             return offersDataSource
-        } else {
-            val offersDataSource = SpecialOffersDataSource(token, null)
-            offersLiveDataSource.postValue(offersDataSource)
-            return offersDataSource
-        }
     }
 }

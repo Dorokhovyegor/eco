@@ -33,12 +33,13 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
     private lateinit var sharedCityViewModel: SharedCityViewModel
 
     private var specialOffersRecyclerView: RecyclerView? = null
-    private var recyclerViewAdapter: SpecialOffersRecyclerViewAdapter? = null
-
+    private var recyclerViewAdapter: SpecialOffersRecyclerViewAdapter? = SpecialOffersRecyclerViewAdapter {specialOfferModel: SpecialOfferModel -> discountClick(specialOfferModel)}
     private var emptyListImageView: ImageView? = null
     private var emptyTextView: TextView? = null
     private var fakeContainer: LinearLayout? = null
     private var listener: DiscountClickListener?  = null
+
+    lateinit var token: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,40 +50,44 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initViews(view)
         specialOfferViewModel = ViewModelProvider(this).get(SpecialOffersViewModel::class.java)
         parentFragment?.let {
             sharedCityViewModel = ViewModelProvider(it)[SharedCityViewModel::class.java]
         }
-        subscribeObserver()
+
+        token = Hawk.get<String>(Constants.TOKEN)
+        initViews(view)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        startMagicWithPagingLibrary()
     }
 
     private fun initViews(view: View) {
+        specialOffersRecyclerView = view.findViewById(R.id.discountRecyclerView)
+        specialOffersRecyclerView?.layoutManager = LinearLayoutManager(context)
+        specialOffersRecyclerView?.adapter = recyclerViewAdapter
+
         fakeContainer = view.findViewById(R.id.fake_items)
         emptyListImageView= view.findViewById(R.id.emptyListImageView)
         emptyTextView = view.findViewById(R.id.emptyListTextView)
-
-        specialOffersRecyclerView = view.findViewById(R.id.discountRecyclerView)
-        specialOffersRecyclerView?.layoutManager = LinearLayoutManager(context)
-        recyclerViewAdapter = SpecialOffersRecyclerViewAdapter {specialOfferModel: SpecialOfferModel -> discountClick(specialOfferModel)}
-        specialOffersRecyclerView?.adapter = recyclerViewAdapter
     }
 
     private fun discountClick(data: SpecialOfferModel) {
         listener?.onDiscountClick(data.id)
     }
 
-    private fun subscribeObserver() {
-        sharedCityViewModel.getCity().observe(viewLifecycleOwner, Observer {
-            val token = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
-            specialOfferViewModel.init(token, it, this)
-        })
-
+    private fun startListeningPagedList() {
         specialOfferViewModel.offersPagedList?.observe(viewLifecycleOwner, Observer {
-            println("MapFragment cnjsdofsrjiigjohsiofdihoshsghgskj")
-            Handler().postDelayed({
-                recyclerViewAdapter?.submitList(it)
-            }, 100)
+            recyclerViewAdapter?.submitList(it)
+        })
+    }
+
+    private fun startMagicWithPagingLibrary() {
+        sharedCityViewModel.getCity().observe(viewLifecycleOwner, Observer {city ->
+            specialOfferViewModel.replaceSubscription(viewLifecycleOwner, city, token, this)
+            startListeningPagedList()
         })
     }
 

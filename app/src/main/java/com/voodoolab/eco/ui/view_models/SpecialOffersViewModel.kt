@@ -1,41 +1,58 @@
 package com.voodoolab.eco.ui.view_models
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.voodoolab.eco.datasource.SpecialOffersDataSource
 import com.voodoolab.eco.datasource.SpecialOffersDataSourceFactory
 import com.voodoolab.eco.interfaces.EmptyListInterface
 import com.voodoolab.eco.models.SpecialOfferModel
-import com.voodoolab.eco.models.TransactionData
 
 class SpecialOffersViewModel : ViewModel() {
 
     var offersPagedList: LiveData<PagedList<SpecialOfferModel>>? = null
-    private var liveDataSource: LiveData<SpecialOffersDataSource>? = null
+    var city: String? = null
 
-    fun init(token: String, city: String?, emptyListInterface: EmptyListInterface?) {
-        val factory = SpecialOffersDataSourceFactory(token, city)
-        liveDataSource = factory.offersLiveDataSource
+    private fun buildPagedList(
+        paramCity: String?,
+        token: String,
+        emptyListInterface: EmptyListInterface?
+    ): LiveData<PagedList<SpecialOfferModel>> {
 
+        println("DEBUG: произошел билд")
         val config = PagedList.Config.Builder()
             .setEnablePlaceholders(false)
-            .setPageSize(5)
+            .setPageSize(10)
             .build()
 
-        offersPagedList = LivePagedListBuilder(factory, config)
+        return LivePagedListBuilder(SpecialOffersDataSourceFactory(token, paramCity), config)
             .setBoundaryCallback(object : PagedList.BoundaryCallback<SpecialOfferModel>() {
                 override fun onZeroItemsLoaded() {
                     super.onZeroItemsLoaded()
                     emptyListInterface?.setEmptyState()
                 }
 
+                override fun onItemAtEndLoaded(itemAtEnd: SpecialOfferModel) {
+                    super.onItemAtEndLoaded(itemAtEnd)
+                    emptyListInterface?.lastItemLoaded()
+                }
+
                 override fun onItemAtFrontLoaded(itemAtFront: SpecialOfferModel) {
                     super.onItemAtFrontLoaded(itemAtFront)
                     emptyListInterface?.firstItemLoaded()
                 }
-            })
-            .build()
+            }).build()
     }
+
+    fun replaceSubscription(
+        lifecycleOwner: LifecycleOwner,
+        city: String?,
+        token: String,
+        emptyListInterface: EmptyListInterface?
+    ) {
+        offersPagedList?.removeObservers(lifecycleOwner)
+        offersPagedList = buildPagedList(city, token, emptyListInterface)
+    }
+
 }
