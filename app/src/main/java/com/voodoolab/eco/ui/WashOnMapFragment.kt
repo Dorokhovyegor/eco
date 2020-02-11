@@ -121,7 +121,6 @@ class WashOnMapFragment : Fragment(), OnMapReadyCallback,
                     )
                 )
             }
-
         }
         clusterManager?.cluster()
     }

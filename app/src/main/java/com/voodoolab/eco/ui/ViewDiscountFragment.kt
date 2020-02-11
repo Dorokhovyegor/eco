@@ -98,7 +98,6 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
                 bodyTextView?.text = response.text
 
                 imageStock?.let {
-
                     if (context != null) {
                         if (response.logo != "") {
                             Glide.with(context!!)

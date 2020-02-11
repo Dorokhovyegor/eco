@@ -20,6 +20,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.iid.FirebaseInstanceId
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
+import com.voodoolab.eco.helper_activities.ViewSpecialOfferActivity
 import com.voodoolab.eco.helper_fragments.SendReportBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ReportViewModel
 import com.voodoolab.eco.interfaces.*
@@ -70,6 +71,14 @@ class MainActivity : AppCompatActivity(),
         // for report это, есди (вроде как кликаем по уведомлению)
         if (intent.hasFullInformationForReport()) {
             showReportBottomSheet(intent.toBundle())
+        }
+
+        if (intent.hasExtra("stock_id")) {
+            val stock_id = intent.getStringExtra("stock_id")
+            val intentToSpecialOfferActivity = Intent(this, ViewSpecialOfferActivity::class.java)
+            intentToSpecialOfferActivity.putExtra("stock_id", stock_id)
+            startActivity(intentToSpecialOfferActivity)
+            finish()
         }
     }
 
