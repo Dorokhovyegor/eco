@@ -66,7 +66,10 @@ class DefaultWashClusterRenderer(
 
         item?.active?.let {
             if (!it) {
-                itemTextView.text = itemTextView.context.resources.getString(R.string.percent_value, item.cashback)
+                itemTextView.text =
+                    itemTextView.context.resources.getString(R.string.percent_value, item.cashback)
+            } else {
+                itemTextView.text = ""
             }
         }
         val bitmapIcon = iconGenerator.makeIcon()

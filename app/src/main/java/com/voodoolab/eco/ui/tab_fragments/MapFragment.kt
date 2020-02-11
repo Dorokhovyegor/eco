@@ -2,7 +2,6 @@ package com.voodoolab.eco.ui.tab_fragments
 
 import android.content.Context
 import android.content.DialogInterface
-import android.content.res.Resources.NotFoundException
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +19,6 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.orhanobut.hawk.Hawk
@@ -41,7 +39,6 @@ import com.voodoolab.eco.ui.view_models.SharedCityViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.show
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
-import kotlin.math.absoluteValue
 
 
 class MapFragment : Fragment(), OnMapReadyCallback,
@@ -58,7 +55,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var map: GoogleMap? = null
     private var mapView: MapView? = null
     private var progressBar: MaterialProgressBar? = null
-    private var optionsButton: ImageButton? = null
     private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
 
     private var clusterManager: ClusterManager<ClusterWash>? = null
@@ -73,13 +69,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         parentFragment?.let {
             sharedCityViewModel = ViewModelProvider(it)[SharedCityViewModel::class.java]
         }
-        val view = inflater.inflate(R.layout.map_fragment, container, false)
-        return view
+        return inflater.inflate(R.layout.map_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        optionsButton = view.findViewById(R.id.options_button)
         progressBar = view.findViewById(R.id.progress_bar)
         mapView = view.findViewById(R.id.map_view)
         mapView?.getMapAsync(this)
@@ -150,29 +144,19 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         list.forEach { wash ->
             val iconHappy = R.drawable.ic_happy_hours
             val iconUnhappy = R.drawable.ic_regular_hours
+
             if (wash.coordinates != null) {
                 wash.happyHoursInfo?.active?.let {
-                    if (it) {
-                        clusterManager?.addItem(
-                            ClusterWash(
-                                wash.id,
-                                LatLng(wash.coordinates[0], wash.coordinates[1]),
-                                wash.cashback,
-                                wash.happyHoursInfo.active,
-                                iconHappy
-                            )
+                    clusterManager?.addItem(
+                        ClusterWash(
+                            wash.id,
+                            LatLng(wash.coordinates[0], wash.coordinates[1]),
+                            if (it) null else wash.cashback,
+                            wash.happyHoursInfo.active,
+                            if (it) iconHappy else iconUnhappy
                         )
-                    } else {
-                        clusterManager?.addItem(
-                            ClusterWash(
-                                wash.id,
-                                LatLng(wash.coordinates[0], wash.coordinates[1]),
-                                wash.cashback,
-                                wash.happyHoursInfo.active,
-                                iconUnhappy
-                            )
-                        )
-                    }
+                    )
+
                 }
             }
         }
@@ -236,18 +220,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     override fun onClusterItemClick(p0: ClusterWash?): Boolean {
+        map?.animateCamera(CameraUpdateFactory.newLatLngZoom(p0?.location, 15f))
         showObject(p0?.id.toString())
-
-        var delta = (map?.projection?.visibleRegion?.farLeft?.latitude?.minus(map?.projection?.visibleRegion?.nearLeft?.latitude!!))?.absoluteValue!!
-        map?.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    p0?.location?.latitude?.minus(
-                        delta.div(4)
-                    )!!, p0.location.longitude
-                ), 15f
-            )
-        )
         return true
     }
 
