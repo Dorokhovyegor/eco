@@ -2,6 +2,7 @@ package com.voodoolab.eco.network
 
 import androidx.lifecycle.LiveData
 import com.voodoolab.eco.models.CityModel
+import com.voodoolab.eco.models.SetDiscountViewedResponse
 import com.voodoolab.eco.responses.*
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.GenericApiResponse
@@ -108,5 +109,11 @@ interface ApiService {
         @Part("stars") rating: Int?
     ): LiveData<GenericApiResponse<ReportResponse>>
 
+    @Multipart
+    @POST("user/set-viewed-stock")
+    fun setViewedDiscount(
+        @Header("Authorization") tokenApp: String,
+        @Part("stock_id") id: Int
+    ): LiveData<GenericApiResponse<SetDiscountViewedResponse>>
 
 }

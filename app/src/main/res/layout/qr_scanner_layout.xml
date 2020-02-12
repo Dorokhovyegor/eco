@@ -5,24 +5,40 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:drawableEnd="@drawable/ic_info_white"
-        android:text="@string/qr_scanner_text"
-        android:background="#E0000000"
-        android:textSize="20sp"
-        android:textColor="@color/white"
-        android:paddingStart="16dp"
-        android:paddingBottom="16dp"
-        android:visibility="invisible"
-        android:paddingEnd="16dp"
-        android:paddingTop="16dp"
+    <com.budiyev.android.codescanner.CodeScannerView
+        android:id="@+id/scanner_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"
+        app:autoFocusButtonColor="@android:color/white"
+        app:autoFocusButtonVisible="true"
+        app:flashButtonColor="@android:color/white"
+        app:flashButtonVisible="true"
+        app:frameColor="@android:color/white"
+        app:frameCornersSize="50dp"
+        app:frameCornersRadius="0dp"
+        app:frameAspectRatioWidth="1"
+        app:frameAspectRatioHeight="1"
+        app:frameSize="0.75"
+        app:frameThickness="2dp"
+        app:maskColor="#77000000"/>
+
+    <TextView
+        android:visibility="invisible"
+        android:id="@+id/open_instruction_textView"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/black"
+        android:textColor="@color/white"
+        android:text="Как пользоваться?"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:textSize="20sp"
+        android:drawableEnd="@drawable/ic_info_white"
+        android:paddingEnd="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp" />
 
     <LinearLayout
+        android:visibility="visible"
         android:id="@+id/info_scanner_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -82,21 +98,15 @@
             android:textSize="16sp" />
 
         <Button
+            android:id="@+id/close_instruction"
+            style="@style/GreenButtonWithoutBackground"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="40dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="32dp"
-            android:background="@null"
-            android:text="@string/complete_text"
-            android:textAllCaps="false"
-            android:textColor="#2C9B1A" />
+            android:text="Хорошо" />
     </LinearLayout>
-
-    <me.dm7.barcodescanner.zxing.ZXingScannerView
-        android:id="@+id/scanner_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

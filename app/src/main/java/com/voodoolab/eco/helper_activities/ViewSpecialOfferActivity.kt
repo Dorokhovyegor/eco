@@ -20,7 +20,9 @@ import com.voodoolab.eco.models.WashModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.DiscountResponse
 import com.voodoolab.eco.states.discount_state.DiscountStateEvent
+import com.voodoolab.eco.states.view_discounts_state.SetViewedDiscountStateEvent
 import com.voodoolab.eco.ui.view_models.DiscountViewModel
+import com.voodoolab.eco.ui.view_models.ViewDiscountViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.show
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
@@ -28,6 +30,7 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 class ViewSpecialOfferActivity : AppCompatActivity(), DataStateListener {
 
     lateinit var specialOfferViewModel: DiscountViewModel
+    lateinit var viewDiscountViewModel: ViewDiscountViewModel
 
     var progressBar: MaterialProgressBar? = null
     var titleSpecialOffer: TextView? = null
@@ -47,12 +50,15 @@ class ViewSpecialOfferActivity : AppCompatActivity(), DataStateListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.discount_layout)
         specialOfferViewModel = ViewModelProvider(this)[DiscountViewModel::class.java]
+        viewDiscountViewModel = ViewModelProvider(this)[ViewDiscountViewModel::class.java]
+
         initViews()
         retrieveSpecialOfferId()
-
         val token = Hawk.get<String>(Constants.TOKEN)
         specialOfferId?.let {
             specialOfferViewModel.setStateEvent(DiscountStateEvent.RequestDiscountById(token, it))
+            viewDiscountViewModel.setStateEvent(SetViewedDiscountStateEvent.ViewDiscountStateEvent(token, it
+            ))
         }
 
         subscribeObserver()
@@ -89,11 +95,7 @@ class ViewSpecialOfferActivity : AppCompatActivity(), DataStateListener {
     }
 
     private fun washClicked(washModel: WashModel) {
-            val list = adapterRecyclerView?.items
-            val bundle = bundleOf(
-                "wash_list" to list,
-                "current_wash" to washModel
-            )
+
     }
 
     private fun retrieveSpecialOfferId() {

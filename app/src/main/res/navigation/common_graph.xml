@@ -67,6 +67,16 @@
             app:launchSingleTop="false"
             app:popUpTo="@+id/auth_destination"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_containerFragment_to_QRScannerFragment"
+            app:destination="@id/QRScannerFragment"
+            app:popUpTo="@+id/containerFragment"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_containerFragment_to_terminalPickUpFragment"
+            app:destination="@id/terminalPickUpFragment"
+            app:popUpTo="@+id/containerFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/viewDiscountFragment"
@@ -85,4 +95,12 @@
             app:destination="@id/viewDiscountFragment"
             app:enterAnim="@anim/enter_from_right" />
     </fragment>
+    <fragment
+        android:id="@+id/QRScannerFragment"
+        android:name="com.voodoolab.eco.ui.terminal_ui.QRScannerFragment"
+        android:label="QRScannerFragment" />
+    <fragment
+        android:id="@+id/terminalPickUpFragment"
+        android:name="com.voodoolab.eco.ui.terminal_ui.TerminalPickUpFragment"
+        android:label="TerminalPickUpFragment" />
 </navigation>
