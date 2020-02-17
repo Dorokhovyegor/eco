@@ -99,8 +99,6 @@ class WashOnMapFragment : Fragment(), OnMapReadyCallback,
             map?.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f))
         }
 
-        // сфокусироваться на этом местоположении
-        // сделать запрос на получение подробной информации
     }
 
     private fun renderMarker(washModel: WashModel?) {

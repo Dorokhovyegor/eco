@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
@@ -42,7 +41,7 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
 
 class MapFragment : Fragment(), OnMapReadyCallback,
-    DataStateListener, DialogInterface.OnClickListener,
+    DataStateListener,
     ClusterManager.OnClusterClickListener<ClusterWash>,
     ClusterManager.OnClusterItemClickListener<ClusterWash> {
 
@@ -82,10 +81,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         objectViewModel.setStateEventForListObject(ListObjectStateEvent.RequestAllObjectEvent("Bearer $token"))
         subscribeObservers()
         subscribeCityInfo()
-    }
-
-    override fun onClick(dialog: DialogInterface?, which: Int) {
-
     }
 
     private fun subscribeCityInfo() {

@@ -103,6 +103,8 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-messaging:20.1.0'
 
+    implementation "com.google.android.gms:play-services-location:17.0.0"
+
     implementation 'com.github.jetradarmobile:android-snowfall:1.2.0'
 
     implementation 'com.elyeproj.libraries:loaderviewlibrary:2.0.0'
@@ -118,6 +120,8 @@ dependencies {
     implementation 'com.budiyev.android:code-scanner:2.1.0'
 
     implementation 'pub.devrel:easypermissions:3.0.0'
+
+    implementation "android.arch.work:work-runtime:1.0.1"
 }
 
 apply plugin: 'com.google.gms.google-services'

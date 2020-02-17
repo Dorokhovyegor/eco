@@ -8,9 +8,11 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.voodoolab.eco.models.WashModel
+import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.utils.Constants.NOTIFICATION_OPERATION_ID
 import com.voodoolab.eco.utils.Constants.NOTIFICATION_VALUE_OF_TRANSACTION
 import com.voodoolab.eco.utils.Constants.NOTIFICATION_WASH_ADDRESS
@@ -284,5 +286,18 @@ fun String.toCalendar(): Calendar? {
         e.printStackTrace()
         null
     }
+}
+
+fun List<ObjectResponse>.convertToJson(): JsonArray? {
+    var jsonArray = JsonArray()
+    this.forEach {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("id", it.id)
+        jsonObject.addProperty("full_address", "${it.city}, ${it.address}")
+        jsonObject.addProperty("latitude", it.coordinates?.get(0))
+        jsonObject.addProperty("longitude", it.coordinates?.get(1))
+        jsonArray.add(jsonObject)
+    }
+    return if (jsonArray.size()>0) jsonArray else null
 }
 

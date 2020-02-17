@@ -14,8 +14,6 @@ import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 
-// todo https://blog.mindorks.com/implementing-easy-permissions-in-android-android-tutorial easy perms
-// todo https://github.com/dm77/barcodescanner
 
 class WashingFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
@@ -69,7 +67,21 @@ class WashingFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     @AfterPermissionGranted(222)
     private fun openMap() {
-
+        val perms = android.Manifest.permission.ACCESS_FINE_LOCATION
+        context?.let {
+            if (EasyPermissions.hasPermissions(it, perms)) {
+                activity?.findNavController(R.id.frame_container)?.navigate(
+                    R.id.action_containerFragment_to_terminalPickUpFragment
+                )
+            } else {
+                EasyPermissions.requestPermissions(
+                    this,
+                    "Чтобы использовать эту функцию, необходимо разрешить приложению доступ к Вашему местоположению",
+                    222,
+                    perms
+                )
+            }
+        }
     }
 
     @AfterPermissionGranted(111)
@@ -78,7 +90,8 @@ class WashingFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         context?.let {
             if (EasyPermissions.hasPermissions(it, perms)) {
                 activity?.findNavController(R.id.frame_container)?.navigate(
-                    R.id.action_containerFragment_to_QRScannerFragment)
+                    R.id.action_containerFragment_to_QRScannerFragment
+                )
 
             } else {
                 EasyPermissions.requestPermissions(
@@ -97,7 +110,6 @@ class WashingFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
 
@@ -108,13 +120,20 @@ class WashingFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        openScanner()
+        when (requestCode) {
+            111 -> {
+                openScanner()
+            }
+            222 -> {
+                openMap()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
+       /* if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
             openScanner()
-        }
+        }*/
     }
 }
