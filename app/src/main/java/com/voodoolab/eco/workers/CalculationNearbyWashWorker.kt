@@ -1,77 +1,70 @@
 package com.voodoolab.eco.workers
 
 import android.content.Context
+import android.location.Location
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.google.gson.JsonSyntaxException
+import org.json.JSONException
 
 class CalculationNearbyWashWorker(var context: Context, var workerParameters: WorkerParameters) :
     Worker(context, workerParameters) {
 
     override fun doWork(): Result {
         val input = inputData
-        // разбираем данные, которые необходимо собрать и построить задачу
-        println("DEBUG: work manager: ")
-        if (input.getString("inputData") != null &&
-                ) {
-            var array = JsonParser().parse(input.getString("inputData")).asJsonArray
+        if (input.getString("inputMarkers") != null) {
+            try {
+                val array = JsonParser().parse(input.getString("inputMarkers")).asJsonArray
+                val locationUser = Location("")
+                locationUser.latitude = input.getDouble("my_lat", 0.0)
+                locationUser.longitude = input.getDouble("my_long", 0.0)
 
-        }
+                var nearbyDistance = Float.MAX_VALUE
+                var nearbyWashId = -1
+                var nearbyAddress: String? = null
+                var nearbyLatitude: Double = Double.MAX_VALUE
+                var nearbyLongitude: Double = Double.MAX_VALUE
 
-        // выводим данные обратно
-        val outputData = Data.Builder().putFloat("sfksad", 15f).build()
-        return Result.success(outputData)
-    }
+                array?.forEach { element ->
+                    element as JsonObject
+                    val id = element.get("id").asInt
+                    val fullAddress = element.get("full_address").asString
+                    val washLocation = Location("")
+                    washLocation.longitude = element.get("longitude").asDouble
+                    washLocation.latitude = element.get("latitude").asDouble
 
-
-   /* if (map != null) {
-        map?.let {
-            if (it.isMyLocationEnabled) {
-                fusedLocationClient.lastLocation?.addOnSuccessListener { location ->
-                    if (location != null) {
-                        map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 12f))
-                        var distance = Float.MAX_VALUE
-                        var idNearbyWash = -1
-                        var address: String? = null
-                        var coord: LatLng? = null
-                        markers.forEach { washObject ->
-                            if (washObject.coordinates?.size == 2) {
-                                val currentLocation = Location("")
-                                currentLocation.latitude = washObject.coordinates[0]
-                                currentLocation.longitude = washObject.coordinates[1]
-                                if (location.distanceTo(currentLocation) < distance) {
-                                    distance = location.distanceTo(currentLocation)
-                                    idNearbyWash = washObject.id
-                                    address = "${washObject.city}, ${washObject.address}"
-                                    coord = LatLng(washObject.coordinates[0], washObject.coordinates[1])
-                                }
-                            }
-                        }
-
-                        if (distance != Float.MAX_VALUE && idNearbyWash != -1 && address != null) {
-                            // todo нашел необходимые данные, необходимо сделать запрос с подтверждением
-                            context?.let {
-                                AlertDialog.Builder(it)
-                                    .setTitle("Подтверждение")
-                                    .setMessage("Вы находитесь на мойке по адресу ${address}?")
-                                    .setNegativeButton("Нет") { w, p ->
-                                        w.dismiss()
-                                        map?.animateCamera(
-                                            CameraUpdateFactory.newLatLngZoom(
-                                                LatLng(location.latitude, location.longitude), 12f))
-                                    }
-                                    .setPositiveButton("Да") { w, p ->
-                                        map?.animateCamera(CameraUpdateFactory.newLatLngZoom(coord, 16f))
-                                        // todo request info
-                                    }
-                                    .show()
-
-                            }
-                        }
+                    if (nearbyDistance > locationUser.distanceTo(washLocation)) {
+                        nearbyDistance = locationUser.distanceTo(washLocation)
+                        nearbyWashId = id
+                        nearbyAddress = fullAddress
+                        nearbyLatitude = washLocation.latitude
+                        nearbyLongitude = washLocation.longitude
                     }
                 }
+                return if (nearbyDistance != Float.MAX_VALUE && nearbyWashId != -1 && nearbyAddress != null && nearbyLatitude != Double.MAX_VALUE && nearbyLongitude != Double.MAX_VALUE) {
+                    val outputData = Data.Builder().putFloat("min_distance", nearbyDistance)
+                        .putDouble("latitude", nearbyLatitude)
+                        .putDouble("longitude", nearbyLongitude)
+                        .putString("address", nearbyAddress)
+                        .putInt("id", nearbyWashId)
+                        .build()
+                    Result.success(outputData)
+                } else {
+                    Result.failure()
+                }
+
+            } catch (syntaxException: JsonSyntaxException) {
+                syntaxException.printStackTrace()
+                return Result.failure()
+            } catch (jsonException: JSONException) {
+                jsonException.printStackTrace()
+                return Result.failure()
             }
+        } else {
+            return Result.failure()
         }
-    }*/
+    }
 }

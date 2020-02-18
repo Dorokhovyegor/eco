@@ -289,7 +289,7 @@ fun String.toCalendar(): Calendar? {
 }
 
 fun List<ObjectResponse>.convertToJson(): JsonArray? {
-    var jsonArray = JsonArray()
+    val jsonArray = JsonArray()
     this.forEach {
         val jsonObject = JsonObject()
         jsonObject.addProperty("id", it.id)

@@ -1,21 +1,17 @@
 package com.voodoolab.eco.ui.terminal_ui
 
 import android.Manifest
-import android.content.DialogInterface
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.annotation.NonNull
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -25,14 +21,14 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.tasks.Task
+import com.google.android.material.snackbar.Snackbar
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
+import com.voodoolab.eco.helper_fragments.ChooseTerminalBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
 import com.voodoolab.eco.interfaces.DataStateListener
-import com.voodoolab.eco.models.WashModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.states.object_state.ListObjectStateEvent
@@ -89,7 +85,6 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun subscribeObservers() {
-
         objectViewModel.dataStateListObject.observe(viewLifecycleOwner, Observer { dataState ->
             stateHandler.onDataStateChange(dataState)
             dataState.data?.let { listData ->
@@ -108,23 +103,85 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
                     if (map != null) {
                         map?.let {
                             fusedLocationClient.lastLocation?.addOnSuccessListener {
-                                it.longitude
-                                it.latitude
+                                map?.moveCamera(
+                                    CameraUpdateFactory.newLatLngZoom(
+                                        LatLng(
+                                            it.latitude,
+                                            it.longitude
+                                        ), 15f
+                                    )
+                                )
                                 val workManager = WorkManager.getInstance()
-                                val workerRequest = OneTimeWorkRequest.Builder(CalculationNearbyWashWorker::class.java)
-                                    .setInputData(Data.Builder()
-                                        .putString("inputMarkers", markers.convertToJson().toString())
-                                        .putDouble("my_long", it.longitude)
-                                        .putDouble("my_lat", it.latitude)
-                                        .build())
-                                    .build()
+                                val workerRequest =
+                                    OneTimeWorkRequest.Builder(CalculationNearbyWashWorker::class.java)
+                                        .setInputData(
+                                            Data.Builder()
+                                                .putString(
+                                                    "inputMarkers",
+                                                    markers.convertToJson().toString()
+                                                )
+                                                .putDouble("my_long", it.longitude)
+                                                .putDouble("my_lat", it.latitude)
+                                                .build()
+                                        )
+                                        .build()
                                 workManager.enqueue(workerRequest)
+                                workManager.getWorkInfoByIdLiveData(workerRequest.id)
+                                    .observe(viewLifecycleOwner, Observer { workInfo ->
+                                        if (workInfo != null) {
+                                            if (workInfo.state == WorkInfo.State.SUCCEEDED) {
+                                                val address: String? =
+                                                    workInfo.outputData.getString("address")
+                                                val id = workInfo.outputData.getInt("id", -1)
+                                                val coord = LatLng(
+                                                    workInfo.outputData.getDouble(
+                                                        "latitude",
+                                                        Double.MAX_VALUE
+                                                    ),
+                                                    workInfo.outputData.getDouble(
+                                                        "longitude",
+                                                        Double.MAX_VALUE
+                                                    )
+                                                )
+                                                buildAlertDialog(
+                                                    address = address,
+                                                    washId = id,
+                                                    coord = coord
+                                                )
+                                            }
+                                        }
+                                    })
                             }
                         }
                     }
                 }
             }
         })
+    }
+
+    private fun buildAlertDialog(washId: Int, address: String?, coord: LatLng) {
+        context?.let {
+            androidx.appcompat.app.AlertDialog.Builder(it)
+                .setTitle("Подтверждение")
+                .setMessage("Вы находитесь по адресу ${address}?")
+                .setNegativeButton("Нет") { dialog, _ ->
+                    map?.animateCamera(CameraUpdateFactory.zoomBy(-3f))
+                    Snackbar.make(view!!, "Выберите подходящую мойку", Snackbar.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+                .setPositiveButton("Да") { dialog, _ ->
+                    dialog.dismiss()
+                    map?.animateCamera(CameraUpdateFactory.newLatLngZoom(coord, 15f))
+                    map?.setOnCameraIdleListener {
+                        openBottomSheet()
+                        map?.setOnCameraIdleListener {
+
+                        }
+                    }
+
+                }
+                .show()
+        }
     }
 
 
@@ -154,7 +211,6 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
         }
         clusterManager?.cluster()
     }
-
 
     override fun onMapReady(p0: GoogleMap?) {
         map = p0
@@ -210,12 +266,26 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
     }
 
     override fun onClusterItemClick(p0: ClusterWash?): Boolean {
-        // todo request info about this wash-object
+        map?.setOnCameraIdleListener {
+            openBottomSheet()
+            map?.setOnCameraIdleListener {
+               
+            }
+        }
         return false
     }
 
-    private fun openBottomSheet(objectResponse: ObjectResponse) {
+    private fun openBottomSheet() {
         // todo сделать то, который будет показывать терминады
+        childFragmentManager.run {
+            val bottomSheetDialogFragment =
+                ChooseTerminalBottomSheet()
+
+            val fragment = childFragmentManager.findFragmentByTag("objectInfoFragment")
+            if (fragment == null) {
+                bottomSheetDialogFragment.show(this, "objectInfoFragment")
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
