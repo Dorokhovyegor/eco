@@ -115,7 +115,9 @@ class WashOnMapFragment : Fragment(), OnMapReadyCallback,
                         LatLng(washModel.coordinates[0], washModel.coordinates[1]),
                         null,
                         true,
-                        ecoMarker
+                        ecoMarker,
+                        washModel.seats!!,
+                        washModel.address!!
                     )
                 )
             }

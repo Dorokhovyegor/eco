@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
@@ -17,8 +18,8 @@ import pub.devrel.easypermissions.EasyPermissions
 
 class WashingFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
-    private var findTerminalOnMapItem: View? = null
-    private var findTerminalViaScanner: View? = null
+    private var findTerminalOnMapItem: Button? = null
+    private var findTerminalViaScanner: Button? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,23 +35,6 @@ class WashingFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initListeners()
-        setContentForMapItem()
-        setContentForScannerItem()
-    }
-
-    private fun setContentForScannerItem() {
-        findTerminalViaScanner?.findViewById<TextView>(R.id.titleTextView)?.text =
-            "Сделай это сканером"
-        Glide.with(this).load(R.mipmap.scanner_init)
-            .into(findTerminalViaScanner?.findViewById(R.id.offerImageView)!!)
-
-    }
-
-    private fun setContentForMapItem() {
-        findTerminalOnMapItem?.findViewById<TextView>(R.id.titleTextView)?.text =
-            "Сделай это c помощью карты"
-        Glide.with(this).load(R.mipmap.map_init)
-            .into(findTerminalOnMapItem?.findViewById(R.id.offerImageView)!!)
     }
 
     private fun initListeners() {
@@ -132,8 +116,6 @@ class WashingFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-       /* if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
-            openScanner()
-        }*/
+
     }
 }

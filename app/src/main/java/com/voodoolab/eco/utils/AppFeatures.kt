@@ -296,6 +296,7 @@ fun List<ObjectResponse>.convertToJson(): JsonArray? {
         jsonObject.addProperty("full_address", "${it.city}, ${it.address}")
         jsonObject.addProperty("latitude", it.coordinates?.get(0))
         jsonObject.addProperty("longitude", it.coordinates?.get(1))
+        jsonObject.addProperty("seats", it.seats)
         jsonArray.add(jsonObject)
     }
     return if (jsonArray.size()>0) jsonArray else null

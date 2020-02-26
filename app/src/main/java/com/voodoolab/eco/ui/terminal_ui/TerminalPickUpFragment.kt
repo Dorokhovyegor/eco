@@ -143,10 +143,12 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
                                                         Double.MAX_VALUE
                                                     )
                                                 )
+                                                val seats = workInfo.outputData.getInt("seats", -1)
                                                 buildAlertDialog(
                                                     address = address,
                                                     washId = id,
-                                                    coord = coord
+                                                    coord = coord,
+                                                    seats = seats
                                                 )
                                             }
                                         }
@@ -159,7 +161,7 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
         })
     }
 
-    private fun buildAlertDialog(washId: Int, address: String?, coord: LatLng) {
+    private fun buildAlertDialog(washId: Int, address: String?, coord: LatLng, seats: Int?) {
         context?.let {
             androidx.appcompat.app.AlertDialog.Builder(it)
                 .setTitle("Подтверждение")
@@ -173,7 +175,7 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
                     dialog.dismiss()
                     map?.animateCamera(CameraUpdateFactory.newLatLngZoom(coord, 15f))
                     map?.setOnCameraIdleListener {
-                        openBottomSheet()
+                        openBottomSheet(washId, address, seats)
                         map?.setOnCameraIdleListener {
 
                         }
@@ -203,7 +205,9 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
                             LatLng(wash.coordinates[0], wash.coordinates[1]),
                             null,
                             true,
-                            ecoMarker
+                            ecoMarker,
+                            wash.seats!!,
+                            wash.address!!
                         )
                     )
                 }
@@ -267,19 +271,18 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
 
     override fun onClusterItemClick(p0: ClusterWash?): Boolean {
         map?.setOnCameraIdleListener {
-            openBottomSheet()
+            openBottomSheet(p0?.id, p0?.address, p0?.seats)
             map?.setOnCameraIdleListener {
-               
+
             }
         }
         return false
     }
 
-    private fun openBottomSheet() {
-        // todo сделать то, который будет показывать терминады
+    private fun openBottomSheet(washId: Int?, address: String?, seats: Int?) {
         childFragmentManager.run {
             val bottomSheetDialogFragment =
-                ChooseTerminalBottomSheet()
+                ChooseTerminalBottomSheet( washId!!, address = address!!, seats = seats!!)
 
             val fragment = childFragmentManager.findFragmentByTag("objectInfoFragment")
             if (fragment == null) {

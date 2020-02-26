@@ -148,7 +148,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                             LatLng(wash.coordinates[0], wash.coordinates[1]),
                             if (it) null else wash.cashback,
                             wash.happyHoursInfo.active,
-                            if (it) iconHappy else iconUnhappy
+                            if (it) iconHappy else iconUnhappy,
+                            wash.seats!!,
+                            wash.address!!
                         )
                     )
 

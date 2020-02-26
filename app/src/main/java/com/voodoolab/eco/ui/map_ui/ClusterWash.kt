@@ -8,7 +8,9 @@ class ClusterWash(
     val location: LatLng?,
     val cashback: Int?,
     val active: Boolean?,
-    var icon: Int
+    val icon: Int,
+    val seats: Int,
+    val address: String
 ) : ClusterItem {
 
     override fun getSnippet(): String? {
