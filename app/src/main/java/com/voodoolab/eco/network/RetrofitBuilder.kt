@@ -27,8 +27,24 @@ object RetrofitBuilder {
             .addCallAdapterFactory(LiveDataCallAdapterFactory())
     }
 
+
+    val checkerConnection: Retrofit.Builder by lazy {
+        Retrofit.Builder()
+            .client(httpClient.build())
+            .baseUrl("http://demo8604520.mockable.io/")
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(LiveDataCallAdapterFactory())
+    }
+
     val apiService: ApiService by lazy {
         retrofitBuilder
+            .build()
+            .create(ApiService::class.java)
+    }
+
+    val connectionInterceptor: ApiService by lazy {
+        checkerConnection
             .build()
             .create(ApiService::class.java)
     }

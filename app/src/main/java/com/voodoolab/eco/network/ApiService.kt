@@ -1,6 +1,7 @@
 package com.voodoolab.eco.network
 
 import androidx.lifecycle.LiveData
+import com.google.gson.JsonObject
 import com.voodoolab.eco.models.CityModel
 import com.voodoolab.eco.models.SetDiscountViewedResponse
 import com.voodoolab.eco.responses.*
@@ -123,4 +124,7 @@ interface ApiService {
         @Part("amount") id: Int,
         @Part("url") enableMode: Boolean = true
     ): LiveData<GenericApiResponse<UrlResponse>>
+
+    @GET("setnewvalue")
+    fun requestConnection(): Call<JsonObject>
 }

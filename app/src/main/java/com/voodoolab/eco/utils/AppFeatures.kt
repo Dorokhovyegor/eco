@@ -1,6 +1,7 @@
 package com.voodoolab.eco.utils
 
 import android.animation.Animator
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -148,7 +149,7 @@ fun ViewGroup.openFromUp(screenMetric: Float?) {
 }
 
 fun ViewGroup.closeToUp(screenMetric: Float?) {
-    this.let {animatedView ->
+    this.let { animatedView ->
         val animation = animatedView.animate()
         animatedView.visibility = View.VISIBLE
         animation.duration = 300
@@ -299,6 +300,10 @@ fun List<ObjectResponse>.convertToJson(): JsonArray? {
         jsonObject.addProperty("seats", it.seats)
         jsonArray.add(jsonObject)
     }
-    return if (jsonArray.size()>0) jsonArray else null
+    return if (jsonArray.size() > 0) jsonArray else null
+}
+
+fun Activity.connectionApply() {
+    finish()
 }
 

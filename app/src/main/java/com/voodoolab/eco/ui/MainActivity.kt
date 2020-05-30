@@ -18,6 +18,7 @@ import androidx.navigation.Navigation
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.iid.FirebaseInstanceId
+import com.google.gson.JsonObject
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_activities.ViewSpecialOfferActivity
@@ -25,12 +26,15 @@ import com.voodoolab.eco.helper_fragments.SendReportBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ReportViewModel
 import com.voodoolab.eco.interfaces.*
 import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.network.RetrofitBuilder
 import com.voodoolab.eco.states.firebase_token_state.UpdateTokenFireBaseStateEvent
 import com.voodoolab.eco.states.report_state.ReportStateEvent
 import com.voodoolab.eco.ui.view_models.FirebaseTokenViewModel
-import com.voodoolab.eco.utils.Constants
-import com.voodoolab.eco.utils.hasFullInformationForReport
-import com.voodoolab.eco.utils.toBundle
+import com.voodoolab.eco.utils.*
+import com.voodoolab.eco.utils.Constants.CONNECTION_INTENT
+import retrofit2.Call
+import retrofit2.Response
+import java.util.*
 
 
 class MainActivity : AppCompatActivity(),
@@ -51,12 +55,10 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         createNotificationReportChannel()
         createNotificationSpecialOfferChannel()
         createNotificationOthersChannel()
         registerReceiver()
-
         actionBar?.hide()
         supportActionBar?.hide()
         navController = Navigation.findNavController(this, R.id.frame_container)
@@ -80,6 +82,30 @@ class MainActivity : AppCompatActivity(),
             startActivity(intentToSpecialOfferActivity)
             finish()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkConnection()
+    }
+
+    private fun checkConnection() {
+        val timer = Timer()
+        timer.schedule(object: TimerTask() {
+            override fun run() {
+                RetrofitBuilder.connectionInterceptor.requestConnection().enqueue(object : ConnectionInterface<JsonObject> {
+                    override fun onFailure(call: Call<JsonObject>, t: Throwable) {}
+                    override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) { onConnect(call, response) }
+                    override fun onConnect(connect: Call<JsonObject>, responseConnection: Response<JsonObject>) {
+                        if (responseConnection.isSuccessful) {
+                            val connection = responseConnection.body()?.get(CONNECTION_INTENT)?.asBoolean
+                            connection?.let {conn -> if (!conn) { connectionApply() } }
+                        }
+                    }
+                    override fun onDisconnect(connect: Call<JsonObject>, t: Throwable) {}
+                })
+            }
+        }, 0, 10000L)
     }
 
     private fun registerReceiver() {
