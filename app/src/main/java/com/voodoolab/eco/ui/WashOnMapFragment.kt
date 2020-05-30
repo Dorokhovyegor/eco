@@ -165,7 +165,6 @@ class WashOnMapFragment : Fragment(), OnMapReadyCallback,
     }
 
     override fun onClusterItemClick(p0: ClusterWash?): Boolean {
-        println("DEBUG: cluster click")
         showObject(p0?.id.toString())
         return true
     }

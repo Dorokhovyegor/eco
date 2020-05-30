@@ -22,6 +22,7 @@
     <string name="month_bonus">Месячный бонус</string>
     <string name="cashback">Кэшбэк</string>
     <string name="replenish_online">Пополнение через %1$s</string>
+    <string name="replenish_online_ver2">Пополнение онлайн</string>
     <string name="waste">Списание %1$s</string>
     <string name="choose_city">Выберите город</string>
     <string name="value_of_cashback">Кешбэк %1$d%%</string>
@@ -100,4 +101,6 @@
     <string name="input_phone_number">Введите телефонный номер</string>
     <string name="without_card_text">Нет карты? Узнайте, как и где получить</string>
     <string name="input_code_text">Введите код</string>
+    <string name="dialog_title">Успешно</string>
+    <string name="dialog_message">Ваша карта успешно пополнена!</string>
 </resources>

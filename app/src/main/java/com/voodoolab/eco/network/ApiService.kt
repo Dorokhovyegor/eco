@@ -116,4 +116,11 @@ interface ApiService {
         @Part("stock_id") id: Int
     ): LiveData<GenericApiResponse<SetDiscountViewedResponse>>
 
+    @Multipart
+    @POST("api/user/replenish")
+    fun getHtmlFromServer(
+        @Header("Authorization") tokenApp: String,
+        @Part("amount") id: Int,
+        @Part("url") enableMode: Boolean = true
+    ): LiveData<GenericApiResponse<UrlResponse>>
 }

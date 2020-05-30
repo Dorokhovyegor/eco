@@ -201,7 +201,8 @@ class ProfileFragment : Fragment(),
                     citiesViewModel.setStateEvent(CitiesStateEvent.RequestCityList())
                 updateContent(it)
                 sharedViewModel.setCity(it.city)
-                sharedViewModel.setCoord(Hawk.get(it.city) as ArrayList<Double>)
+                    // todo тут падает
+                    //sharedViewModel.setCoord(Hawk.get(it.city) as ArrayList<Double>)
                 clearInfoUserModel = it.copy()
             }
         })

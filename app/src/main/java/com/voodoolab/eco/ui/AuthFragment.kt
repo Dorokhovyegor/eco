@@ -171,7 +171,6 @@ class AuthFragment : Fragment(), DataStateListener {
     }
 
     private fun subscriberCodeObservers() {
-        println("DEBUG: codeViewModel ${codeViewModel.dataState.hasObservers()}")
         codeViewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
             dataStateHandler.onDataStateChange(dataState)
             dataState.data?.let { codeViewState ->
@@ -183,7 +182,6 @@ class AuthFragment : Fragment(), DataStateListener {
             }
         })
 
-        println("DEBUG: codeViewModel ${codeViewModel.viewState.hasObservers()}")
         codeViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.codeResponse?.let {
                 if (it.status == "ok") {
@@ -222,19 +220,12 @@ class AuthFragment : Fragment(), DataStateListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        println("DEBUG: Remove observers")
         timer?.cancel()
         timer = null
         codeViewModel.dataState.removeObservers(viewLifecycleOwner)
         codeViewModel.viewState.removeObservers(viewLifecycleOwner)
-
         loginViewModel.dataState.removeObservers(viewLifecycleOwner)
         loginViewModel.viewState.removeObservers(viewLifecycleOwner)
-
-        println("DEBUG: codeviewModel dataState ${codeViewModel.dataState.hasObservers()}")
-        println("DEBUG: codeviewModel viewState ${codeViewModel.viewState.hasObservers()}")
-        println("DEBUG: loginViewModel dataState ${loginViewModel.dataState.hasObservers()}")
-        println("DEBUG: loginViewModel viewState ${loginViewModel.viewState.hasObservers()}")
     }
 
     private fun startTimer(time: Long?) {

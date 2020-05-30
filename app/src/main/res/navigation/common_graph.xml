@@ -9,6 +9,8 @@
         android:name="com.voodoolab.eco.ui.PaymentMethodFragment"
         android:label="PaymentMethodFragment">
         <action
+            app:popUpTo="@id/payment_destination"
+            app:popUpToInclusive="true"
             android:id="@+id/action_paymentMethodFragment_to_webFragment"
             app:destination="@id/webFragment" />
     </fragment>

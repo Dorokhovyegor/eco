@@ -109,8 +109,8 @@ class TransactionsRecyclerViewAdapter :
                 REPLENISH_ONLINE -> {
                     Glide.with(itemView).load(R.drawable.ic_balance_up).into(image)
                     transactionName?.text = itemView.resources.getString(
-                        R.string.replenish_online,
-                        transactionData.terminal?.name
+                       if (transactionData.terminal?.name == null) R.string.replenish_online_ver2 else R.string.replenish_online,
+                        transactionData.terminal?.name ?: ""
                     )
                     transactionValue?.text = itemView.resources.getString(
                         R.string.transaction_value_plus,

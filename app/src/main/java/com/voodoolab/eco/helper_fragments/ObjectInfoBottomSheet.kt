@@ -78,7 +78,6 @@ class ObjectInfoBottomSheet(
                 ), 0)
             }
         }
-
         cashBack?.text = Html.fromHtml(getString(R.string.cashback_info, objectInfo?.cashback), 0)
     }
 

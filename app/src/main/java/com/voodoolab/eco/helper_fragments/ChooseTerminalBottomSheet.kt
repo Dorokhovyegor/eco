@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
@@ -80,6 +82,8 @@ class ChooseTerminalBottomSheet(
                             .setTitle("Подтверждение")
                             .setMessage("Вы уверены, что хотите начать мойку по адресу ${address}, терминал №${adapterPosition+1}?")
                             .setPositiveButton("Да") { w, a ->
+                                findNavController().popBackStack(R.id.containerFragment, true)
+                                Toast.makeText(it.applicationContext, "Мойка началась", Toast.LENGTH_LONG).show()
                                 dismiss()
                             }
                             .setNegativeButton("Нет") { w, a ->
@@ -89,7 +93,6 @@ class ChooseTerminalBottomSheet(
                     }
                 }
             }
-
         }
 
         Handler().postDelayed({
