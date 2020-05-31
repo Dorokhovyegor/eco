@@ -153,8 +153,6 @@ class MainActivity : AppCompatActivity(),
 
         updateTokenViewModel.viewState.observe(this, Observer {
             it.updateTokenResponse?.let {
-                // ну типа сохранил
-                println("DEBUG: ${it.status}")
             }
         })
 
