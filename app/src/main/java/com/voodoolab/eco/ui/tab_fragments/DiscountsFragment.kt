@@ -1,27 +1,24 @@
 package com.voodoolab.eco.ui.tab_fragments
 
-import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.SpecialOffersRecyclerViewAdapter
-import com.voodoolab.eco.interfaces.DiscountClickListener
 import com.voodoolab.eco.interfaces.EmptyListInterface
 import com.voodoolab.eco.models.SpecialOfferModel
-import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.view_models.SharedCityViewModel
 import com.voodoolab.eco.ui.view_models.SpecialOffersViewModel
 import com.voodoolab.eco.utils.Constants
@@ -37,8 +34,6 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
     private var emptyListImageView: ImageView? = null
     private var emptyTextView: TextView? = null
     private var fakeContainer: LinearLayout? = null
-    private var listener: DiscountClickListener?  = null
-
     lateinit var token: String
 
     override fun onCreateView(
@@ -75,7 +70,10 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
     }
 
     private fun discountClick(data: SpecialOfferModel) {
-        listener?.onDiscountClick(data.id)
+        val bundle = bundleOf(
+            "id" to data.id
+        )
+        findNavController().navigate(R.id.action_containerFragment_to_viewDiscountFragment, bundle)
     }
 
     private fun startListeningPagedList() {
@@ -103,17 +101,5 @@ class DiscountsFragment : Fragment(), EmptyListInterface {
 
     override fun lastItemLoaded() {
 
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is MainActivity) {
-            listener = context
-        }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
     }
 }

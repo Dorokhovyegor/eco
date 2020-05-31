@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity(),
     SkipSplashScreenListener,
     AuthenticateListener,
     BalanceUpClickListener,
-    DiscountClickListener,
     LogoutListener,
     SendReportInterface {
 
@@ -235,12 +234,6 @@ class MainActivity : AppCompatActivity(),
         navController.navigate(R.id.action_containerFragment_to_payment_destination)
     }
 
-    override fun onDiscountClick(discountID: Int) {
-        val bundle = bundleOf(
-            "id" to discountID
-        )
-        navController.navigate(R.id.action_containerFragment_to_viewDiscountFragment, bundle)
-    }
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp()
