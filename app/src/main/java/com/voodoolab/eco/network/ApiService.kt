@@ -125,6 +125,6 @@ interface ApiService {
         @Part("url") enableMode: Boolean = true
     ): LiveData<GenericApiResponse<UrlResponse>>
 
-    @GET("setnewvalue")
+    @GET("/api/check")
     fun requestConnection(): Call<JsonObject>
 }

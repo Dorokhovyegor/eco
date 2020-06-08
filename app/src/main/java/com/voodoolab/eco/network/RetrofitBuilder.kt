@@ -31,7 +31,7 @@ object RetrofitBuilder {
     val checkerConnection: Retrofit.Builder by lazy {
         Retrofit.Builder()
             .client(httpClient.build())
-            .baseUrl("http://demo8604520.mockable.io/")
+            .baseUrl("http://188.225.78.188/")
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(LiveDataCallAdapterFactory())

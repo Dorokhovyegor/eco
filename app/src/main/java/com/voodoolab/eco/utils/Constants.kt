@@ -143,7 +143,7 @@ object Constants {
     val REQUEST_PARAM_PERIOD_TO ="period_to"
 
     // connection constants
-    val CONNECTION_INTENT = "connection"
+    val CONNECTION_INTENT = "value"
 
 
 
