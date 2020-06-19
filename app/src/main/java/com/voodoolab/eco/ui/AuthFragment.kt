@@ -31,6 +31,7 @@ import com.voodoolab.eco.ui.view_models.CodeViewModel
 import com.voodoolab.eco.ui.view_models.LoginViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.show
+import kotlinx.android.synthetic.main.auth_layout.*
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import ru.tinkoff.decoro.MaskImpl
 import ru.tinkoff.decoro.slots.PredefinedSlots
@@ -60,7 +61,6 @@ class AuthFragment : Fragment(), DataStateListener {
     private var authenticateListener: AuthenticateListener? = null
     private var timer: CountDownTimer? = null
 
-    // lifecycle methods ===========================================================================
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -76,7 +76,7 @@ class AuthFragment : Fragment(), DataStateListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initViews(view)
+        initViews()
         initListeners()
     }
 
@@ -93,29 +93,19 @@ class AuthFragment : Fragment(), DataStateListener {
     }
 
     //==============================================================================================
-    private fun initViews(view: View) {
-        inputNumberEditText = view.findViewById(R.id.phone_edit_text)
-        inputCodeEditText = view.findViewById(R.id.password_input_edit_text)
-        inputCodeLayout = view.findViewById(R.id.password_input_layout)
-        inputPhoneLayout = view.findViewById(R.id.phone_input_layout)
-        progressBar = view.findViewById(R.id.progress_bar)
-        infoSMSTextView = view.findViewById(R.id.smsInfo)
-        repeatSMSButton = view.findViewById(R.id.repeatButton)
-        infoCardTextView = view.findViewById(R.id.infoCardTextView)
-        getInfoAboutCardButton = view.findViewById(R.id.go_to_map_button)
+    private fun initViews() {
         setNormalLayoutParams()
-
         val mask = MaskImpl.createTerminated(PredefinedSlots.RUS_PHONE_NUMBER)
         val watcher = MaskFormatWatcher(mask)
-        inputNumberEditText?.let {
+        phone_edit_text?.let {
             watcher.installOn(it)
         }
     }
 
     private fun initListeners() {
-        repeatSMSButton?.setOnClickListener {
+        repeatButton?.setOnClickListener {
             if (getNumberFromDecorateNumber(inputNumberEditText?.text.toString())?.length == 11) {
-                repeatSMSButton?.visibility = View.INVISIBLE
+                repeatButton?.visibility = View.INVISIBLE
                 codeViewModel.setStateEvent(CodeStateEvent.RequestCodeEvent(inputNumberEditText?.text.toString()))
                 if (!codeViewModel.dataState.hasObservers() && !codeViewModel.viewState.hasObservers()) {
                     subscriberCodeObservers()
@@ -123,7 +113,7 @@ class AuthFragment : Fragment(), DataStateListener {
             }
         }
 
-        inputNumberEditText?.addTextChangedListener(object : TextWatcher {
+        phone_edit_text?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val number = getNumberFromDecorateNumber(s.toString())
                 number?.let {
@@ -145,7 +135,7 @@ class AuthFragment : Fragment(), DataStateListener {
             }
         })
 
-        inputCodeEditText?.addTextChangedListener(object : TextWatcher {
+        password_input_edit_text?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 if (s.toString().length == 6 && getNumberFromDecorateNumber(inputNumberEditText?.text.toString())?.length == 11) {
                     loginViewModel.setStateEvent(
@@ -250,32 +240,11 @@ class AuthFragment : Fragment(), DataStateListener {
     private fun setNormalLayoutParams() {
         val buttonParams = getInfoAboutCardButton?.layoutParams as ConstraintLayout.LayoutParams
         val infoCardParams = infoCardTextView?.layoutParams as ConstraintLayout.LayoutParams
-
         buttonParams.verticalBias = 1.0f
         infoCardParams.verticalBias = 1.0f
-
         getInfoAboutCardButton?.requestLayout()
         infoCardTextView?.requestLayout()
     }
-
-    /*  private fun changeViewForVisibleKeyboard(visible: Boolean) {
-          if (visible) {
-              // todo
-              val paramPhoneInput = getInfoAboutCardButton?.layoutParams as ConstraintLayout.LayoutParams
-              paramPhoneInput.verticalBias = 0.0f
-              inputPhoneLayout?.requestLayout()
-              val paramsButton = authButton?.layoutParams as ConstraintLayout.LayoutParams
-              paramsButton.verticalBias = 0.40f
-              authButton?.requestLayout()
-          } else {
-              val paramPhoneInput = inputPhoneLayout?.layoutParams as ConstraintLayout.LayoutParams
-              paramPhoneInput.verticalBias = 0.1f
-              inputPhoneLayout?.requestLayout()
-              val paramsButton = authButton?.layoutParams as ConstraintLayout.LayoutParams
-              paramsButton.verticalBias = 1f
-              authButton?.requestLayout()
-          }
-    }*/
 
     private fun handleDataStateChange(dataState: DataState<*>?) {
         dataState?.let {
@@ -285,7 +254,12 @@ class AuthFragment : Fragment(), DataStateListener {
             // handle message
             it.message?.let { event ->
                 event.getContentIfNotHandled()?.let {
-                    showSnackBar(JsonParser().parse(it).asJsonObject.get("msg").asString)
+                    try {
+                        showSnackBar(JsonParser().parse(it).asJsonObject.get("msg").asString)
+                    } catch (t: Throwable) {
+                        showSnackBar("Произошла ошибка, возможно, Вашего телефона нет в базе")
+                        t.printStackTrace()
+                    }
                 }
             }
         }
@@ -293,7 +267,7 @@ class AuthFragment : Fragment(), DataStateListener {
 
     private fun showSnackBar(message: String?) {
         message?.let {
-            Toast.makeText(context!!, message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -309,7 +283,6 @@ class AuthFragment : Fragment(), DataStateListener {
         return number
     }
 
-    // overrides methods ===========================================================================
     override fun onDataStateChange(dataState: DataState<*>?) {
         handleDataStateChange(dataState)
     }

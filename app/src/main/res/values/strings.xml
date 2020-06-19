@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ECO</string>
+    <string name="app_name">Eco car wash</string>
     <string name="next_text">Далее</string>
     <string name="skip_text">Пропустить</string>
     <string name="name_notification_channel_reports">Предлагать оставить отзыв</string>

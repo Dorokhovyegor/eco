@@ -14,9 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".helper_activities.ViewSpecialOfferActivity"></activity>
+        <activity android:name=".helper_activities.ViewSpecialOfferActivity" />
 
-        <receiver android:name=".broadcast_receivers.ReportBroadcastReceiver"></receiver>
+        <receiver android:name=".broadcast_receivers.ReportBroadcastReceiver" />
 
         <service
             android:name=".services.NotificationService"
@@ -47,7 +47,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.PaymentActivity"></activity>
     </application>
 
 </manifest>
