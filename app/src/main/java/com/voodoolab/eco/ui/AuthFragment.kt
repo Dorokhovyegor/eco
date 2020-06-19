@@ -45,19 +45,6 @@ class AuthFragment : Fragment(), DataStateListener {
     lateinit var loginViewModel: LoginViewModel
 
     var dataStateHandler: DataStateListener = this
-
-    private var inputNumberEditText: EditText? = null
-    private var inputCodeEditText: EditText? = null
-    private var inputCodeLayout: TextInputLayout? = null
-    private var inputPhoneLayout: TextInputLayout? = null
-
-    private var infoSMSTextView: TextView? = null
-    private var getInfoAboutCardButton: Button? = null
-    private var repeatSMSButton: Button? = null
-    private var infoCardTextView: TextView? = null
-
-    private var progressBar: MaterialProgressBar? = null
-
     private var authenticateListener: AuthenticateListener? = null
     private var timer: CountDownTimer? = null
 
@@ -94,7 +81,6 @@ class AuthFragment : Fragment(), DataStateListener {
 
     //==============================================================================================
     private fun initViews() {
-        setNormalLayoutParams()
         val mask = MaskImpl.createTerminated(PredefinedSlots.RUS_PHONE_NUMBER)
         val watcher = MaskFormatWatcher(mask)
         phone_edit_text?.let {
@@ -104,9 +90,9 @@ class AuthFragment : Fragment(), DataStateListener {
 
     private fun initListeners() {
         repeatButton?.setOnClickListener {
-            if (getNumberFromDecorateNumber(inputNumberEditText?.text.toString())?.length == 11) {
+            if (getNumberFromDecorateNumber(phone_edit_text.text.toString())?.length == 11) {
                 repeatButton?.visibility = View.INVISIBLE
-                codeViewModel.setStateEvent(CodeStateEvent.RequestCodeEvent(inputNumberEditText?.text.toString()))
+                codeViewModel.setStateEvent(CodeStateEvent.RequestCodeEvent(phone_edit_text.text.toString()))
                 if (!codeViewModel.dataState.hasObservers() && !codeViewModel.viewState.hasObservers()) {
                     subscriberCodeObservers()
                 }
@@ -137,10 +123,10 @@ class AuthFragment : Fragment(), DataStateListener {
 
         password_input_edit_text?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (s.toString().length == 6 && getNumberFromDecorateNumber(inputNumberEditText?.text.toString())?.length == 11) {
+                if (s.toString().length == 6 && getNumberFromDecorateNumber(phone_edit_text.text.toString())?.length == 11) {
                     loginViewModel.setStateEvent(
                         AuthStateEvent.LoginEvent(
-                            getNumberFromDecorateNumber(inputNumberEditText?.text.toString()),
+                            getNumberFromDecorateNumber(phone_edit_text.text.toString()),
                             s.toString()
                         )
                     )
@@ -175,10 +161,10 @@ class AuthFragment : Fragment(), DataStateListener {
         codeViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.codeResponse?.let {
                 if (it.status == "ok") {
-                    inputCodeEditText?.visibility = View.VISIBLE
-                    inputCodeLayout?.visibility = View.VISIBLE
-                    infoSMSTextView?.visibility = View.VISIBLE
-                    inputCodeEditText?.requestFocus()
+                    password_input_edit_text?.visibility = View.VISIBLE
+                    password_input_layout.visibility = View.VISIBLE
+                    smsInfo.visibility = View.VISIBLE
+                    password_input_edit_text?.requestFocus()
                     startTimer(it.time?.times(1000)?.toLong())
                 }
             }
@@ -222,14 +208,14 @@ class AuthFragment : Fragment(), DataStateListener {
         time?.let {
             timer = object : CountDownTimer(it, 1000) {
                 override fun onFinish() {
-                    infoSMSTextView?.visibility = View.INVISIBLE
-                    repeatSMSButton?.visibility = View.VISIBLE
+                    smsInfo.visibility = View.INVISIBLE
+                    repeatButton.visibility = View.VISIBLE
                 }
 
                 override fun onTick(millisUntilFinished: Long) {
                     val timeFormat = SimpleDateFormat("mm:ss")
                     val normalTime = timeFormat.format(millisUntilFinished)
-                    infoSMSTextView?.text =
+                    smsInfo.text =
                         Html.fromHtml(getString(R.string.time_text, normalTime), 0)
                 }
             }
@@ -237,19 +223,10 @@ class AuthFragment : Fragment(), DataStateListener {
         }
     }
 
-    private fun setNormalLayoutParams() {
-        val buttonParams = getInfoAboutCardButton?.layoutParams as ConstraintLayout.LayoutParams
-        val infoCardParams = infoCardTextView?.layoutParams as ConstraintLayout.LayoutParams
-        buttonParams.verticalBias = 1.0f
-        infoCardParams.verticalBias = 1.0f
-        getInfoAboutCardButton?.requestLayout()
-        infoCardTextView?.requestLayout()
-    }
-
     private fun handleDataStateChange(dataState: DataState<*>?) {
         dataState?.let {
             // handle loading
-            progressBar?.show(it.loading)
+            progress_bar.show(it.loading)
 
             // handle message
             it.message?.let { event ->
