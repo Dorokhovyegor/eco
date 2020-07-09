@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/discount_navigation_graph"
+    app:startDestination="@id/discountsFragment">
+    <fragment
+        android:id="@+id/discountsFragment"
+        android:name="com.voodoolab.eco.ui.tab_fragments.DiscountsFragment"
+        android:label="DiscountsFragment">
+        <action
+            android:id="@+id/action_discountsFragment_to_viewDiscountFragment"
+            app:destination="@id/viewDiscountFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewDiscountFragment"
+        android:name="com.voodoolab.eco.ui.ViewDiscountFragment"
+        android:label="ViewDiscountFragment">
+        <action
+            android:id="@+id/action_viewDiscountFragment_to_washOnMapFragment"
+            app:destination="@id/washOnMapFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_viewDiscountFragment_to_discountsFragment"
+            app:destination="@id/discountsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@navigation/discount_navigation_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/washOnMapFragment"
+        android:name="com.voodoolab.eco.ui.WashOnMapFragment"
+        android:label="WashOnMapFragment">
+        <action
+            android:id="@+id/action_washOnMapFragment_to_viewDiscountFragment"
+            app:destination="@id/viewDiscountFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_washOnMapFragment_to_discountsFragment"
+            app:destination="@id/discountsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@navigation/discount_navigation_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+</navigation>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/washing_navigation_graph"
+    app:startDestination="@id/washingFragment">
+
+    <fragment
+        android:id="@+id/washingFragment"
+        android:name="com.voodoolab.eco.ui.tab_fragments.WashingFragment"
+        android:label="WashingFragment">
+        <action
+            android:id="@+id/action_washingFragment_to_QRScannerFragment"
+            app:destination="@id/QRScannerFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_washingFragment_to_terminalPickUpFragment"
+            app:destination="@id/terminalPickUpFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/QRScannerFragment"
+        android:name="com.voodoolab.eco.ui.terminal_ui.QRScannerFragment"
+        android:label="QRScannerFragment">
+        <action
+            android:id="@+id/action_QRScannerFragment_to_washingFragment"
+            app:destination="@id/washingFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@navigation/washing_navigation_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/terminalPickUpFragment"
+        android:name="com.voodoolab.eco.ui.terminal_ui.TerminalPickUpFragment"
+        android:label="TerminalPickUpFragment">
+        <action
+            android:id="@+id/action_terminalPickUpFragment_to_washingFragment"
+            app:destination="@id/washingFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@navigation/washing_navigation_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+</navigation>

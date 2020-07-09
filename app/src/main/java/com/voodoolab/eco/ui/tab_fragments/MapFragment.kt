@@ -12,6 +12,7 @@ import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -25,13 +26,11 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_fragments.ObjectInfoBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
 import com.voodoolab.eco.interfaces.DataStateListener
-import com.voodoolab.eco.interfaces.DiscountClickListener
 import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.states.object_state.ListObjectStateEvent
 import com.voodoolab.eco.states.object_state.ObjectStateEvent
-import com.voodoolab.eco.ui.MainActivity
 import com.voodoolab.eco.ui.map_ui.ClusterWash
 import com.voodoolab.eco.ui.map_ui.DefaultWashClusterRenderer
 import com.voodoolab.eco.ui.view_models.SharedCityViewModel
@@ -49,7 +48,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     lateinit var sharedCityViewModel: SharedCityViewModel
 
     var stateHandler: DataStateListener = this
-    var discountClickListener: DiscountClickListener? = null
 
     private var map: GoogleMap? = null
     private var mapView: MapView? = null
@@ -198,7 +196,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun navigateToSpecialOffer(model: SpecialOfferModel) {
-        discountClickListener?.onDiscountClick(model.id)
+        findNavController().navigate(R.id.action_washOnMapFragment_to_viewDiscountFragment, bundleOf(
+            "id" to model.id
+        ))
     }
 
     override fun onClusterClick(p0: Cluster<ClusterWash>?): Boolean {
@@ -282,17 +282,5 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 }
             }
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is MainActivity) {
-            discountClickListener = context
-        }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        discountClickListener = null
     }
 }
