@@ -14,6 +14,7 @@ data class ObjectResponse(
     @SerializedName("coordinates") val coordinates: ArrayList<Double>?,
     @SerializedName("cashback") val cashback: Int?,
     @SerializedName("seats") val seats: Int?,
+    @SerializedName("system_id") val systemId: String,
     @SerializedName("happy-hours") val happyHoursInfo: HappyHoursModel?,
     @SerializedName("stocks") val stocks: ArrayList<SpecialOfferModel>?
 ): Parcelable

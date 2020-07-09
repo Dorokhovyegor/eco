@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity(),
                     override fun onDisconnect(connect: Call<JsonObject>, t: Throwable) {}
                 })
             }
-        }, 0, 10000L)
+        }, 0, 100000L)
     }
 
     private fun registerReceiver() {

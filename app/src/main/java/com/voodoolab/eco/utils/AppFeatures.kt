@@ -244,7 +244,7 @@ fun Intent.toBundle(): Bundle {
     return bundle
 }
 
-fun String.convertToWashModel(): WashModel {
+/*fun String.convertToWashModel(): WashModel {
     // защитить это от падения
     val washJson = JsonParser().parse(this) as JsonObject
     // get data for washModel
@@ -259,7 +259,7 @@ fun String.convertToWashModel(): WashModel {
         cashback = null,
         seats = null
     )
-}
+}*/
 
 fun View.translateYFromToViaPercent(targetY: Float, percent: Float) {
     val delta = targetY / 100f
@@ -295,6 +295,7 @@ fun List<ObjectResponse>.convertToJson(): JsonArray? {
         val jsonObject = JsonObject()
         jsonObject.addProperty("id", it.id)
         jsonObject.addProperty("full_address", "${it.city}, ${it.address}")
+        jsonObject.addProperty("system_id", it.systemId)
         jsonObject.addProperty("latitude", it.coordinates?.get(0))
         jsonObject.addProperty("longitude", it.coordinates?.get(1))
         jsonObject.addProperty("seats", it.seats)

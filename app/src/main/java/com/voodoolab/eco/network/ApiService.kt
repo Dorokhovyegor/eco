@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.google.gson.JsonObject
 import com.voodoolab.eco.models.CityModel
 import com.voodoolab.eco.models.SetDiscountViewedResponse
+import com.voodoolab.eco.models.WashStartResponse
 import com.voodoolab.eco.responses.*
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.GenericApiResponse
@@ -127,4 +128,11 @@ interface ApiService {
 
     @GET("/api/check")
     fun requestConnection(): Call<JsonObject>
+
+    @Multipart
+    @POST("api/start-wash")
+    fun startWash(
+        @Header("Authorization") tokenApp: String,
+        @Part("code") washCode: String
+    ): LiveData<GenericApiResponse<WashStartResponse>>
 }

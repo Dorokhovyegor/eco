@@ -145,6 +145,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     clusterManager?.addItem(
                         ClusterWash(
                             wash.id,
+                            wash.systemId,
                             LatLng(wash.coordinates[0], wash.coordinates[1]),
                             if (it) null else wash.cashback,
                             wash.happyHoursInfo.active,

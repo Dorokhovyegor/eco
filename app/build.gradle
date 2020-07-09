@@ -17,8 +17,8 @@ android {
         applicationId "com.voodoolab.eco"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 2
-        versionName "eco wash car name"
+        versionCode 6
+        versionName "1.0.090820"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

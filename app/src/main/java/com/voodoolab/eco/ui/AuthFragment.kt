@@ -1,6 +1,8 @@
 package com.voodoolab.eco.ui
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Editable
@@ -63,6 +65,13 @@ class AuthFragment : Fragment(), DataStateListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        try {
+            val pInfo = context?.applicationContext?.packageManager?.getPackageInfo(requireActivity().packageName, 0);
+            versionBuild.text = pInfo?.versionName;
+        } catch (e: PackageManager.NameNotFoundException ) {
+            e.printStackTrace();
+        }
+
         initViews()
         initListeners()
     }

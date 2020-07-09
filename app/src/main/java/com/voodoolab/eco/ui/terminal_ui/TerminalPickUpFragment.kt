@@ -3,12 +3,15 @@ package com.voodoolab.eco.ui.terminal_ui
 import android.Manifest
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkInfo
@@ -32,12 +35,15 @@ import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.states.object_state.ListObjectStateEvent
+import com.voodoolab.eco.states.startwash_state.StartWashStateEvent
 import com.voodoolab.eco.ui.map_ui.ClusterWash
 import com.voodoolab.eco.ui.map_ui.DefaultWashClusterRenderer
+import com.voodoolab.eco.ui.view_models.StartWashViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.convertToJson
 import com.voodoolab.eco.utils.show
 import com.voodoolab.eco.workers.CalculationNearbyWashWorker
+import kotlinx.android.synthetic.main.qr_scanner_layout.*
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -47,9 +53,11 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
     ClusterManager.OnClusterClickListener<ClusterWash>,
     ClusterManager.OnClusterItemClickListener<ClusterWash>,
     GoogleMap.OnMyLocationButtonClickListener,
-    GoogleMap.OnMyLocationClickListener {
+    GoogleMap.OnMyLocationClickListener,
+    ChooseTerminalBottomSheet.ChooseTerminalListener{
 
     lateinit var objectViewModel: ObjectInfoViewModel
+    lateinit var startWashViewModel: StartWashViewModel
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -63,17 +71,20 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
     private var clusterManager: ClusterManager<ClusterWash>? = null
 
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
-        objectViewModel = ViewModelProvider(this)[ObjectInfoViewModel::class.java]
         return inflater.inflate(R.layout.map_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        objectViewModel = ViewModelProvider(this)[ObjectInfoViewModel::class.java]
+        startWashViewModel = ViewModelProvider(this)[StartWashViewModel::class.java]
+
         progressBar = view.findViewById(R.id.progress_bar)
         mapView = view.findViewById(R.id.map_view)
         mapView?.getMapAsync(this)
@@ -95,7 +106,6 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
                 }
             }
         })
-
         objectViewModel.viewStateListObject.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.listObjectResponse?.let { list ->
                 list.list?.let { markers ->
@@ -143,10 +153,11 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
                                                         Double.MAX_VALUE
                                                     )
                                                 )
+                                                val systemId = workInfo.outputData.getString("system_id")
                                                 val seats = workInfo.outputData.getInt("seats", -1)
                                                 buildAlertDialog(
-                                                    address = address,
-                                                    washId = id,
+                                                    address = address!!,
+                                                    systemId = systemId!!,
                                                     coord = coord,
                                                     seats = seats
                                                 )
@@ -159,9 +170,13 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
                 }
             }
         })
+
+        startWashViewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
+            onDataStateChange(dataState)
+        })
     }
 
-    private fun buildAlertDialog(washId: Int, address: String?, coord: LatLng, seats: Int?) {
+    private fun buildAlertDialog(systemId: String, address: String, coord: LatLng, seats: Int) {
         context?.let {
             androidx.appcompat.app.AlertDialog.Builder(it)
                 .setTitle("Подтверждение")
@@ -175,7 +190,7 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
                     dialog.dismiss()
                     map?.animateCamera(CameraUpdateFactory.newLatLngZoom(coord, 15f))
                     map?.setOnCameraIdleListener {
-                        openBottomSheet(washId, address, seats)
+                        openBottomSheet(systemId, address, seats)
                         map?.setOnCameraIdleListener {
 
                         }
@@ -202,6 +217,7 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
                     clusterManager?.addItem(
                         ClusterWash(
                             wash.id,
+                            wash.systemId,
                             LatLng(wash.coordinates[0], wash.coordinates[1]),
                             null,
                             true,
@@ -240,8 +256,11 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
 
     override fun onDataStateChange(dataState: DataState<*>?) {
         dataState?.let {
-            it.loading
-            progressBar?.show(it.loading)
+            progress_bar.show(it.loading)
+            it.message?.getContentIfNotHandled()?.let {
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            }
         }
     }
 
@@ -271,7 +290,9 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
 
     override fun onClusterItemClick(p0: ClusterWash?): Boolean {
         map?.setOnCameraIdleListener {
-            openBottomSheet(p0?.id, p0?.address, p0?.seats)
+            p0?.let { clusterWash ->
+                openBottomSheet(clusterWash.systemId, clusterWash.address, clusterWash.seats)
+            }
             map?.setOnCameraIdleListener {
 
             }
@@ -279,11 +300,10 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
         return false
     }
 
-    private fun openBottomSheet(washId: Int?, address: String?, seats: Int?) {
+    private fun openBottomSheet(systemId: String, address: String, seats: Int) {
         childFragmentManager.run {
             val bottomSheetDialogFragment =
-                ChooseTerminalBottomSheet( washId!!, address = address!!, seats = seats!!)
-
+                ChooseTerminalBottomSheet(systemID = systemId, address = address, seats = seats)
             val fragment = childFragmentManager.findFragmentByTag("objectInfoFragment")
             if (fragment == null) {
                 bottomSheetDialogFragment.show(this, "objectInfoFragment")
@@ -299,6 +319,10 @@ class TerminalPickUpFragment : Fragment(), OnMapReadyCallback,
             outState.putBundle(MAP_VIEW_BUNDLE_KEY, mapViewBundle)
         }
         mapView?.onSaveInstanceState(mapViewBundle)
+    }
+
+    override fun onTerminalClick(code: String) {
+        startWashViewModel.setStateEvent(StartWashStateEvent.StartWashViaCode(Hawk.get<String>(Constants.TOKEN), code))
     }
 
     override fun onStart() {

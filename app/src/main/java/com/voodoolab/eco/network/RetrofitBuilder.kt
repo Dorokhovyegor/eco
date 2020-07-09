@@ -13,7 +13,7 @@ import com.google.gson.GsonBuilder
 
 object RetrofitBuilder {
 
-    const val BASE_URL = "http://eco.voodoolab.io"
+    const val BASE_URL = "http://loyalty.myeco24.ru/"
 
     val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
     val httpClient = OkHttpClient.Builder().addInterceptor(logging)

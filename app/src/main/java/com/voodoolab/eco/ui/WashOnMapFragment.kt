@@ -112,6 +112,7 @@ class WashOnMapFragment : Fragment(), OnMapReadyCallback,
                 clusterManager?.addItem(
                     ClusterWash(
                         washModel.id,
+                        washModel.systemId!!,
                         LatLng(washModel.coordinates[0], washModel.coordinates[1]),
                         null,
                         true,

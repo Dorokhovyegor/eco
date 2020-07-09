@@ -92,8 +92,6 @@ class PaymentMethodFragment : Fragment(), DataStateListener {
         paymentViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             if (viewState.paymentHtml != null) {
                 // todo здесь переходим на соседний fragment
-                // what is going on here?
-                Log.e("PaymentFragment", "sss")
                 findNavController().navigate(R.id.action_paymentMethodFragment_to_webFragment, bundleOf("html" to viewState.paymentHtml))
             }
         })

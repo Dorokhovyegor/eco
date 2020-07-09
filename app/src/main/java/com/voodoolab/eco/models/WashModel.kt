@@ -11,5 +11,6 @@ data class WashModel(
     @SerializedName("address") val address: String?,
     @SerializedName("coordinates") val coordinates: ArrayList<Double>?,
     @SerializedName("cashback") val cashback: Int?,
+    @SerializedName("system_id") val systemId: String?,
     @SerializedName("seats") val seats: Int?
 ): Parcelable

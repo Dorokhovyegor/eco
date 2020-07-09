@@ -28,11 +28,13 @@ class CalculationNearbyWashWorker(var context: Context, var workerParameters: Wo
                 var nearbyLatitude: Double = Double.MAX_VALUE
                 var nearbyLongitude: Double = Double.MAX_VALUE
                 var seats: Int = Int.MAX_VALUE
+                var systemId: String? = null
 
                 array?.forEach { element ->
                     element as JsonObject
                     val id = element.get("id").asInt
                     val fullAddress = element.get("full_address").asString
+                    systemId = element.get("system_id").asString
                     val currentSeats = element.get("seats").asInt
                     val washLocation = Location("")
                     washLocation.longitude = element.get("longitude").asDouble
@@ -52,6 +54,7 @@ class CalculationNearbyWashWorker(var context: Context, var workerParameters: Wo
                         .putDouble("latitude", nearbyLatitude)
                         .putDouble("longitude", nearbyLongitude)
                         .putString("address", nearbyAddress)
+                        .putString("system_id", systemId)
                         .putInt("id", nearbyWashId)
                         .putInt("seats", seats)
                         .build()
