@@ -1,9 +1,9 @@
-package com.voodoolab.eco.repositories
+package com.voodoolab.eco.repositories.auth
 
 import androidx.lifecycle.LiveData
-import com.voodoolab.eco.network.DataState
-import com.voodoolab.eco.network.NetworkBoundResource
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.network.RetrofitBuilder
+import com.voodoolab.eco.repositories.NetworkBoundResource
 import com.voodoolab.eco.responses.LoginResponse
 import com.voodoolab.eco.states.auth_state.AuthViewState
 import com.voodoolab.eco.utils.ApiSuccessResponse

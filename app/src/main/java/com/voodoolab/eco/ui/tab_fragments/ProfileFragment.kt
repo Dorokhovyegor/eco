@@ -27,7 +27,7 @@ import com.voodoolab.eco.interfaces.BalanceUpClickListener
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.interfaces.ParamsTransactionChangeListener
 import com.voodoolab.eco.models.ClearUserModel
-import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.responses.CitiesResponse
 import com.voodoolab.eco.states.cities_state.CitiesStateEvent
 import com.voodoolab.eco.states.logout_state.LogoutStateEvent

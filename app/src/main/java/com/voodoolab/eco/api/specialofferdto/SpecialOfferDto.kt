@@ -1,10 +1,10 @@
-package com.voodoolab.eco.responses
+package com.voodoolab.eco.api.specialofferdto
 
 
 import com.google.gson.annotations.SerializedName
 import com.voodoolab.eco.models.WashModel
 
-data class DiscountResponse(
+data class SpecialOfferDto(
     @SerializedName("cashback")
     val cashback: Int?,
     @SerializedName("finished_at")

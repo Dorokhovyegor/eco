@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -25,7 +24,6 @@ import com.voodoolab.eco.helper_activities.ViewSpecialOfferActivity
 import com.voodoolab.eco.helper_fragments.SendReportBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ReportViewModel
 import com.voodoolab.eco.interfaces.*
-import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.network.RetrofitBuilder
 import com.voodoolab.eco.states.firebase_token_state.UpdateTokenFireBaseStateEvent
 import com.voodoolab.eco.states.report_state.ReportStateEvent

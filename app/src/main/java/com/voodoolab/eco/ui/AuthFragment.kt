@@ -2,7 +2,6 @@ package com.voodoolab.eco.ui
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Editable
@@ -11,22 +10,15 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.JsonParser
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.AuthenticateListener
 import com.voodoolab.eco.interfaces.DataStateListener
-import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.states.auth_state.AuthStateEvent
 import com.voodoolab.eco.states.code_state.CodeStateEvent
 import com.voodoolab.eco.ui.view_models.CodeViewModel
@@ -34,12 +26,10 @@ import com.voodoolab.eco.ui.view_models.LoginViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.show
 import kotlinx.android.synthetic.main.auth_layout.*
-import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import ru.tinkoff.decoro.MaskImpl
 import ru.tinkoff.decoro.slots.PredefinedSlots
 import ru.tinkoff.decoro.watchers.MaskFormatWatcher
 import java.text.SimpleDateFormat
-import kotlin.math.log
 
 class AuthFragment : Fragment(), DataStateListener {
 
@@ -69,9 +59,8 @@ class AuthFragment : Fragment(), DataStateListener {
             val pInfo = context?.applicationContext?.packageManager?.getPackageInfo(requireActivity().packageName, 0);
             versionBuild.text = pInfo?.versionName;
         } catch (e: PackageManager.NameNotFoundException ) {
-            e.printStackTrace();
+            e.printStackTrace()
         }
-
         initViews()
         initListeners()
     }
@@ -88,7 +77,6 @@ class AuthFragment : Fragment(), DataStateListener {
         authenticateListener = null
     }
 
-    //==============================================================================================
     private fun initViews() {
         val mask = MaskImpl.createTerminated(PredefinedSlots.RUS_PHONE_NUMBER)
         val watcher = MaskFormatWatcher(mask)

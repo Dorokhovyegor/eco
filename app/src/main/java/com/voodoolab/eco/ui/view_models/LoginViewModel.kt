@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.voodoolab.eco.network.DataState
-import com.voodoolab.eco.repositories.AuthRepo
+import com.voodoolab.eco.ui.DataState
+import com.voodoolab.eco.repositories.auth.AuthRepo
 import com.voodoolab.eco.responses.LoginResponse
 import com.voodoolab.eco.states.auth_state.AuthStateEvent
 import com.voodoolab.eco.states.auth_state.AuthViewState

@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.voodoolab.eco.models.SetDiscountViewedResponse
-import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.repositories.ViewDiscountRepo
 import com.voodoolab.eco.states.view_discounts_state.SetViewedDiscountStateEvent
 import com.voodoolab.eco.states.view_discounts_state.ViewDiscountStateView

@@ -4,11 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.voodoolab.eco.models.CityModel
-import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.repositories.CitiesRepo
 import com.voodoolab.eco.responses.CitiesResponse
-import com.voodoolab.eco.responses.UpdateCityResponse
 import com.voodoolab.eco.states.cities_state.CitiesStateEvent
 import com.voodoolab.eco.states.cities_state.CitiesViewState
 import com.voodoolab.eco.utils.AbsentLiveData

@@ -2,8 +2,7 @@ package com.voodoolab.eco.repositories
 
 import androidx.lifecycle.LiveData
 import com.voodoolab.eco.models.WashStartResponse
-import com.voodoolab.eco.network.DataState
-import com.voodoolab.eco.network.NetworkBoundResource
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.network.RetrofitBuilder
 import com.voodoolab.eco.states.startwash_state.StartWashViewState
 import com.voodoolab.eco.utils.ApiSuccessResponse

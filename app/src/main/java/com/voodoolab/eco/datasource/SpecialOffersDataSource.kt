@@ -3,7 +3,7 @@ package com.voodoolab.eco.datasource
 import androidx.paging.PageKeyedDataSource
 import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.network.RetrofitBuilder
-import com.voodoolab.eco.responses.SpecialOffersResponse
+import com.voodoolab.eco.api.specialofferdto.ListSpecialOfferDto
 import retrofit2.Call
 import retrofit2.Response
 import java.lang.reflect.InvocationTargetException
@@ -27,18 +27,18 @@ class SpecialOffersDataSource(val token: String, val city: String?) :
             FIRST_PAGE.toString(),
             QUANTITY.toString()
         ).enqueue(
-            object : retrofit2.Callback<SpecialOffersResponse> {
-                override fun onFailure(call: Call<SpecialOffersResponse>, t: Throwable) {
+            object : retrofit2.Callback<ListSpecialOfferDto> {
+                override fun onFailure(call: Call<ListSpecialOfferDto>, t: Throwable) {
                     t.printStackTrace()
                     println("DEBUG: i am fail")
                 }
 
                 override fun onResponse(
-                    call: Call<SpecialOffersResponse>,
-                    response: Response<SpecialOffersResponse>
+                    call: Call<ListSpecialOfferDto>,
+                    dtoList: Response<ListSpecialOfferDto>
                 ) {
                     println("DEBUG: i am good")
-                    response.body()?.let { responseList ->
+                    dtoList.body()?.let { responseList ->
                         val convertResponse = ArrayList<SpecialOfferModel>()
                         responseList.offers?.forEach {
                             convertResponse.add(
@@ -73,17 +73,17 @@ class SpecialOffersDataSource(val token: String, val city: String?) :
             params.key.toString(),
             QUANTITY.toString()
         )
-            .enqueue(object : retrofit2.Callback<SpecialOffersResponse> {
-                override fun onFailure(call: Call<SpecialOffersResponse>, t: Throwable) {
+            .enqueue(object : retrofit2.Callback<ListSpecialOfferDto> {
+                override fun onFailure(call: Call<ListSpecialOfferDto>, t: Throwable) {
                     t.printStackTrace()
                 }
 
                 override fun onResponse(
-                    call: Call<SpecialOffersResponse>,
-                    response: Response<SpecialOffersResponse>
+                    call: Call<ListSpecialOfferDto>,
+                    dtoList: Response<ListSpecialOfferDto>
                 ) {
                     val key = params.key + 1
-                    response.body()?.let { specialOffersResponse ->
+                    dtoList.body()?.let { specialOffersResponse ->
                         val convertResponse = ArrayList<SpecialOfferModel>()
                         specialOffersResponse.offers?.forEach {
                             convertResponse.add(

@@ -18,7 +18,7 @@ import com.budiyev.android.codescanner.DecodeCallback
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.DataStateListener
-import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.states.startwash_state.StartWashStateEvent
 import com.voodoolab.eco.ui.view_models.StartWashViewModel
 import com.voodoolab.eco.utils.*

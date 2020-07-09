@@ -1,11 +1,11 @@
-package com.voodoolab.eco.responses
+package com.voodoolab.eco.api.specialofferdto
 
 import com.google.gson.annotations.SerializedName
 import com.voodoolab.eco.models.SpecialOfferModel
 
-data class SpecialOffersResponse(
+data class ListSpecialOfferDto(
     @SerializedName("current_page") val page: Int,
-    @SerializedName("data") val offers: ArrayList<SpecialOfferModel>?,
+    @SerializedName("data") val offers: List<SpecialOfferModel>?,
     @SerializedName("first_page_url") val firstPageUrl: String?,
     @SerializedName("from") val from: Int,
     @SerializedName("last_page") val lastPage: Int?,

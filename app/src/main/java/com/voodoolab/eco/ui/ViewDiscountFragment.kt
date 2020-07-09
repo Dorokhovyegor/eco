@@ -22,9 +22,8 @@ import com.voodoolab.eco.adapters.WashAdapterRecyclerView
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.models.WashModel
-import com.voodoolab.eco.network.DataState
-import com.voodoolab.eco.states.discount_state.DiscountStateEvent
-import com.voodoolab.eco.ui.view_models.DiscountViewModel
+import com.voodoolab.eco.states.discount_state.SpecialOfferStateEvent
+import com.voodoolab.eco.ui.specialoffers.viewmodel.SpecialOfferViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.show
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
@@ -32,7 +31,7 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 class ViewDiscountFragment : Fragment(), DataStateListener {
 
     var dataStateHandler: DataStateListener = this
-    lateinit var discountViewModel: DiscountViewModel
+    lateinit var specialOfferViewModel: SpecialOfferViewModel
 
     private var titleTextView: TextView? = null
     private var bodyTextView: TextView? = null
@@ -55,7 +54,7 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
             val model = arguments?.getParcelable<SpecialOfferModel>("offer_model")
             discountId = model?.id
         }
-        discountViewModel = ViewModelProvider(this).get(DiscountViewModel::class.java)
+        specialOfferViewModel = ViewModelProvider(this).get(SpecialOfferViewModel::class.java)
         return inflater.inflate(R.layout.discount_layout, container, false)
     }
 
@@ -81,18 +80,18 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
     }
 
     private fun subscribeObservers() {
-        discountViewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
+        specialOfferViewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
             dataStateHandler.onDataStateChange(dataState)
             dataState.data?.let { viewState ->
                 viewState.getContentIfNotHandled()?.let {
                     it.discountResponse?.let {
-                        discountViewModel.setDiscountResponse(it)
+                        specialOfferViewModel.setDiscountResponse(it)
                     }
                 }
             }
         })
 
-        discountViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
+        specialOfferViewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState.discountResponse?.let { response ->
                 titleTextView?.text = response.title
                 bodyTextView?.text = response.text
@@ -122,7 +121,7 @@ class ViewDiscountFragment : Fragment(), DataStateListener {
 
     private fun triggerEvent(id: Int) {
         val token = "Bearer ${Hawk.get<String>(Constants.TOKEN)}"
-        discountViewModel.setStateEvent(DiscountStateEvent.RequestDiscountById(token, id))
+        specialOfferViewModel.setStateEvent(SpecialOfferStateEvent.RequestSpecialOfferById(token, id))
     }
 
     private fun washClicked(washModel: WashModel) {

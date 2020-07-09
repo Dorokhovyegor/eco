@@ -3,12 +3,9 @@ package com.voodoolab.eco.helper_activities
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -17,11 +14,11 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.adapters.WashAdapterRecyclerView
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.models.WashModel
-import com.voodoolab.eco.network.DataState
-import com.voodoolab.eco.responses.DiscountResponse
-import com.voodoolab.eco.states.discount_state.DiscountStateEvent
+import com.voodoolab.eco.ui.DataState
+import com.voodoolab.eco.api.specialofferdto.SpecialOfferDto
+import com.voodoolab.eco.states.discount_state.SpecialOfferStateEvent
 import com.voodoolab.eco.states.view_discounts_state.SetViewedDiscountStateEvent
-import com.voodoolab.eco.ui.view_models.DiscountViewModel
+import com.voodoolab.eco.ui.specialoffers.viewmodel.SpecialOfferViewModel
 import com.voodoolab.eco.ui.view_models.ViewDiscountViewModel
 import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.show
@@ -29,7 +26,7 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
 class ViewSpecialOfferActivity : AppCompatActivity(), DataStateListener {
 
-    lateinit var specialOfferViewModel: DiscountViewModel
+    lateinit var specialOfferViewModel: SpecialOfferViewModel
     lateinit var viewDiscountViewModel: ViewDiscountViewModel
 
     var progressBar: MaterialProgressBar? = null
@@ -49,14 +46,14 @@ class ViewSpecialOfferActivity : AppCompatActivity(), DataStateListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.discount_layout)
-        specialOfferViewModel = ViewModelProvider(this)[DiscountViewModel::class.java]
+        specialOfferViewModel = ViewModelProvider(this)[SpecialOfferViewModel::class.java]
         viewDiscountViewModel = ViewModelProvider(this)[ViewDiscountViewModel::class.java]
 
         initViews()
         retrieveSpecialOfferId()
         val token = Hawk.get<String>(Constants.TOKEN)
         specialOfferId?.let {
-            specialOfferViewModel.setStateEvent(DiscountStateEvent.RequestDiscountById(token, it))
+            specialOfferViewModel.setStateEvent(SpecialOfferStateEvent.RequestSpecialOfferById(token, it))
             viewDiscountViewModel.setStateEvent(SetViewedDiscountStateEvent.ViewDiscountStateEvent(token, it
             ))
         }
@@ -77,16 +74,16 @@ class ViewSpecialOfferActivity : AppCompatActivity(), DataStateListener {
         specialOfferImageView = findViewById(R.id.discountImageView)
     }
 
-    private fun setContent(discountResponse: DiscountResponse?) {
-        titleSpecialOffer?.text = discountResponse?.title
-        bodyTextSpecialOffer?.text = discountResponse?.text
+    private fun setContent(specialOfferDto: SpecialOfferDto?) {
+        titleSpecialOffer?.text = specialOfferDto?.title
+        bodyTextSpecialOffer?.text = specialOfferDto?.text
 
         specialOfferImageView?.let {
-            Glide.with(this).load(discountResponse?.logo).into(it)
+            Glide.with(this).load(specialOfferDto?.logo).into(it)
         }
 
         adapterRecyclerView =
-            WashAdapterRecyclerView(discountResponse?.washes) { model: WashModel ->
+            WashAdapterRecyclerView(specialOfferDto?.washes) { model: WashModel ->
                 washClicked(model)
             }
         listWashes?.adapter = adapterRecyclerView

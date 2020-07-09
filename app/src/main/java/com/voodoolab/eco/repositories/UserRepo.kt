@@ -2,12 +2,9 @@ package com.voodoolab.eco.repositories
 
 import androidx.lifecycle.LiveData
 import com.voodoolab.eco.models.ClearUserModel
-import com.voodoolab.eco.models.Data
-import com.voodoolab.eco.network.DataState
-import com.voodoolab.eco.network.NetworkBoundResource
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.network.RetrofitBuilder
 import com.voodoolab.eco.responses.LogoutResponse
-import com.voodoolab.eco.responses.UpdateNameResponse
 import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.states.logout_state.LogoutViewState
 import com.voodoolab.eco.states.user_state.UserViewState

@@ -15,13 +15,12 @@ import com.voodoolab.eco.R
 
 class BottomNavController(
     val context: Context,
-    @IdRes val containerId: Int,  // host id (In the mainActivity it is nav_host_fragment)
+    @IdRes val containerId: Int,
     @IdRes val appStartDestinationId: Int,
     val graphChangeListener: OnNavigationGraphChanged?,
     val navGraphProvider: NavGraphProvider
 ) {
 
-    val TAG = this.javaClass.canonicalName
     lateinit var activity: Activity
     lateinit var fragmentManager: FragmentManager
     lateinit var navItemChangeListener: OnNavigationItemChanged

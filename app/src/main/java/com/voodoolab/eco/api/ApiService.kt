@@ -1,12 +1,12 @@
-package com.voodoolab.eco.network
+package com.voodoolab.eco.api
 
 import androidx.lifecycle.LiveData
 import com.google.gson.JsonObject
-import com.voodoolab.eco.models.CityModel
+import com.voodoolab.eco.api.specialofferdto.SpecialOfferDto
+import com.voodoolab.eco.api.specialofferdto.ListSpecialOfferDto
 import com.voodoolab.eco.models.SetDiscountViewedResponse
 import com.voodoolab.eco.models.WashStartResponse
 import com.voodoolab.eco.responses.*
-import com.voodoolab.eco.utils.Constants
 import com.voodoolab.eco.utils.GenericApiResponse
 import retrofit2.Call
 import retrofit2.http.*
@@ -78,15 +78,15 @@ interface ApiService {
     fun getSpecialOffers(
         @Header("Authorization") tokenApp: String,
         @Query("city") city: String?,
-        @Query("page") page: String,
-        @Query("qty") qty: String
-    ): Call<SpecialOffersResponse>
+        @Query("page") page: Int,
+        @Query("qty") qty: Int
+    ): LiveData<GenericApiResponse<ListSpecialOfferDto>>
 
     @GET("api/stock/{id}")
     fun getSpecialOfferById(
         @Header("Authorization") tokenApp: String,
         @Path("id") discountId: Int
-    ): LiveData<GenericApiResponse<DiscountResponse>>
+    ): LiveData<GenericApiResponse<SpecialOfferDto>>
 
     @GET("api/user/logout")
     fun logout(

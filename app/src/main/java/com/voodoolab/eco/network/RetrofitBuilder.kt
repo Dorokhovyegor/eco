@@ -1,14 +1,12 @@
 package com.voodoolab.eco.network
 
-import com.google.gson.Gson
 import com.voodoolab.eco.utils.LiveDataCallAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import com.google.gson.GsonBuilder
-
+import com.voodoolab.eco.api.ApiService
 
 
 object RetrofitBuilder {

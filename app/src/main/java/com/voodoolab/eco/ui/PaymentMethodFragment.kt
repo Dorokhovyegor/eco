@@ -1,22 +1,18 @@
 package com.voodoolab.eco.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.textfield.TextInputEditText
 import com.orhanobut.hawk.Hawk
 import com.voodoolab.eco.R
 import com.voodoolab.eco.interfaces.DataStateListener
-import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.states.payment_state.PaymentStateEvent
 import com.voodoolab.eco.ui.view_models.PaymentViewModel
 import com.voodoolab.eco.utils.Constants

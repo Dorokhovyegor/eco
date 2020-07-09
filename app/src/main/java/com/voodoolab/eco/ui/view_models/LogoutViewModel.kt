@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.repositories.UserRepo
 import com.voodoolab.eco.responses.LogoutResponse
 import com.voodoolab.eco.states.logout_state.LogoutStateEvent

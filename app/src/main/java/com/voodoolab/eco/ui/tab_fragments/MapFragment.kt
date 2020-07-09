@@ -1,7 +1,5 @@
 package com.voodoolab.eco.ui.tab_fragments
 
-import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,7 +25,7 @@ import com.voodoolab.eco.helper_fragments.ObjectInfoBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.models.SpecialOfferModel
-import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.states.object_state.ListObjectStateEvent
 import com.voodoolab.eco.states.object_state.ObjectStateEvent

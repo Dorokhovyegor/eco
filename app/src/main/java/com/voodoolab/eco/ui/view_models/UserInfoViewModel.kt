@@ -5,15 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.voodoolab.eco.models.ClearUserModel
-import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.repositories.CitiesRepo
 import com.voodoolab.eco.repositories.UserRepo
-import com.voodoolab.eco.responses.UpdateNameResponse
-import com.voodoolab.eco.responses.UserInfoResponse
 import com.voodoolab.eco.states.user_state.UserStateEvent
 import com.voodoolab.eco.states.user_state.UserViewState
-import com.voodoolab.eco.utils.AbsentLiveData
-import java.lang.ArithmeticException
 
 class UserInfoViewModel : ViewModel() {
 

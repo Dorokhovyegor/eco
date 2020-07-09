@@ -3,7 +3,6 @@ package com.voodoolab.eco.ui.terminal_ui
 import android.Manifest
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +31,7 @@ import com.voodoolab.eco.R
 import com.voodoolab.eco.helper_fragments.ChooseTerminalBottomSheet
 import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
 import com.voodoolab.eco.interfaces.DataStateListener
-import com.voodoolab.eco.network.DataState
+import com.voodoolab.eco.ui.DataState
 import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.states.object_state.ListObjectStateEvent
 import com.voodoolab.eco.states.startwash_state.StartWashStateEvent

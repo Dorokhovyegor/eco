@@ -24,7 +24,6 @@ import com.voodoolab.eco.helper_fragments.view_models.ObjectInfoViewModel
 import com.voodoolab.eco.interfaces.DataStateListener
 import com.voodoolab.eco.models.SpecialOfferModel
 import com.voodoolab.eco.models.WashModel
-import com.voodoolab.eco.network.DataState
 import com.voodoolab.eco.responses.ObjectResponse
 import com.voodoolab.eco.states.object_state.ObjectStateEvent
 import com.voodoolab.eco.ui.map_ui.ClusterWash
